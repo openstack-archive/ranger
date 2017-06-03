@@ -1,0 +1,4 @@
+#!/bin/bash
+
+#rm -rf /opt/app/orm/keystone_utils
+#echo "Deleting /opt/app/orm/keystone_utils directory."
