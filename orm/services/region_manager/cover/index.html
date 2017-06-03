@@ -1,0 +1,455 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Coverage report</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.ba-throttle-debounce.min.js"></script>
+    <script type="text/javascript" src="jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="coverage_html.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(coverage.index_ready);
+    </script>
+</head>
+<body class="indexfile">
+
+<div id="header">
+    <div class="content">
+        <h1>Coverage report:
+            <span class="pc_cov">88%</span>
+        </h1>
+
+        <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+
+        <form id="filter_container">
+            <input id="filter" type="text" value="" placeholder="filter..." />
+        </form>
+    </div>
+</div>
+
+<div class="help_panel">
+    <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
+    <p class="legend">Hot-keys on this page</p>
+    <div>
+    <p class="keyhelp">
+        <span class="key">n</span>
+        <span class="key">s</span>
+        <span class="key">m</span>
+        <span class="key">x</span>
+        
+        <span class="key">c</span> &nbsp; change column sorting
+    </p>
+    </div>
+</div>
+
+<div id="index">
+    <table class="index">
+        <thead>
+            
+            <tr class="tablehead" title="Click to sort">
+                <th class="name left headerSortDown shortkey_n">Module</th>
+                <th class="shortkey_s">statements</th>
+                <th class="shortkey_m">missing</th>
+                <th class="shortkey_x">excluded</th>
+                
+                <th class="right shortkey_c">coverage</th>
+            </tr>
+        </thead>
+        
+        <tfoot>
+            <tr class="total">
+                <td class="name left">Total</td>
+                <td>1287</td>
+                <td>160</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="1127 1287">88%</td>
+            </tr>
+        </tfoot>
+        <tbody>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms___init___py.html">rms/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers___init___py.html">rms/controllers/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_configuration_py.html">rms/controllers/configuration.py</a></td>
+                <td>17</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="17 17">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_lcp_controller_py.html">rms/controllers/lcp_controller.py</a></td>
+                <td>56</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="56 56">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_logs_py.html">rms/controllers/logs.py</a></td>
+                <td>36</td>
+                <td>2</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="34 36">94%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_root_py.html">rms/controllers/root.py</a></td>
+                <td>12</td>
+                <td>1</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="11 12">92%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_v2___init___py.html">rms/controllers/v2/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_v2_orm___init___py.html">rms/controllers/v2/orm/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_v2_orm_resources___init___py.html">rms/controllers/v2/orm/resources/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_v2_orm_resources_groups_py.html">rms/controllers/v2/orm/resources/groups.py</a></td>
+                <td>124</td>
+                <td>22</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="102 124">82%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_v2_orm_resources_metadata_py.html">rms/controllers/v2/orm/resources/metadata.py</a></td>
+                <td>85</td>
+                <td>19</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="66 85">78%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_v2_orm_resources_regions_py.html">rms/controllers/v2/orm/resources/regions.py</a></td>
+                <td>187</td>
+                <td>5</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="182 187">97%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_v2_orm_resources_status_py.html">rms/controllers/v2/orm/resources/status.py</a></td>
+                <td>47</td>
+                <td>3</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="44 47">94%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_v2_orm_root_py.html">rms/controllers/v2/orm/root.py</a></td>
+                <td>5</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="5 5">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_controllers_v2_root_py.html">rms/controllers/v2/root.py</a></td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="3 3">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock___init___py.html">rms/external_mock/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_audit_client___init___py.html">rms/external_mock/audit_client/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_audit_client_api___init___py.html">rms/external_mock/audit_client/api/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_audit_client_api_audit_py.html">rms/external_mock/audit_client/api/audit.py</a></td>
+                <td>4</td>
+                <td>4</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 4">0%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_keystone_utils___init___py.html">rms/external_mock/keystone_utils/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_keystone_utils_tokens_py.html">rms/external_mock/keystone_utils/tokens.py</a></td>
+                <td>5</td>
+                <td>1</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="4 5">80%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_orm_common___init___py.html">rms/external_mock/orm_common/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_orm_common_policy___init___py.html">rms/external_mock/orm_common/policy/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_orm_common_policy_policy_py.html">rms/external_mock/orm_common/policy/policy.py</a></td>
+                <td>6</td>
+                <td>2</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="4 6">67%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_orm_common_utils___init___py.html">rms/external_mock/orm_common/utils/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_orm_common_utils_api_error_utils_py.html">rms/external_mock/orm_common/utils/api_error_utils.py</a></td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="1 2">50%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_external_mock_orm_common_utils_utils_py.html">rms/external_mock/orm_common/utils/utils.py</a></td>
+                <td>6</td>
+                <td>1</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="5 6">83%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_model___init___py.html">rms/model/__init__.py</a></td>
+                <td>3</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="3 3">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_model_model_py.html">rms/model/model.py</a></td>
+                <td>100</td>
+                <td>7</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="93 100">93%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_model_url_parm_py.html">rms/model/url_parm.py</a></td>
+                <td>63</td>
+                <td>4</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="59 63">94%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_services___init___py.html">rms/services/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_services_error_base_py.html">rms/services/error_base.py</a></td>
+                <td>18</td>
+                <td>2</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="16 18">89%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_services_services_py.html">rms/services/services.py</a></td>
+                <td>170</td>
+                <td>55</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="115 170">68%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_storage___init___py.html">rms/storage/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_storage_base_data_manager_py.html">rms/storage/base_data_manager.py</a></td>
+                <td>24</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="24 24">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_storage_data_manager_factory_py.html">rms/storage/data_manager_factory.py</a></td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="12 12">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_storage_my_sql___init___py.html">rms/storage/my_sql/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_storage_my_sql_data_manager_py.html">rms/storage/my_sql/data_manager.py</a></td>
+                <td>270</td>
+                <td>31</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="239 270">89%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_utils___init___py.html">rms/utils/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rms_utils_authentication_py.html">rms/utils/authentication.py</a></td>
+                <td>32</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="32 32">100%</td>
+            </tr>
+            
+        </tbody>
+    </table>
+
+    <p id="no_rows">
+        No items found using the specified filter.
+    </p>
+</div>
+
+<div id="footer">
+    <div class="content">
+        <p>
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.3.4</a>,
+            created at 2017-03-13 02:18
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

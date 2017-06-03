@@ -1,0 +1,296 @@
+---
+swagger: "2.0"
+info:
+  description: "RDS API"
+  version: "1.0.0"
+  title: "RDS API"
+host: "server"
+basePath: "/v1"
+schemes:
+- "http"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /resources:
+    post:
+      tags:
+      - "Resources"
+      summary: "New Resource"
+      description: "Creates new resource\n"
+      operationId: "resourcesPOST"
+      parameters:
+      - in: "body"
+        name: "resource"
+        description: "The new resource"
+        required: true
+        schema:
+          $ref: "#/definitions/Resource"
+      responses:
+        201:
+          description: "Created"
+          schema:
+            $ref: "#/definitions/CreatedResource"
+        default:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Resources"
+    delete:
+      tags:
+      - "Resources"
+      summary: "Update resource"
+      description: "Update resource\n"
+      operationId: "resourcesDELETE"
+      parameters:
+      - in: "body"
+        name: "resource"
+        description: "The new resource to update"
+        required: true
+        schema:
+          $ref: "#/definitions/Resource"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "string"
+        default:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Resources"
+  /status:
+    post:
+      tags:
+      - "Status"
+      summary: "New resource status"
+      description: "Creates new resource status\n"
+      operationId: "statusPOST"
+      parameters:
+      - in: "body"
+        name: "status_input"
+        description: "New resoure status"
+        required: true
+        schema:
+          $ref: "#/definitions/StatusInput"
+      responses:
+        201:
+          description: "Created"
+        default:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Status"
+  /status/resource/{id}:
+    get:
+      tags:
+      - "Status"
+      summary: "Get resource status"
+      description: "Get resource status\n"
+      operationId: "statusResourceIdGET"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "resource id"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "resource status"
+          schema:
+            $ref: "#/definitions/ResourceStatus"
+        default:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Status"
+definitions:
+  Resource:
+    type: "object"
+    required:
+    - "service_template"
+    properties:
+      service_template:
+        $ref: "#/definitions/ResourceData"
+  ResourceData:
+    type: "object"
+    required:
+    - "model"
+    - "resource"
+    - "tracking"
+    properties:
+      resource:
+        $ref: "#/definitions/ResourceTypeData"
+      model:
+        type: "string"
+        description: "model"
+      tracking:
+        $ref: "#/definitions/TrackingData"
+  ResourceTypeData:
+    type: "object"
+    required:
+    - "resource_type"
+    properties:
+      resource_type:
+        type: "string"
+        description: "resource type"
+      resource_id:
+        type: "string"
+        description: "resource id"
+  TrackingData:
+    type: "object"
+    required:
+    - "external_id"
+    - "tracking_id"
+    properties:
+      external_id:
+        type: "string"
+        description: "external id"
+      tracking_id:
+        type: "string"
+        description: "tracking id"
+  CreatedResource:
+    type: "object"
+    required:
+    - "id"
+    - "links"
+    properties:
+      id:
+        type: "string"
+        description: "id"
+      created:
+        type: "string"
+        description: "tracking id"
+      links:
+        $ref: "#/definitions/links"
+      updated:
+        type: "string"
+        description: "tracking id"
+      err:
+        type: "string"
+        description: "tracking id"
+      message:
+        type: "string"
+        description: "tracking id"
+  links:
+    type: "object"
+    required:
+    - "self"
+    properties:
+      self:
+        type: "string"
+        description: "self"
+  Error:
+    type: "object"
+    properties:
+      faultcode:
+        type: "string"
+      faultstring:
+        type: "string"
+      debuginfo:
+        type: "string"
+  StatusInput:
+    type: "object"
+    required:
+    - "rds_listener"
+    properties:
+      rds_listener:
+        $ref: "#/definitions/StatusResourceData"
+  StatusResourceData:
+    type: "object"
+    required:
+    - "error-code"
+    - "error-msg"
+    - "ord-notifier-id"
+    - "region"
+    - "request-id"
+    - "resource-id"
+    - "resource-operation"
+    - "resource-template-type"
+    - "resource-template-version"
+    - "resource-type"
+    - "status"
+    properties:
+      resource-id:
+        type: "string"
+        description: "resource id"
+      request-id:
+        type: "string"
+        description: "request id"
+      resource-type:
+        type: "string"
+        description: "resource type"
+      resource-template-version:
+        type: "string"
+        description: "resource template version"
+      resource-template-type:
+        type: "string"
+        description: "resource template type"
+      resource-operation:
+        type: "string"
+        description: "resource operation"
+      ord-notifier-id:
+        type: "string"
+        description: "ord notifier id"
+      region:
+        type: "string"
+        description: "region"
+      status:
+        type: "string"
+        description: "status"
+      error-code:
+        type: "string"
+        description: "error code"
+      error-msg:
+        type: "string"
+        description: "error msg"
+  ResourceStatus:
+    type: "object"
+    required:
+    - "regions"
+    - "status"
+    properties:
+      status:
+        type: "string"
+        description: "status"
+      regions:
+        type: "array"
+        items:
+          $ref: "#/definitions/OutputResource"
+  OutputResource:
+    type: "object"
+    required:
+    - "error_code"
+    - "error_msg"
+    - "ord_notifier_id"
+    - "ord_transaction_id"
+    - "region"
+    - "resource_id"
+    - "status"
+    - "timestamp"
+    properties:
+      region:
+        type: "string"
+        description: "region"
+      timestamp:
+        type: "string"
+        description: "timestamp"
+      ord_transaction_id:
+        type: "string"
+        description: "ord transaction id"
+      resource_id:
+        type: "string"
+        description: "resource id"
+      ord_notifier_id:
+        type: "string"
+        description: "ord notifier id"
+      status:
+        type: "string"
+        description: "status"
+      error_code:
+        type: "string"
+        description: "error code"
+      error_msg:
+        type: "string"
+        description: "error msg"
