@@ -1,0 +1,24 @@
+{
+    "default": "!",
+    "orm_admin": "role:admin and tenant:admin",
+
+    "lcp:get_one": "",
+    "lcp:get_all": "",
+    "region:get_one": "",
+    "region:get_all": "",
+    "region:create": "rule:orm_admin",
+    "region:update": "rule:orm_admin",
+    "region:delete": "rule:orm_admin",
+    "group:get_one": "",
+    "group:get_all": "",
+    "group:create": "rule:orm_admin",
+    "group:update": "rule:orm_admin",
+    "group:delete": "rule:orm_admin",
+    "configuration:get": "rule:orm_admin",
+    "log:update": "rule:orm_admin",
+    "metadata:get": "rule:orm_admin",
+    "metadata:create": "rule:orm_admin",
+    "metadata:update": "rule:orm_admin",
+    "metadata:delete": "rule:orm_admin",
+    "status:put": "rule:orm_admin"
+}
