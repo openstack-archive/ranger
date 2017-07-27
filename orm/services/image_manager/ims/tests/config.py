@@ -74,14 +74,12 @@ api = {
         'uuids': 'v1/uuids'
     },
     'rds_server': {
-        # 'base': 'http://172.20.90.179:8777/',
         'base': 'http://127.0.0.1:8777/',
         'resources': 'v1/rds/resources',
         'status': 'v1/rds/status/resource/'
     },
     'rms_server': {
         'base': 'http://127.0.0.1:8080/',
-        # 'base': 'http://172.20.90.179:8080/',
         'groups': 'v1/orm/groups',
         'regions': 'v1/orm/regions',
         'cache_seconds': 60
@@ -99,7 +97,7 @@ authentication = {
     "enabled": False,
     "mech_id": "admin",
     "mech_pass": "stack",
-    "rms_url": "http://172.20.90.174:8080",
+    "rms_url": "http://127.0.0.1:8080",
     "tenant_name": "admin",
     "keystone_version": "2.0",
     "token_role": "admin",

@@ -28,7 +28,7 @@ git = {
     'commit_message_format': 'File was added to repository: {}',
     'commit_user': 'orm_rds',
     'commit_email': 'orm_rds@att.com',
-    'git_server_url': 'orm_rds@172.20.90.218:~/SoT/ORM.git'
+    'git_server_url': 'orm_rds@127.0.0.1:~/SoT/ORM.git'
 
 }
 
@@ -42,7 +42,7 @@ authentication = {
     'enabled': False,
     'mech_id': 'admin',
     'mech_pass': 'stack',
-    'rms_url': 'http://172.20.90.174:8080',
+    'rms_url': 'http://127.0.0.1:8080',
     'tenant_name': 'admin'
 }
 
@@ -54,7 +54,7 @@ ordupdate = {
 
 verify = False
 
-UUID_URL = 'http://172.20.90.232:8090/v1/uuids'
+UUID_URL = 'http://127.0.0.1:8090/v1/uuids'
 
 yaml_configs = {
     'customer_yaml': {

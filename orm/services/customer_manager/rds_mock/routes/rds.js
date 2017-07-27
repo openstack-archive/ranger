@@ -8,8 +8,8 @@ router.post('/v1/rds/resources', (req, res)=> {
        'customer': {
            'id': '70383330-f107-11e5-9d3c-005056a504e9',
            'links': {
-               'own': 'http://172.20.90.179:8777/v1/rds/customer/70383330-f107-11e5-9d3c-005056a504e9'
-           },
+               'own': 'http://127.0.0.1:8777/v1/rds/customer/70383330-f107-11e5-9d3c-005056a504e9'
+           }
            'created': '703ca0a0-f107-11e5-9d3c-005056a504e9'
        }
    });
@@ -24,7 +24,7 @@ router.put('/v1/rds/resources', (req, res)=> {
        'customer': {
            'id': '70383330-f107-11e5-9d3c-005056a504e9',
            'links': {
-               'own': 'http://172.20.90.179:8777/v1/rds/customer/70383330-f107-11e5-9d3c-005056a504e9'
+               'own': 'http://127.0.0.1:8777/v1/rds/customer/70383330-f107-11e5-9d3c-005056a504e9'
            },
            'created': '703ca0a0-f107-11e5-9d3c-005056a504e9'
        }

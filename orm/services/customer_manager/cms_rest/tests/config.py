@@ -88,7 +88,7 @@ api_options = {
             'uuids': 'v1/uuids'
         },
         'rds_server': {
-            'base': 'http://172.20.90.219:8777/',
+            'base': 'http://127.0.0.1:8777/',
             'resources': 'v1/rds/resources',
             'status': 'v1/rds/status/resource/'
         },

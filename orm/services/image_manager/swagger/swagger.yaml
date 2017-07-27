@@ -11,7 +11,7 @@ info:
         There is an optional header parameter X-RANGER-Client which tells who is the client for the api's
 
 # the domain of the service
-host: 135.76.2.229
+host: 127.0.0.1
 # array of all schemes that your API supports
 schemes:
   - https

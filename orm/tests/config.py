@@ -129,7 +129,7 @@ authentication = {
     "enabled": False,
     "mech_id": "admin",
     "mech_pass": "stack",
-    "rms_url": "http://172.20.90.174:8080",
+    "rms_url": "http://127.0.0.1:8080",
     "tenant_name": "admin",
     "keystone_version": "2.0",
     # "policy_file": "/opt/app/orm/aic-orm-fms/fms_rest/etc/policy.json",

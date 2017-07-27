@@ -129,7 +129,7 @@ api = {
     },
     'rds_server': {
         'base': 'http://127.0.0.1:8777/',
-        # 'base': 'http://172.20.91.35:8777/',
+        # 'base': 'http://127.0.0.1:8777/',
         'resources': 'v1/rds/resources',
         'status': 'v1/rds/status/resource/'
     },
@@ -153,7 +153,7 @@ authentication = {
     "mech_id": "admin",
     "mech_pass": "stack",
     "rms_url": "http://127.0.0.1:8080",
-    # "rms_url": "http://172.20.90.174:8080",
+    # "rms_url": "http://127.0.0.1:8080",
     "tenant_name": "admin",
     "token_role": "admin",
     # The Keystone version currently in use. Can be either "2.0" or "3"
