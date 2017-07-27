@@ -48,7 +48,8 @@ class DataManager(BaseDataManager):
         """ add a new region to the `region` table
         add also the regions give meta_data and end_points to the `region_end_point` and
         `region_meta_data` tables if given.
-        handle duplicate errors if raised"""
+        handle duplicate errors if raised
+        """
         try:
             session = self._engine_facade.get_session()
             with session.begin():
@@ -115,7 +116,8 @@ class DataManager(BaseDataManager):
         """ add a new region to the `region` table
         add also the regions give meta_data and end_points to the `region_end_point` and
         `region_meta_data` tables if given.
-        handle duplicate errors if raised"""
+        handle duplicate errors if raised
+        """
         try:
             session = self._engine_facade.get_session()
             with session.begin():

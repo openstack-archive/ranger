@@ -41,6 +41,7 @@ yaml_output = {'description': 'yaml file for region - North',
  'heat_template_version': '2015-1-1',
  'outputs': {'glance_image_id': {'value': {'get_resource': 'glance_image'}}}}
 
+
 class CreateImage(unittest.TestCase):
     """class method image test."""
 

@@ -3,7 +3,7 @@ import unittest
 import mock
 from mock import patch
 
-from  rds.sot.git_sot import git_base
+from rds.sot.git_sot import git_base
 from rds.sot.git_sot.git_base import BaseGit, GitResetError
 
 
@@ -49,7 +49,8 @@ class BaseGitTests(unittest.TestCase):
 
     def test_git_base_no_method_git_reset_changes_implemented(self):
         """ Check if creating an instance and calling
-        git_reset_changes method fail"""
+        git_reset_changes method fail
+        """
         with self.assertRaises(NotImplementedError):
             base_git = BaseGit()
             base_git.git_reset_changes()

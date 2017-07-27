@@ -64,7 +64,7 @@ class CreateResource(unittest.TestCase):
 
     @patch.object(FlavorBuild, 'conf')
     def test_create_flavor_yaml(self, mock_conf):
-        self.maxDiff=None
+        self.maxDiff = None
         """test valid dict to yaml output as expected."""
         mock_conf.yaml_configs.flavor_yaml.yaml_version = '2015-1-1'
         mock_conf.yaml_configs.flavor_yaml.yaml_args.rxtx_factor = 1

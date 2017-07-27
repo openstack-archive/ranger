@@ -31,7 +31,7 @@ def _get_token_conf():
 def get_keystone_ep_region_name():
     # get any region that hase keystone end point
     logger.debug("get list of regions from rms")
-    regions  = RmsService.get_regions()
+    regions = RmsService.get_regions()
     if not regions:
         logger.error("failto get regions from rms")
         return None, None
@@ -98,7 +98,7 @@ def check_permissions(token_to_validate, lcp_id):
             token_conf = _get_token_conf()
             logger.debug("Authorization: validating token=[{}] on lcp_id=[{}]".format(token_to_validate, lcp_id))
             is_permitted = tokens.is_token_valid(token_to_validate, lcp_id, token_conf)
-            logger.debug("Authorization: The token=[{}] on lcp_id=[{}] is [{}]".format(token_to_validate, lcp_id, "valid" if is_permitted else  "invalid"))
+            logger.debug("Authorization: The token=[{}] on lcp_id=[{}] is [{}]".format(token_to_validate, lcp_id, "valid" if is_permitted else "invalid"))
         else:
             logger.debug("The authentication service is disabled. No authentication is needed.")
             is_permitted = True

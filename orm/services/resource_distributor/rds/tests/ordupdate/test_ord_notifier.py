@@ -186,7 +186,7 @@ class MainTest(unittest.TestCase):
                                     'gigi', '7', '')
             self.fail('notify_ord() passed successfully (expected OrdNotFoundError)')
         except ord_notifier.OrdNotFoundError as e:
-            self.assertEquals(e.message, 'ORD of LCP %s not found' % (
+            self.assertEqual(e.message, 'ORD of LCP %s not found' % (
                 'gigi', ))
 
     #@patch.object(ord_notifier.audit, 'audit')
