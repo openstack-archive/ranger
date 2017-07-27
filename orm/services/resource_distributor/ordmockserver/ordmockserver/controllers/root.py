@@ -14,14 +14,14 @@ class ORD(object):
     @expose()
     def index(self):
         return dict()
-    ord_notifier=root.OrdNotifier()
+    ord_notifier = root.OrdNotifier()
 
 
 class RootOne(object):
     @expose()
     def index(self):
         return dict()
-    ord=ORD()
+    ord = ORD()
 
 
 class RootController(object):
@@ -34,7 +34,6 @@ class RootController(object):
     def index_get(self):
         return 'hi'
 
-
     def error(self, status):
         try:
             status = int(status)
@@ -43,6 +42,6 @@ class RootController(object):
         message = getattr(status_map.get(status), 'explanation', '')
         return dict(status=status, message=message)
 
-    cat=CatalogController()
+    cat = CatalogController()
     #customer=root.CreateNewCustomer()
-    v1=RootOne()
+    v1 = RootOne()

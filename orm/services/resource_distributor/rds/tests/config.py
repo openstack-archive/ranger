@@ -86,7 +86,7 @@ yaml_configs = {
 }
 
 # yaml configuration for create flavor
-yaml_flavor_version='2014-10-16'
+yaml_flavor_version = '2014-10-16'
 
 # value of status to be blocked before creating any resource
 block_by_status = "Submitted"

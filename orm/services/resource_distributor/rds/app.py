@@ -21,7 +21,8 @@ def setup_app(pecan_config):
     or by running this file with python,
     then the main method is called and starting pecan.
 
-    The method initializes components and return a WSGI application"""
+    The method initializes components and return a WSGI application
+    """
 
     init_sot()
     init_audit()

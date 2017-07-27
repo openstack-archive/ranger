@@ -53,11 +53,11 @@ logging = {
             'class': 'logging.StreamHandler',
             'formatter': 'color'
         },
-        'logfile' : {
+        'logfile': {
             'class': 'logging.FileHandler',
-            'filename' : '/home/pecanlogs.log',
-            'level' : 'DEBUG',
-            'formatter' : 'simple'
+            'filename': '/home/pecanlogs.log',
+            'level': 'DEBUG',
+            'formatter': 'simple'
         }
     },
     'formatters': {

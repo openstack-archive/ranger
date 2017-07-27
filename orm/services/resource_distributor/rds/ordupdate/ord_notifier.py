@@ -90,15 +90,16 @@ def _notify(ord_url,
     :return:
     """
     # Prepare the request body
-    data_to_send = {'ord-notifier': {
-        'request-id': transaction_id,
-        'resource-id': resource_id,
-        'resource-type': resource_type,
-        'resource-template-version': resource_template_version,
-        'resource-template-name': resource_template_name,
-        'resource-template-type': conf.ordupdate.template_type,
-        'operation': operation,
-        'region': region_id
+    data_to_send = {
+        'ord-notifier': {
+            'request-id': transaction_id,
+            'resource-id': resource_id,
+            'resource-type': resource_type,
+            'resource-template-version': resource_template_version,
+            'resource-template-name': resource_template_name,
+            'resource-template-type': conf.ordupdate.template_type,
+            'operation': operation,
+            'region': region_id
         }
     }
 

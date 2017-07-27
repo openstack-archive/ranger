@@ -45,8 +45,8 @@ data = {
         "status": "Success",
         "error-code": "200",
         "error-msg": "OK"
-        }
     }
+}
 
 data_not_valid = {
     "rds_listener": {
@@ -60,5 +60,5 @@ data_not_valid = {
         "status": "Success",
         "error_code": "200",
         "error_msg": "OK"
-        }
     }
+}

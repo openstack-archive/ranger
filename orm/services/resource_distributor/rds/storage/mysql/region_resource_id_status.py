@@ -32,11 +32,12 @@ class ResourceStatusRecord(Base):
     resource_extra_metadata = relationship("ImageMetadData",
                                            cascade="all, delete, delete-orphan")
 
+
 class ImageMetadData(Base):
     __tablename__ = 'image_metadata'
 
     image_meta_data_id = Column(ForeignKey(u'resource_status.id'),
-                                 primary_key=True)
+                                primary_key=True)
     checksum = Column(Text, primary_key=False)
     virtual_size = Column(Text, primary_key=False)
     size = Column(Text, primary_key=False)
@@ -164,7 +165,8 @@ class Connection(region_resource_id_status.Base):
         """ This method filters all the records where resource_id is the given
         resource_id and status is the given status.
         for the matching records check if a time period elapsed and if so,
-        change the status to 'Error' and the timestamp to the given timestamp."""
+        change the status to 'Error' and the timestamp to the given timestamp.
+        """
         logger.debug("Get records filtered by resource_id={} "
                      "and status={}".format(resource_id,
                                             status))

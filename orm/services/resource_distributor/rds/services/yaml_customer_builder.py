@@ -7,6 +7,7 @@ from pecan import conf
 
 logger = logging.getLogger(__name__)
 
+
 def get_users_quotas(data, region):
     """get default or own region.
 
@@ -46,8 +47,8 @@ def creat_final_yaml(title, description, resources, outputs):
 
 
 def _create_metadata_yaml(alldata):
-    metadata ={}
-    metadata_items={}
+    metadata = {}
+    metadata_items = {}
     for item in alldata['metadata']:
         metadata_items.update(item)
     metadata['tenant_metadata'] = {'type': 'OS::Keystone::Metadata\n',

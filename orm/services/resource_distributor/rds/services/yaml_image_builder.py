@@ -22,23 +22,23 @@ def _properties(alldata, region):
     protected = {0: False, 1: True}[alldata['protected']]
     tenants = [tenant['customer_id'] for tenant in alldata['customers']]
     return dict(
-        name = alldata['name'],
-        container_format = alldata["container_format"],
-        min_ram = alldata['min_ram'],
-        disk_format = alldata['disk_format'],
-        min_disk = alldata['min_disk'],
-        protected = protected,
-        copy_from = alldata["url"],
-        owner = alldata["owner"],
-        is_public = public,
-        tenants = str(tenants)
+        name=alldata['name'],
+        container_format=alldata["container_format"],
+        min_ram=alldata['min_ram'],
+        disk_format=alldata['disk_format'],
+        min_disk=alldata['min_disk'],
+        protected=protected,
+        copy_from=alldata["url"],
+        owner=alldata["owner"],
+        is_public=public,
+        tenants=str(tenants)
     )
 
 
 def _glanceimage(alldata, region):
     return dict(
-        type = "OS::Glance::Image2",
-        properties = _properties(alldata, region)
+        type="OS::Glance::Image2",
+        properties=_properties(alldata, region)
     )
 
 

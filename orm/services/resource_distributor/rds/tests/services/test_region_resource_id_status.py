@@ -70,7 +70,7 @@ class TestModel(unittest.TestCase):
 
         self.assertRaises(region_resource_id_status.InputError,
                           region_resource_id_status.validate_operation_type,
-                           test_operation)
+                          test_operation)
 
     def test_validate_resource_type_sanity(self):
         test_resource = 'test'
@@ -84,7 +84,7 @@ class TestModel(unittest.TestCase):
 
         self.assertRaises(region_resource_id_status.InputError,
                           region_resource_id_status.validate_resource_type,
-                           test_resource)
+                          test_resource)
 
     @mock.patch.object(region_resource_id_status.factory, 'get_region_resource_id_status_connection')
     def test_get_regions_by_status_resource_id_sanity(self, mock_factory):
