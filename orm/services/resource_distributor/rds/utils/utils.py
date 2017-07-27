@@ -40,7 +40,7 @@ def _get_all_rms_regions():
 def _validate_version(region, resource_type):
     version = None
     if 'ranger_agent' in region['version'].lower():
-        version = region['version'].lower().split('ranger_agent')[1].strip().split('.')
+        version = region['version'].lower().split('ranger-agent')[1].strip().split('.')
         version = version[0] + '.' + ''.join(version[1:])
     if not version or float(version) < 3:
         return False
@@ -71,3 +71,4 @@ def add_rms_status_to_regions(resource_regions, resource_type):
         # if region not found in rms
         region['rms_status'] = "region_not_found_in_rms"
     return resource_regions
+

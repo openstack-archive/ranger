@@ -83,14 +83,14 @@ class TestCreateResource(FunctionalTest):
 
     @patch.object(root.ResourceService, 'main', return_value="12345")
     def test_update_resource_success(self, input):
-        updated =False
+        updated = False
         """test update resource as it succeed."""
         response = self.app.put_json('/v1/rds/resources', good_data)
         if 'updated' in response.json['customer']:
             updated = True
         assert response.json['customer']['id'] == '12345'
         assert response.status_int == 201
-        assert updated == True
+        assert updated
 
     @patch.object(root.ResourceService, 'main',
                   side_effect=Exception("unknown error"))
@@ -107,14 +107,14 @@ class TestCreateResource(FunctionalTest):
     def test_modify_resource_conflict_except(self, input):
         """test modify resource to catch ConflictValue exception."""
         response = self.app.put_json('/v1/rds/resources',
-                                      good_data, expect_errors=True)
+                                     good_data, expect_errors=True)
         assert response.status_int == 409
 
 good_data = {
     "service_template": {
         "resource": {
             "resource_type": "customer"
-            },
+        },
         "model": "{\n  \"uuid\": \"1e24981a-fa51-11e5-86aa-5e5517507c6"
                  "6\",\n  \"description\": \"this is a description\",\n  \"nam"
                  "e\": \"testname\",\n  \"enabled\": 1,\n  \"default_regio"
@@ -176,15 +176,15 @@ good_data = {
         "tracking": {
             "external_id": "SSP-session1234",
             "tracking_id": "uuid-12345"
-            }
         }
     }
+}
 
 flavor_data = {
     "service_template": {
         "resource": {
             "resource_type": "flavor"
-            },
+        },
         "model": "{\n            \"status\": \"complete\",\n            \"pr"
                  "ofile\": \"P2\",\n            \"regions\": [\n            "
                  "    {\n                    \"name\": \"0\"\n              "
@@ -206,9 +206,9 @@ flavor_data = {
         "tracking": {
             "external_id": "SSP-session1234",
             "tracking_id": "uuid-12345"
-            }
         }
     }
+}
 
 image_data = {
     "service_template": {

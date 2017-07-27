@@ -226,7 +226,6 @@ class CreateResource(unittest.TestCase):
     #                                        'flavor', 'delete')
     #     self.assertEqual('uuid-uuid-uuid-uuid', resource_id)
 
-
     # @patch.object(ResourceService.regionResourceIdStatus, 'add_status',
     #               return_value=None)
     # @patch.object(ResourceService.yaml_customer_builder, 'yamlbuilder',
@@ -247,7 +246,6 @@ class CreateResource(unittest.TestCase):
     #     moc_get_regions_by_status_resource_id.return_value = status_model
     #     resource_id = ResourceService.main(jsondata, uuid,
     #                                        'customer', 'modify')
-
 
     # @patch.object(ResourceService.regionResourceIdStatus, 'add_status',
     #               return_value=None)
@@ -270,27 +268,23 @@ class CreateResource(unittest.TestCase):
     #     resource_id = ResourceService.main(json_data_image, uuid,
     #                                        'image', 'modify')
 
-
     def test_get_inputs_from_resource_type(self):
         input_data = ResourceService._get_inputs_from_resource_type(jsondata,
                                                                     'customer',
                                                                     'uuid-12345')
-        assert ( input_data.__dict__ == input_data_resource )
-
+        assert (input_data.__dict__ == input_data_resource)
 
     def test_get_inputs_from_resource_type_image(self):
         input_data = ResourceService._get_inputs_from_resource_type(json_data_image,
-                                                                      'image',
-                                                                      'uuid-12345')
+                                                                    'image',
+                                                                    'uuid-12345')
         assert (input_data.__dict__ == expected_image_input_data)
-
 
     def test_unknown_resource_type(self):
         with self.assertRaises(ResourceService.ErrorMesage):
             input_data = ResourceService._get_inputs_from_resource_type(jsondata,
                                                                         'unknown',
                                                                         'uuid-12345')
-
 
 
 jsondata = {
@@ -309,14 +303,13 @@ jsondata = {
                                     "snapshots": "10",
                                     "volumes": "10"
                                     },
-                        "network":
-                             {
+                        "network":{
                                  "router": "10",
                                  "floatingip": "10",
                                  "port": "10",
                                  "network": "10",
                                  "subnet": "10"
-                             }}],
+                        }}],
             "users":
                 [
                     {
@@ -400,68 +393,139 @@ jsondata = {
     "name": "welcome_man"
 }
 
-flavorjsondata = {"status": "complete", "profile": "P2", "regions":
-    [{"name": "North1","action": "create"}, {"name": "North2","action": "delete"
-                }], "description": "First flavor for AMAR",
-                  "ram": 64, "visibility": "public", "extra_specs": {
-                "key1": "value1", "key2": "value2", "keyx": "valuex"},
-                  "vcpus": 2,
-            "swap": 0, "tenants": [{"tenant_id": "abcd-efgh-ijkl-4567"},
-                                  {"tenant_id": "abcd-efgh-ijkl-4567"
-                }],
-                  "disk": 512, "empheral": 1, "id": "uuid-uuid-uuid-uuid",
-                  "name": "Nice Flavor"}
+flavorjsondata = {
+    "status": "complete",
+    "profile": "P2",
+    "regions": [
+        {
+            "name": "North1",
+            "action": "create"
+        },
+        {
+            "name": "North2",
+            "action": "delete"
+        }
+    ],
+    "description": "First flavor for AMAR",
+    "ram": 64,
+    "visibility": "public",
+    "extra_specs": {
+        "key1": "value1",
+        "key2": "value2",
+        "keyx": "valuex"
+    },
+    "vcpus": 2,
+    "swap": 0,
+    "tenants": [
+        {
+            "tenant_id": "abcd-efgh-ijkl-4567"
+        },
+        {
+            "tenant_id": "abcd-efgh-ijkl-4567"
+        }
+    ],
+    "disk": 512,
+    "empheral": 1,
+    "id": "uuid-uuid-uuid-uuid",
+    "name": "Nice Flavor"
+}
 
-json_data = {'uuid': '1e24981a-fa51-11e5-86aa-5e5517507c66',
-              'default_region': {'users': [{'id': 'userId1zzzz',
-                                            'roles': ['adminzzzz',
-                                                      'otherzzzzz'
-                                                      ]
-                                            },
-                                           {'id': 'userId2zzz',
-                                            'roles': ['storagezzzzz'
-                                                      ]
-                                            }
-                                           ],
-                                 'name': 'regionnamezzzz',
-                                 "action": "create",
-                                 'quotas': [{'storage': {
-                                     'gigabytes': '111',
-                                     'volumes': '111',
-                                     'snapshots': '111'},
-                                     'compute': {'instances': '111',
-                                                 'ram': '111',
-                                                 'keypairs': '111',
-                                                 'injected_files': '111'
-                                                 },
-                                     'network': {'port': '111',
-                                                 'router': '111',
-                                                 'subnet': '111',
-                                                 'network': '111',
-                                                 'floatingip': '111'}}]},
-              'description': 'this is a description', 'enabled': 1,
-              'regions': [{'users': [{'id': 'userId1',
-                                      'roles': ['admin', 'other']},
-                                     {'id': 'userId2',
-                                      'roles': ['storage']}],
-                           'name': 'regionname', "action": "delete",
-                           'quotas': []},
-                          {'users': [], 'name': 'regionnametest',
-                           "action": "modify",
-                           'quotas': [{'storage': {'gigabytes': '10',
-                                                   'volumes': '10',
-                                                   'snapshots': '10'},
-                                       'compute': {'instances': '10',
-                                                   'ram': '10',
-                                                   'keypairs': '10',
-                                                   'injected_files': '10'},
-                                       'network': {'port': '10',
-                                                   'router': '10',
-                                                   'subnet': '10',
-                                                   'network': '10',
-                                                   'floatingip': '10'}}]}],
-              'name': 'welcome_man'}
-
+json_data = {
+    "uuid": "1e24981a-fa51-11e5-86aa-5e5517507c66",
+    "default_region": {
+        "users": [
+            {
+                "id": "userId1zzzz",
+                "roles": [
+                    "adminzzzz",
+                    "otherzzzzz"
+                ]
+            },
+            {
+                "id": "userId2zzz",
+                "roles": [
+                    "storagezzzzz"
+                ]
+            }
+        ],
+        "name": "regionnamezzzz",
+        "action": "create",
+        "quotas": [
+            {
+                "storage": {
+                    "gigabytes": "111",
+                    "volumes": "111",
+                    "snapshots": "111"
+                },
+                "compute": {
+                    "instances": "111",
+                    "ram": "111",
+                    "keypairs": "111",
+                    "injected_files": "111"
+                },
+                "network": {
+                    "port": "111",
+                    "router": "111",
+                    "subnet": "111",
+                    "network": "111",
+                    "floatingip": "111"
+                }
+            }
+        ]
+    },
+    "description": "this is a description",
+    "enabled": 1,
+    "regions": [
+        {
+            "users": [
+                {
+                    "id": "userId1",
+                    "roles": [
+                        "admin",
+                        "other"
+                    ]
+                },
+                {
+                    "id": "userId2",
+                    "roles": [
+                        "storage"
+                    ]
+                }
+            ],
+            "name": "regionname",
+            "action": "delete",
+            "quotas": []
+        },
+        {
+            "users": [],
+            "name": "regionnametest",
+            "action": "modify",
+            "quotas": [
+                {
+                    "storage": {
+                        "gigabytes": "10",
+                        "volumes": "10",
+                        "snapshots": "10"
+                    },
+                    "compute": {
+                        "instances": "10",
+                        "ram": "10",
+                        "keypairs": "10",
+                        "injected_files": "10"
+                    },
+                    "network": {
+                        "port": "10",
+                        "router": "10",
+                        "subnet": "10",
+                        "network": "10",
+                        "floatingip": "10"
+                    }
+                }
+            ]
+        }
+    ],
+    "name": "welcome_man"
+}
 
 target_list = [{'template_data': ['anystring'],
                 'operation': 'create',

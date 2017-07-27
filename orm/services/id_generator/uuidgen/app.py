@@ -17,6 +17,7 @@ def setup_app(config):
     logger.info('Starting uuidgen...')
     return app
 
+
 def main():
     dir_name = os.path.dirname(__file__)
     drive, path_and_file = os.path.splitdrive(dir_name)

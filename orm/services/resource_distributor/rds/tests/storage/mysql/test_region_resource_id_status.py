@@ -71,7 +71,8 @@ class MysqlRegionResourceIdStatusTest(unittest.TestCase):
                        return_value=MyFacade(False, True))
     def test_add_update_status_record_record_exist_sanity(self, mock_db_session):
         """Test that no exception is raised when calling add_update_status_record.
-        where record exist"""
+        where record exist
+        """
         my_connection = region_resource_id_status.Connection('url')
         my_connection.add_update_status_record('timestamp',
                                                'region',
@@ -89,7 +90,8 @@ class MysqlRegionResourceIdStatusTest(unittest.TestCase):
                        return_value=MyFacade())
     def test_add_update_status_record_record_not_exist_sanity(self, mock_db_session):
         """Test that no exception is raised when calling add_update_status_record.
-        where record does not exist"""
+        where record does not exist
+        """
         my_connection = region_resource_id_status.Connection('url')
         my_connection.add_update_status_record('timestamp',
                                                'region',
@@ -154,9 +156,9 @@ class MysqlRegionResourceIdStatusTest(unittest.TestCase):
     @mock.patch.object(region_resource_id_status.db_session, 'EngineFacade',
                        return_value=MyFacade(False, False, True))
     def test_get_records_by_resource_id_sanity(self, mock_db_session,
-                                                   mock_get_timestamp,
-                                                   mock_model,
-                                                   mock_statusmodel):
+                                               mock_get_timestamp,
+                                               mock_model,
+                                               mock_statusmodel):
         """No exception is raised when calling get_records_by_resource_id."""
         my_connection = region_resource_id_status.Connection('url')
         my_connection.get_records_by_resource_id('test')
@@ -194,9 +196,9 @@ class MysqlRegionResourceIdStatusTest(unittest.TestCase):
     @mock.patch.object(region_resource_id_status.db_session, 'EngineFacade',
                        return_value=MyFacade(False, True, True))
     def test_get_records_by_resource_id_and_status_sanity(self, mock_db_session,
-                                                                mock_get_timestamp,
-                                                                mock_model,
-                                                                mock_statusmodel):
+                                                          mock_get_timestamp,
+                                                          mock_model,
+                                                          mock_statusmodel):
         my_connection = region_resource_id_status.Connection('url')
         my_connection.get_records_by_resource_id_and_status('1', '2')
 

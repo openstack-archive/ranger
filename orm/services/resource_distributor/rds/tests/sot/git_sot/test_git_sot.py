@@ -22,7 +22,7 @@ resource = {
         "template_data": '4'
 }
 
-resource_delete= {
+resource_delete = {
         "operation": "delete",
         "region_id": '1',
         "resource_type": '2',
@@ -125,7 +125,6 @@ class GitSoTTest(unittest.TestCase):
         sot.save_resource_to_sot("t_id", "tk_id", [], "a_id", "u_id")
         self.assertNotEqual(thread, threading.Thread.getName("main_thread"))
 
-
     ################################
     # create_file_in_path          #
     ################################
@@ -195,7 +194,6 @@ class GitSoTTest(unittest.TestCase):
     #     roll_list = []
     #     sot.handle_file_operations([resource_delete, ], roll_list)
     #     self.assertEqual(len(roll_list), 1)
-
 
     #############################
     #  write_data_to_file       #
@@ -272,8 +270,8 @@ class GitSoTTest(unittest.TestCase):
     def test_git_sot_update_git_commit_faild(self):
         """Check update_git commit failed"""
         git_impl = mock.MagicMock()
-        git_impl.git_upload_changes = mock.MagicMock(side_effect=
-                                                     GitUploadError("Failed in upload"))
+        git_impl.git_upload_changes = mock.MagicMock(
+            side_effect=GitUploadError("Failed in upload"))
         with self.assertRaises(GitUploadError):
             sot.update_git(git_impl)
 
@@ -284,8 +282,8 @@ class GitSoTTest(unittest.TestCase):
     def test_git_sot_validate_git_faild(self):
         """Check validate_git failed"""
         git_impl = mock.MagicMock()
-        git_impl.validate_git = mock.MagicMock(side_effect=
-                                               GitValidateError("Failed in upload"))
+        git_impl.validate_git = mock.MagicMock(
+            side_effect=GitValidateError("Failed in upload"))
         try:
             sot.validate_git(git_impl, lock)
         except GitInitError:

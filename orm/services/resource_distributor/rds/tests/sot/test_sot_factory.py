@@ -14,14 +14,16 @@ class SoTFactoryTests(unittest.TestCase):
 
     def test_get_sot_no_sot_type(self):
         """Check that a runtime error is raised if no git type
-            is available from config"""
+        is available from config
+        """
         sot_factory.sot_type = ""
         with self.assertRaises(RuntimeError):
             sot_factory.get_sot()
 
     def test_get_sot_git_type(self):
         """ Check that when 'git' type is provided the returned object
-            is instance of  GiTSoT"""
+        is instance of  GiTSoT
+        """
         sot_factory.sot_type = "git"
         obj = sot_factory.get_sot()
         self.assertIsInstance(obj, GitSoT)

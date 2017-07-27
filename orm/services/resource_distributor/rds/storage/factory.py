@@ -1,7 +1,7 @@
 from rds.storage.mysql.region_resource_id_status import Connection as RegionResourceIdStatusConnection
 
 database = {
-    'url' : 'na'
+    'url': 'na'
 }
 
 
