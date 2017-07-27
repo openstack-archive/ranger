@@ -114,7 +114,7 @@ good_data = {
     "service_template": {
         "resource": {
             "resource_type": "customer"
-            },
+        },
         "model": "{\n  \"uuid\": \"1e24981a-fa51-11e5-86aa-5e5517507c6"
                  "6\",\n  \"description\": \"this is a description\",\n  \"nam"
                  "e\": \"testname\",\n  \"enabled\": 1,\n  \"default_regio"
@@ -176,15 +176,15 @@ good_data = {
         "tracking": {
             "external_id": "SSP-session1234",
             "tracking_id": "uuid-12345"
-            }
         }
     }
+}
 
 flavor_data = {
     "service_template": {
         "resource": {
             "resource_type": "flavor"
-            },
+        },
         "model": "{\n            \"status\": \"complete\",\n            \"pr"
                  "ofile\": \"P2\",\n            \"regions\": [\n            "
                  "    {\n                    \"name\": \"0\"\n              "
@@ -206,9 +206,9 @@ flavor_data = {
         "tracking": {
             "external_id": "SSP-session1234",
             "tracking_id": "uuid-12345"
-            }
         }
     }
+}
 
 image_data = {
     "service_template": {
