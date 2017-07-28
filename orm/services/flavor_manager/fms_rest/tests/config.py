@@ -132,6 +132,5 @@ authentication = {
     "rms_url": "http://127.0.0.1:8080",
     "tenant_name": "admin",
     "keystone_version": "2.0",
-    # "policy_file": "/opt/app/orm/aic-orm-fms/fms_rest/etc/policy.json",
-    "policy_file": "/orm/aic-orm-fms/fms_rest/etc/policy.json"
+    "policy_file": "fms_rest/etc/policy.json"
 }

@@ -126,5 +126,5 @@ authentication = {
     "token_role": "admin",
     "role_location": {"tenant": "admin"},
     "keystone_version": "2.0",
-    "policy_file": "/opt/app/orm/aic-orm-cms/cms_rest/etc/policy.json"
+    "policy_file": "cms_rest/etc/policy.json"
 }

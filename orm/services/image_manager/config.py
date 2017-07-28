@@ -116,7 +116,6 @@ authentication = {
     "rms_url": "http://127.0.0.1:8080",
     "tenant_name": "admin",
     "token_role": "admin",
-    # The Keystone version currently in use. Can be either "2.0" or "3"
     "keystone_version": "2.0",
-    "policy_file": "/opt/app/orm/aic-orm-ims/ims/etc/policy.json"
+    "policy_file": "ims/etc/policy.json"
 }

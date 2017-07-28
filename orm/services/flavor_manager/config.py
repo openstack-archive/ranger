@@ -158,6 +158,5 @@ authentication = {
     "token_role": "admin",
     # The Keystone version currently in use. Can be either "2.0" or "3"
     "keystone_version": "2.0",
-    "policy_file": "/opt/app/orm/aic-orm-fms/fms_rest/etc/policy.json",
-    # "policy_file": "/orm/aic-orm-fms/fms_rest/etc/policy.json"
+    "policy_file": "fms_rest/etc/policy.json",
 }

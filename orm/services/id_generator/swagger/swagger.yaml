@@ -1,0 +1,106 @@
+swagger: '2.0'
+info:
+  version: 3.5.0
+  title: Uuidgen API
+  description: ORM UUID generator API.
+  contact:
+    url: www.orm.com
+    email: zb593m@att.com
+
+
+# the domain of the service
+host: 135.76.2.229
+# array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /v1
+produces:
+  - application/json
+
+paths:
+  /uuids:
+
+    post:
+      summary: Generate a new UUID or save an existing one
+
+      parameters:
+        - name: uuid
+          in: body
+          description: Information about the UUID (if available)
+          schema:
+            $ref: "#/definitions/Uuid"
+          required: false
+
+      tags:
+        - UUID
+
+      responses:
+        200:
+          description: UUID generated successfully (or it already exists)
+          schema:
+            $ref: '#/definitions/UuidResponse'
+        400:
+          description: Invalid parameters received
+          schema:
+            $ref: '#/definitions/UnknownParametersError'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+  Uuid:
+    type: object
+    properties:
+      uuid:
+        type: string
+        description: The existing UUID to add (do not specify if you want to generate a new UUID)
+      uuid_type:
+        type: string
+        description: UUID type (e.g., transaction)
+
+  UuidResponse:
+    type: object
+    properties:
+      uuid:
+        type: string
+        description: The existing UUID to add (do not specify if you want to generate a new UUID)
+      uuid_type:
+        type: string
+        description: UUID type (e.g., transaction)
+      issued_at:
+        type: string
+        description: Response timestamp
+
+  BadRequest:
+    type: object
+    properties:
+      code:
+        type: integer
+        description: Error code
+      message:
+        type: string
+        description: Error message
+
+  UnknownParametersError:
+    type: object
+    properties:
+      badRequest:
+        $ref: '#/definitions/BadRequest'
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      type:
+        type: string
+      transaction_id:
+        type: string
+      message:
+        type: string
+      details:
+        type: string
+

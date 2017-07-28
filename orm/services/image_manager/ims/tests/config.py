@@ -101,5 +101,5 @@ authentication = {
     "tenant_name": "admin",
     "keystone_version": "2.0",
     "token_role": "admin",
-    "policy_file": "/opt/app/orm/aic-orm-ims/ims/etc/policy.json"
+    "policy_file": "ims/etc/policy.json"
 }

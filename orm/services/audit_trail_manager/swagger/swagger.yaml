@@ -1,0 +1,179 @@
+swagger: '2.0'
+info:
+  version: 3.5.0
+  title: Audit API
+  description: Audit trail API.
+
+
+  termsOfService: terms
+  contact:
+    url: www.orm.com
+    email: zb593m@att.com
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+
+# the domain of the service
+host: 135.76.2.229
+# array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /v1/audit
+produces:
+  - application/json
+
+paths:
+  /transaction:
+
+    post:
+      summary: Add a new transaction
+      description: |
+        Add a new transaction record to Audit trail.
+
+      parameters:
+        - name: transaction
+          in: body
+          description: Full transaction to add.
+          schema:
+            $ref: "#/definitions/Transaction"
+          required: true
+
+      tags:
+        - Audit
+
+      responses:
+        201:
+          description: Success (no body)
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+    get:
+      summary: Get a list of Audit records by criteria
+      description: |
+        The get Audit endpoint retrieves all flavors that match the specified criteria
+      parameters:
+        - name: q.timestamp_from
+          in: query
+          type: "integer"
+          required: false
+          description: Get records starting from this time
+        - name: q.timestamp_to
+          in: query
+          type: "integer"
+          description: Get records up to this time
+          required: false
+        - name: q.user_id
+          in: query
+          type: "string"
+          description: User ID
+          required: false
+        - name: q.application_id
+          in: query
+          type: "string"
+          description: Application ID
+          required: false
+        - name: q.tracking_id
+          in: query
+          type: "string"
+          description: Tracking ID
+          required: false
+        - name: q.external_id
+          in: query
+          type: "string"
+          description: External ID
+          required: false
+        - name: q.transaction_id
+          in: query
+          type: "string"
+          description: Transaction ID
+          required: false
+        - name: q.transaction_type
+          in: query
+          type: "string"
+          description: Transaction type (e.g., 'create customer')
+          required: false
+        - name: q.event_details
+          in: query
+          type: "string"
+          description: Event details
+          required: false
+        - name: q.resource_id
+          in: query
+          type: "string"
+          description: Get records that involved this resource
+          required: false
+        - name: q.service_name
+          in: query
+          type: "string"
+          description: Get records that originated by this service
+          required: false
+      tags:
+        - Audit
+      responses:
+        200:
+          description: List of Audit records that matched all criteria
+          schema:
+            $ref: '#/definitions/Transactions'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+  Transaction:
+    type: object
+    properties:
+      timestamp:
+        type: integer
+        description: Transaction timestamp (long integer)
+      user_id:
+        type: string
+        description: User ID (not mandatory)
+      application_id:
+        type: string
+        description: Application ID
+      tracking_id:
+        type: string
+        description: Tracking ID for the operation
+      external_id:
+        type: string
+        description: External ID (not mandatory)
+      transaction_id:
+        type: string
+        description: Transaction ID
+      transaction_type:
+        type: string
+        description: Transaction type (e.g., 'create customer')
+      event_details:
+        type: string
+        description: All information about the resource and the operation (not mandatory)
+      resource_id:
+        type: string
+        description: Resource ID
+      service_name:
+        type: string
+        description: Service name (e.g., 'CMS')
+
+  Transactions:
+    type: array
+    items:
+      $ref: '#/definitions/Transaction'
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      type:
+        type: string
+      transaction_id:
+        type: string
+      message:
+        type: string
+      details:
+        type: string
+
