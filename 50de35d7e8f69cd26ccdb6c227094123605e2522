@@ -1,0 +1,9 @@
+Code-Review+2: Michael Glaser <michael.glaser@att.com>
+Code-Review+1: STEW TY <st3wty@att.com>
+Workflow+1: Michael Glaser <michael.glaser@att.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 31 Jul 2017 21:18:14 +0000
+Reviewed-on: https://review.openstack.org/489296
+Project: openstack/ranger
+Branch: refs/heads/master
