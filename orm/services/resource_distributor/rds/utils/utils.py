@@ -71,4 +71,3 @@ def add_rms_status_to_regions(resource_regions, resource_type):
         # if region not found in rms
         region['rms_status'] = "region_not_found_in_rms"
     return resource_regions
-

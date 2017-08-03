@@ -15,19 +15,19 @@ from rds.tests import config as conf
 lock = mock.MagicMock()
 
 resource = {
-        "operation": "create",
-        "region_id": '1',
-        "resource_type": '2',
-        "resource_name": '3',
-        "template_data": '4'
+    "operation": "create",
+    "region_id": '1',
+    "resource_type": '2',
+    "resource_name": '3',
+    "template_data": '4'
 }
 
 resource_delete = {
-        "operation": "delete",
-        "region_id": '1',
-        "resource_type": '2',
-        "resource_name": '3',
-        "template_data": '4'
+    "operation": "delete",
+    "region_id": '1',
+    "resource_type": '2',
+    "resource_name": '3',
+    "template_data": '4'
 }
 
 
@@ -43,15 +43,12 @@ class GitSoTTest(unittest.TestCase):
         git_factory = mock.MagicMock()
         git_factory.get_git_impl = mock.MagicMock()
 
-    ##################
-    ### update_sot ###
-    ##################
-
+    # update_sot
     @patch.object(sot, 'init_git', side_effect=GitInitError("Failed to initialize Git"))
     def test_git_sot_update_sot_init_git_fail(self, result):
         """" init_git fails and raise exception"""
         try:
-            sot.update_sot("", lock, '1', '2', ['3','5'], '4', '6')
+            sot.update_sot("", lock, '1', '2', ['3', '5'], '4', '6')
         except SoTError:
             self.fail("Exception should have been handled inside method")
 
@@ -71,7 +68,7 @@ class GitSoTTest(unittest.TestCase):
     def test_git_sot_update_sot_update_git_fail(self, git_repo, files_created, result, clean_result):
         """" update git fails and raise exception"""
         try:
-            sot.update_sot("",lock, 'a', 'b', ['c', 'd'], 'e', 'f')
+            sot.update_sot("", lock, 'a', 'b', ['c', 'd'], 'e', 'f')
         except GitUploadError:
             self.fail("Exception should have been handled inside method")
 
@@ -288,5 +285,3 @@ class GitSoTTest(unittest.TestCase):
             sot.validate_git(git_impl, lock)
         except GitInitError:
             self.fail("No exceptions should be thrown in this case")
-
-

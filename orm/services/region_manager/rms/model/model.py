@@ -84,7 +84,7 @@ class RegionData(object):
                             "type {}".format(endpoint.type))
             try:
                 endpoints_types_must_have.remove(endpoint.type)
-            except:
+            except Exception:
                 pass
         if len(endpoints_types_must_have) > 0:
             raise error_base.InputValueError(

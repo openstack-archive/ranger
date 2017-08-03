@@ -1,6 +1,7 @@
 """Native (bash commands) Git module."""
 import logging
-import subprocess, shlex
+import subprocess
+import shlex
 from threading import Timer
 
 import time
@@ -23,8 +24,8 @@ class GitNative(BaseGit):
                         "Git server url: {}, "
                         "Git command timeout: "
                         "{} seconds".format(conf.git.local_repository_path,
-                                    conf.git.git_server_url,
-                                    conf.git.git_cmd_timeout))
+                                            conf.git.git_server_url,
+                                            conf.git.git_cmd_timeout))
 
             out, error = self._git_pull(conf.git.local_repository_path)
             if self._is_conflict(out) or self._is_error(error):

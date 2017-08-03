@@ -82,7 +82,7 @@ class GitNativeTest(unittest.TestCase):
     @patch.object(git_native.subprocess, 'Popen')
     @patch.object(git_native.GitNative, '_git_config',
                   side_effect=GitNativeError("Could not write to file"))
-    def test_git_native_validate_git_config_fail(self, conf,mock_popen, result):
+    def test_git_native_validate_git_config_fail(self, conf, mock_popen, result):
         """Test that no exception is raised when calling git_init.aein"""
         my_pipe = mock.MagicMock()
         my_pipe.communicate = mock.MagicMock(return_value=('1', '2',))

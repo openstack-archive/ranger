@@ -8,7 +8,7 @@ from rds.services import yaml_customer_builder as CustomerBuild
 
 alldata = {
     'uuid': '1e24981a-fa51-11e5-86aa-5e5517507c66',
-    'metadata': [{'my_server_name': 'Apache1'},{'ocx_cust': '123456889'}],
+    'metadata': [{'my_server_name': 'Apache1'}, {'ocx_cust': '123456889'}],
     'default_region': {'users': [{'id': 'userId1zzzz',
                                   'roles': ['adminzzzz', 'otherzzzzz']},
                                  {'id': 'userId2zzz',

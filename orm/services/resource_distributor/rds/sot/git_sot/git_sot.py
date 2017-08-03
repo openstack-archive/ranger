@@ -226,8 +226,3 @@ def cleanup(git_impl):
     except GitResetError as exc:
         logger.error(exc.message)
         raise SoTError(exc.message)
-
-
-
-
-

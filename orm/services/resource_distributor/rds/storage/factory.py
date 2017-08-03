@@ -7,4 +7,3 @@ database = {
 
 def get_region_resource_id_status_connection():
     return RegionResourceIdStatusConnection(database['url'])
-

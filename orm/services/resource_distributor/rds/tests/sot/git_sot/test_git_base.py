@@ -60,4 +60,3 @@ class BaseGitTests(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             base_git = BaseGit()
             base_git.validate_git()
-

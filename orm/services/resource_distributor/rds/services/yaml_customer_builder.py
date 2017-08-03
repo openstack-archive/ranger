@@ -40,9 +40,9 @@ def creat_final_yaml(title, description, resources, outputs):
                                                default_flow_style=False))
     resources_yaml = re.sub("'", '', resourcesyaml)
     yamldata = title_yaml
-    yamldata = yamldata + "\n"+description_yaml
-    yamldata = yamldata + "\n"+resources_yaml
-    yamldata = yamldata + "\n"+yaml.dump(outputs)
+    yamldata = yamldata + "\n" + description_yaml
+    yamldata = yamldata + "\n" + resources_yaml
+    yamldata = yamldata + "\n" + yaml.dump(outputs)
     return yamldata
 
 
@@ -103,9 +103,6 @@ def yamlbuilder(alldata, region):
                 {"role": role_format % role,
                  'project': "{'get_resource': '%s'}" % alldata['uuid']}
             )
-            # create the output for roles
-          #  outputs['outputs']["%s_id" % role] =\
-         #       {"value": {"get_resource": "%s" % role}}
 
         # no support for group when type is ldap
         if yaml_type != 'ldap':
@@ -156,7 +153,6 @@ def yamlbuilder(alldata, region):
                     if ite in quotas_keys:
                         items[item][quotas_keys[ite]] = items[item][ite]
                         del items[item][ite]
-                #------------------------------------
 
                 # adding tenant to each quota
                 items[item]['tenant'] = \

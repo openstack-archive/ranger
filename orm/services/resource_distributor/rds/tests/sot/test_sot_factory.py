@@ -46,11 +46,3 @@ class SoTFactoryTests(unittest.TestCase):
         self.assertEqual(GitSoT.commit_email, "6", "commit_email not match")
         self.assertEqual(GitSoT.git_server_url, "7", "git_server_url not match")
         self.assertEqual(GitSoT.git_type, "gittle", "git_type not match")
-
-
-
-
-
-
-
-

@@ -192,7 +192,7 @@ class CreateNewResource(rest.RestController):
                                              resource_type,
                                              resource_id)
             res = Result(**{resource_type: CreatedResource(id=resource_id,
-                                                           created='%d' % (time.time()*1000),
+                                                           created='%d' % (time.time() * 1000),
                                                            links=Links(site_link))})
             return res
         except ConflictValue as e:
@@ -233,11 +233,11 @@ class CreateNewResource(rest.RestController):
             site_link = "%s/v1/rds/%s/%s" % (base_url,
                                              resource_type,
                                              resource_id)
-            res = Result(**{resource_type: CreatedResource(id=resource_id,
-                                                           updated='%d' % (
-                                                           time.time() * 1000),
-                                                           links=Links(
-                                                               site_link))})
+            res = Result(**{
+                resource_type: CreatedResource(
+                    id=resource_id,
+                    updated='%d' % (time.time() * 1000),
+                    links=Links(site_link))})
             return res
         except ConflictValue as e:
             my_logger.error("the request blocked need to wait "

@@ -20,7 +20,7 @@ def _set_headers():
         if token_id:
             headers['X-Auth-Token'] = token_id
             headers['X-Auth-Region'] = region
-    except:
+    except Exception:
         logger.error("no token")
 
 

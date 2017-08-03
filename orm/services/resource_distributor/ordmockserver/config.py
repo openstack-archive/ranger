@@ -42,7 +42,7 @@ verify = False
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'restapi': {'level': 'DEBUG', 'handlers': ['console','logfile'], 'propagate': False},
+        'restapi': {'level': 'DEBUG', 'handlers': ['console', 'logfile'], 'propagate': False},
         'pecan': {'level': 'DEBUG', 'handlers': ['console'], 'propagate': False},
         'py.warnings': {'handlers': ['console']},
         '__force_dict__': True
@@ -69,7 +69,7 @@ logging = {
             '()': 'pecan.log.ColorFormatter',
             'format': ('%(asctime)s [%(padded_color_levelname)s] [%(name)s]'
                        '[%(threadName)s] %(message)s'),
-        '__force_dict__': True
+            '__force_dict__': True
         }
     }
 }

@@ -114,30 +114,13 @@ class MainTest(unittest.TestCase):
                       '(expected NotifyNotAcknowledgedError)')
         except ord_notifier.NotifyNotAcknowledgedError:
             pass
-    #    @mock.patch.object(ord_notifier, 'conf')
- #   def test_notify_sanity(self, mock_conf):
-  #      ord_notifier.requests.post = mock.MagicMock(
-   #         return_value=MyResponse(ord_notifier.ACK_CODE, None))
-    #    ord_notifier._notify(*("1", )*8)
-
-#    @mock.patch.object(ord_notifier, 'conf')
- #   def test_notify_not_acknowledged(self, mock_conf):
-  #      ord_notifier.requests.post = mock.MagicMock(
-   #         return_value=MyResponse(404, None))
-#
- #       try:
-  #          ord_notifier._notify(*("1", )*8)
-   #         self.fail('notify() passed successfully'
-    #                  '(expected NotifyNotAcknowledgedError)')
-     #   except ord_notifier.NotifyNotAcknowledgedError:
-      #      pass
 
     @mock.patch.object(ord_notifier, 'conf')
     def test_notify_https_disabled_but_received(self, mock_conf):
         ord_notifier.requests.post = validate_http_post
         mock_conf.ordupdate.https_enabled = False
         mock_conf.ordupdate.template_type = 'a'
-        ord_notifier._notify('https://127.0.0.1:1337', *("1", )*7)
+        ord_notifier._notify('https://127.0.0.1:1337', * ("1", ) * 7)
 
     @mock.patch.object(ord_notifier, 'conf')
     @mock.patch.object(ord_notifier.json, 'dumps')
@@ -158,22 +141,6 @@ class MainTest(unittest.TestCase):
         self.assertRaises(ord_notifier.requests.exceptions.SSLError,
                           ord_notifier._notify, 'https://127.0.0.1:1337',
                           *("1",) * 7)
-#    @mock.patch.object(ord_notifier, 'conf')
- #   def test_notify_https_enabled_and_no_certificate(self, mock_conf):
-  #      ord_notifier.requests.post = validate_https_post
-   #     mock_conf.ordupdate.https_enabled = True
-    #    mock_conf.ordupdate.cert_path = ''
-     #   ord_notifier._notify('https://127.0.0.1:1337', *("1", )*7)
-
-#    @mock.patch.object(ord_notifier, 'conf')
- #   def test_notify_https_enabled_and_ssl_error(self, mock_conf):
-  #      ord_notifier.requests.post = mock.MagicMock(
-   #         side_effect=ord_notifier.requests.exceptions.SSLError('test'))
-    #    mock_conf.ordupdate.https_enabled = True
-     #   mock_conf.ordupdate.cert_path = ''
-      #  self.assertRaises(ord_notifier.requests.exceptions.SSLError,
-       #                   ord_notifier._notify, 'https://127.0.0.1:1337',
-        #                  *("1", )*7)
 
     @patch.object(ord_notifier.audit, 'audit')
     @patch.object(ord_notifier, 'regionResourceIdStatus')
@@ -188,35 +155,6 @@ class MainTest(unittest.TestCase):
         except ord_notifier.OrdNotFoundError as e:
             self.assertEqual(e.message, 'ORD of LCP %s not found' % (
                 'gigi', ))
-
-    #@patch.object(ord_notifier.audit, 'audit')
-    #@patch.object(ord_notifier, 'regionResourceIdStatus')
-  #  @mock.patch.object(ord_notifier, 'conf')
-   # @mock.patch.object(ord_notifier.json, 'dumps')
-    #def test_main_sanity(self, mock_dumps, mock_conf, mock_region, mock_audit):
-     #   ord_notifier.requests.get = mock.MagicMock(
-      #      return_value=MyResponse(ord_notifier.OK_CODE,
-       #                             {ord_notifier.LCP_ID: 'gigi',
-        #                             ord_notifier.ORD_URL: 'test'}))
-   #     ord_notifier.requests.post = mock.MagicMock(
-    #        return_value=MyResponse(ord_notifier.ACK_CODE, None))
-
-     #   ord_notifier.notify_ord('test', '1', '2', '3', '4', '5', '6', '7',
-      #                          '8', '')
-  #  @patch.object(ord_notifier.audit, 'audit')
- #   @patch.object(ord_notifier, 'regionResourceIdStatus')
-#    @mock.patch.object(ord_notifier, 'conf')
-#    def test_main_sanity(self, mock_audit, mock_region, mock_conf):
- #       ord_notifier.requests.get = mock.MagicMock(
-  #          return_value=MyResponse(ord_notifier.OK_CODE,
-   #                                 {'regions': [{'endpoints': [
-    #                                    {'publicurl': 'test',
-     #                                    'type': 'ord'}]}]}))
-      #  ord_notifier.requests.post = mock.MagicMock(
-       #     return_value=MyResponse(ord_notifier.ACK_CODE, None))
-
-        #ord_notifier.notify_ord('test', '1', '2', '3', '4', '5', '6', '7',
-         #                       '8', '')
 
     @patch.object(ord_notifier.audit, 'audit')
     @patch.object(ord_notifier, 'regionResourceIdStatus')

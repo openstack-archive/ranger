@@ -11,4 +11,3 @@ def set_utils_conf(conf):
     """Mock set_utils_conf function."""
 
     pass
-

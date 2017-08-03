@@ -32,4 +32,3 @@ class GitResetError(Exception):
 
 class GitValidateError(Exception):
     pass
-

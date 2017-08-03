@@ -43,5 +43,4 @@ class RootController(object):
         return dict(status=status, message=message)
 
     cat = CatalogController()
-    #customer=root.CreateNewCustomer()
     v1 = RootOne()

@@ -104,7 +104,7 @@ class MysqlRegionResourceIdStatusTest(unittest.TestCase):
                                                'err_code')
 
     @mock.patch.object(region_resource_id_status.db_session, 'EngineFacade',
-                       return_value=MyFacade(True,False))
+                       return_value=MyFacade(True, False))
     def test_add_update_status_record_duplicate_entry(self, mock_db_session):
         """No exception is raised when trying to add a duplicate entry."""
         my_connection = region_resource_id_status.Connection('url')
@@ -121,10 +121,10 @@ class MysqlRegionResourceIdStatusTest(unittest.TestCase):
     @mock.patch.object(region_resource_id_status, 'StatusModel')
     @patch.object(region_resource_id_status.Connection,
                   'get_timstamp_pair',
-                  return_value=(1,2))
+                  return_value=(1, 2))
     @mock.patch.object(region_resource_id_status, 'Model')
     @mock.patch.object(region_resource_id_status.db_session, 'EngineFacade',
-                       return_value=MyFacade(False,False,True))
+                       return_value=MyFacade(False, False, True))
     def test_get_records_by_filter_args_no_records(self, mock_db_session,
                                                    mock_get_timestamp,
                                                    mock_model,
@@ -140,10 +140,11 @@ class MysqlRegionResourceIdStatusTest(unittest.TestCase):
     @mock.patch.object(region_resource_id_status, 'Model')
     @mock.patch.object(region_resource_id_status.db_session, 'EngineFacade',
                        return_value=MyFacade(False, True, True))
-    def test_get_records_by_filter_args_with_records(self, mock_db_session,
-                                                   mock_get_timestamp,
-                                                   mock_model,
-                                                   mock_statusmodel):
+    def test_get_records_by_filter_args_with_records(self,
+                                                     mock_db_session,
+                                                     mock_get_timestamp,
+                                                     mock_model,
+                                                     mock_statusmodel):
         """Test that the function returns None when it got records."""
         my_connection = region_resource_id_status.Connection('url')
         my_connection.get_records_by_filter_args()
@@ -214,4 +215,3 @@ class MysqlRegionResourceIdStatusTest(unittest.TestCase):
                                                                 mock_statusmodel):
         my_connection = region_resource_id_status.Connection('url')
         my_connection.get_records_by_resource_id_and_status('1', '2')
-

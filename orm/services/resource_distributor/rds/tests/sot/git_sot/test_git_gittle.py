@@ -53,4 +53,3 @@ class GitGittleTests(unittest.TestCase):
         self.my_git.repo = mock.MagicMock()
         self.my_git.repo.commit = mock.MagicMock(side_effect=Exception("Failed to commit"))
         self.assertRaises(GitUploadError, self.my_git.git_upload_changes)
-
