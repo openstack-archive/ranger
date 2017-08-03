@@ -43,8 +43,8 @@ def _get_inputs_from_resource_type(jsondata,
 
 
 def _region_valid(region):
-    if 'rms_status' in region and region[
-        'rms_status'] not in conf.allow_region_statuses:
+    if ('rms_status' in region
+            and region['rms_status'] not in conf.allow_region_statuses):
         return False
     return True
 
@@ -141,8 +141,9 @@ def _check_resource_status(input_data):
 
 def update_sot(input_data):
     """create resource."""
-    my_logger.debug("build yaml file for %s id: %s" % (input_data.resource_type,
-                     input_data.resource_id))
+    my_logger.debug(
+        "build yaml file for %s id: %s" % (input_data.resource_type,
+                                           input_data.resource_id))
     targetslist = _create_data_to_sot(input_data)
     my_logger.debug("upload yaml to SoT")
     _upload_to_sot(input_data.resource_id,

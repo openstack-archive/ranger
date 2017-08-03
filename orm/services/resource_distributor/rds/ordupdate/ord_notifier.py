@@ -284,5 +284,6 @@ def notify_ord(transaction_id,
         _update_audit(region_id, application_id, tracking_id, transaction_id,
                       transaction_type, resource_id, user_id, external_id,
                       event_details, status)
-        logger.debug("Create Resource Requested to ORD: region=%s resource_id=%s status=%s"
-            % (region_id, resource_id, status))
+        logger.debug(
+            "Create Resource Requested to ORD: region=%s resource_id=%s status=%s" % (
+                region_id, resource_id, status))

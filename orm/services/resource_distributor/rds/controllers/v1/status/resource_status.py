@@ -126,7 +126,7 @@ class Status(rest.RestController):
         logger.info("post status")
         logger.debug("parse json!")
         data_to_save = dict(
-            timestamp=int(time.time())*1000,
+            timestamp=int(time.time()) * 1000,
             region=status_input.rds_listener.region,
             resource_id=status_input.rds_listener.resource_id,
             status=status_input.rds_listener.status,

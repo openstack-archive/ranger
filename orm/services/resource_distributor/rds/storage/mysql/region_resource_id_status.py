@@ -203,7 +203,7 @@ class Connection(region_resource_id_status.Base):
             return None
 
     def get_timstamp_pair(self):
-        timestamp = int(time.time())*1000
+        timestamp = int(time.time()) * 1000
         # assume same time period for all resource types
         max_interval_time_in_seconds = conf.region_resource_id_status.max_interval_time.default * 60
         ref_timestamp = (int(time.time()) - max_interval_time_in_seconds) * 1000

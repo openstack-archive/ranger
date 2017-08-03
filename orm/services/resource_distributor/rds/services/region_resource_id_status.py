@@ -22,14 +22,14 @@ def add_status(data):
                  ", transaction_id [{}] and resource_id [{}], ord_notifier_id [{}], "
                  "error message [{}], error code [{}] and "
                  "resource_extra_metadata [{}]".format(data['timestamp'],
-                                                     data['region'],
-                                                     data['status'],
-                                                     data['transaction_id'],
-                                                     data['resource_id'],
-                                                     data['ord_notifier_id'],
-                                                     data['error_msg'],
-                                                     data['error_code'],
-                                                     data.get('resource_extra_metadata', None)))
+                                                       data['region'],
+                                                       data['status'],
+                                                       data['transaction_id'],
+                                                       data['resource_id'],
+                                                       data['ord_notifier_id'],
+                                                       data['error_msg'],
+                                                       data['error_code'],
+                                                       data.get('resource_extra_metadata', None)))
 
     try:
         validate_status_value(data['status'])

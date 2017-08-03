@@ -26,20 +26,25 @@ json_input = {'status': 'complete', 'name': 'Ubuntu', 'internal_id': 1,
 region = {'action': 'delete', 'image_internal_id': 1, 'type': 'single',
           'name': 'North'}
 
-yaml_output = {'description': 'yaml file for region - North',
- 'resources': {'glance_image': {'properties': {'container_format': 'bare',
-    'disk_format': 'raw',
-    'is_public': True,
-    'copy_from': 'https://mirrors.it.att.com/images/image-name',
-    'min_disk': 2,
-    'min_ram': 0,
-    'name': 'North',
-    'owner': 'unknown',
-    'protected': True,
-    'tenants': ['abcd-efgh-ijkl-4567', 'abcd-efgh-ijkl-4567']},
-   'type': 'OS::Glance::Image2'}},
- 'heat_template_version': '2015-1-1',
- 'outputs': {'glance_image_id': {'value': {'get_resource': 'glance_image'}}}}
+yaml_output = {
+    'description': 'yaml file for region - North',
+    'resources': {
+        'glance_image': {
+            'properties': {
+                'container_format': 'bare',
+                'disk_format': 'raw',
+                'is_public': True,
+                'copy_from': 'https://mirrors.it.att.com/images/image-name',
+                'min_disk': 2,
+                'min_ram': 0,
+                'name': 'North',
+                'owner': 'unknown',
+                'protected': True,
+                'tenants': ['abcd-efgh-ijkl-4567', 'abcd-efgh-ijkl-4567']},
+            'type': 'OS::Glance::Image2'}},
+    'heat_template_version': '2015-1-1',
+    'outputs': {'glance_image_id': {'value': {'get_resource': 'glance_image'}}}
+}
 
 
 class CreateImage(unittest.TestCase):

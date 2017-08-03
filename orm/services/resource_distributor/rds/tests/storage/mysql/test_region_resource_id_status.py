@@ -140,10 +140,11 @@ class MysqlRegionResourceIdStatusTest(unittest.TestCase):
     @mock.patch.object(region_resource_id_status, 'Model')
     @mock.patch.object(region_resource_id_status.db_session, 'EngineFacade',
                        return_value=MyFacade(False, True, True))
-    def test_get_records_by_filter_args_with_records(self, mock_db_session,
-                                                   mock_get_timestamp,
-                                                   mock_model,
-                                                   mock_statusmodel):
+    def test_get_records_by_filter_args_with_records(self,
+                                                     mock_db_session,
+                                                     mock_get_timestamp,
+                                                     mock_model,
+                                                     mock_statusmodel):
         """Test that the function returns None when it got records."""
         my_connection = region_resource_id_status.Connection('url')
         my_connection.get_records_by_filter_args()
