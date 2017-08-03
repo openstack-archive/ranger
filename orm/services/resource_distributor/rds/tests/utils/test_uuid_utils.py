@@ -1,9 +1,5 @@
 """UUID utils test module."""
 
-import mock
-from rds.utils import uuid_utils
-import unittest
-
 
 class MyResponse(object):
     """A test response class."""

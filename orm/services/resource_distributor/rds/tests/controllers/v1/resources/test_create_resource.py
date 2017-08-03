@@ -1,6 +1,5 @@
 """unittest get resource."""
 from mock import patch
-
 import rds.controllers.v1.resources.root as root
 from rds.tests.controllers.v1.functional_test import FunctionalTest
 

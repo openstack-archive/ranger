@@ -1,11 +1,10 @@
 import logging
-from pecan import rest, request
 import wsme
-from wsmeext.pecan import wsexpose
 
 from orm_common.utils import api_error_utils as err_utils
-
+from pecan import request, rest
 from rms.utils import authentication
+from wsmeext.pecan import wsexpose
 
 logger = logging.getLogger(__name__)
 

@@ -18,8 +18,7 @@ class DependencyRegister:
 
     @classmethod
     def _unwrap_func(cls, decorated_func):
-        '''
-        This unwraps a decorated func, returning the inner wrapped func.
+        '''This unwraps a decorated func, returning the inner wrapped func.
 
         This may become unnecessary with Python 3.4's inspect.unwrap().
         '''

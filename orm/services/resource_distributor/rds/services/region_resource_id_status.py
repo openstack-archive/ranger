@@ -1,6 +1,5 @@
 import logging
 import sys
-import time
 
 from rds.services.base import Error, InputError
 from rds.storage import factory
@@ -22,14 +21,14 @@ def add_status(data):
                  ", transaction_id [{}] and resource_id [{}], ord_notifier_id [{}], "
                  "error message [{}], error code [{}] and "
                  "resource_extra_metadata [{}]".format(data['timestamp'],
-                                                     data['region'],
-                                                     data['status'],
-                                                     data['transaction_id'],
-                                                     data['resource_id'],
-                                                     data['ord_notifier_id'],
-                                                     data['error_msg'],
-                                                     data['error_code'],
-                                                     data.get('resource_extra_metadata', None)))
+                                                       data['region'],
+                                                       data['status'],
+                                                       data['transaction_id'],
+                                                       data['resource_id'],
+                                                       data['ord_notifier_id'],
+                                                       data['error_msg'],
+                                                       data['error_code'],
+                                                       data.get('resource_extra_metadata', None)))
 
     try:
         validate_status_value(data['status'])
@@ -47,7 +46,7 @@ def add_status(data):
     except Error as e:
         logger.exception("invalid inputs error")
         raise
-    except:
+    except Exception:
         logger.exception("Unexpected error: {}".format(sys.exc_info()[0]))
         raise
 

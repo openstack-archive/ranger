@@ -1,6 +1,6 @@
 from cms_rest.data.sql_alchemy.models import CmsUser
-
 from cms_rest.logger import get_logger
+
 LOG = get_logger(__name__)
 
 

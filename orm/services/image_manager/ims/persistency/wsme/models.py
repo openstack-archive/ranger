@@ -1,12 +1,11 @@
 """Image model module."""
-import wsme
-from pecan import conf
-from pecan import request
-
 from ims.logic.error_base import ErrorStatus
-from ims.persistency.wsme.base import Model
 from ims.persistency.sql_alchemy import db_models
-from orm_common.utils.cross_api_utils import set_utils_conf, get_regions_of_group
+from ims.persistency.wsme.base import Model
+from orm_common.utils.cross_api_utils import (get_regions_of_group,
+                                              set_utils_conf)
+from pecan import conf, request
+import wsme
 
 
 class Metadata(Model):
@@ -90,7 +89,7 @@ class RegionWrapper(Model):  # pragma: no cover
     regions = wsme.wsattr([Region], mandatory=False)
 
     def __init__(self, regions=[]):
-        """
+        """init
         :param regions: array of regions
         """
         self.regions = regions
@@ -102,7 +101,7 @@ class CustomerWrapper(Model):  # pragma: no cover
     customers = wsme.wsattr(wsme.types.ArrayType(str), mandatory=False)
 
     def __init__(self, customers=[]):
-        """
+        """init
         :param regions: array of regions
         """
         self.customers = customers
@@ -394,7 +393,7 @@ class ImageWrapper(Model):
     image = wsme.wsattr(Image, mandatory=True, name='image')
 
     def __init__(self, image=Image()):
-        """
+        """init
 
         :param image: image dict
         """
@@ -420,9 +419,7 @@ class ImageWrapper(Model):
         return image
 
 
-'''
-' ImageSummary a DataObject contains all the fields defined in ImageSummary.
-'''
+# ImageSummary a DataObject contains all the fields defined in ImageSummary.
 
 
 class ImageSummary(Model):

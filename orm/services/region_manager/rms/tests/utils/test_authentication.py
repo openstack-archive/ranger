@@ -1,7 +1,7 @@
 """Authentication utilities module unittests."""
 import mock
-from rms.utils import authentication
 from rms.tests import FunctionalTest
+from rms.utils import authentication
 
 
 class TestGetConfiguration(FunctionalTest):

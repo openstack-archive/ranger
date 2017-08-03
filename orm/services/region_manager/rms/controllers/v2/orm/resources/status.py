@@ -1,19 +1,16 @@
 import logging
 
 import pecan
-from pecan import rest, request, conf
-
 import wsme
-from wsme import types as wtypes
-from wsmeext.pecan import wsexpose
 
 from orm_common.utils import api_error_utils as err_utils
 from orm_common.utils import utils
-
+from pecan import conf, request, rest
 from rms.services import error_base
 from rms.services import services as RegionService
 from rms.utils import authentication
-
+from wsme import types as wtypes
+from wsmeext.pecan import wsexpose
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +22,7 @@ class RegionStatus(wtypes.DynamicBase):
     links = wsme.wsattr({str: str}, mandatory=False)
 
     def __init__(self, status=None, links=None):
-        """
-        RegionStatus wrapper
+        """RegionStatus wrapper
         :param status:
         """
         self.status = status
@@ -38,8 +34,7 @@ class RegionStatusController(rest.RestController):
     @wsexpose(RegionStatus, str, body=RegionStatus, status_code=201,
               rest_content_types='json')
     def put(self, region_id, new_status):
-        """
-        Handle put request to modify region status
+        """Handle put request to modify region status
         :param region_id:
         :param new_status:
         :return: 200 for updated, 404 for region not found

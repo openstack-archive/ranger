@@ -1,9 +1,10 @@
 """flavor unittest module."""
-from mock import patch
-from rds.services import yaml_flavor_bulder as FlavorBuild
 import unittest
+
 import yaml
 
+from mock import patch
+from rds.services import yaml_flavor_bulder as FlavorBuild
 
 alldata = {'status': 'complete', 'series': 'P2',
            'description': 'First flavor for AMAR',

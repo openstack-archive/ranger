@@ -1,14 +1,11 @@
-from pecan import rest, request
-from pecan.core import abort
-from wsmeext.pecan import wsexpose
-from orm_common.injector import injector
-
-from ims.persistency.wsme.models import ImageWrapper, CustomerWrapper
-from ims.logic.error_base import ErrorStatus
-from orm_common.utils import api_error_utils as err_utils
-from ims.utils import authentication as auth
-
 from ims.logger import get_logger
+from ims.logic.error_base import ErrorStatus
+from ims.persistency.wsme.models import CustomerWrapper, ImageWrapper
+from ims.utils import authentication as auth
+from orm_common.injector import injector
+from orm_common.utils import api_error_utils as err_utils
+from pecan import request, rest
+from wsmeext.pecan import wsexpose
 
 LOG = get_logger(__name__)
 

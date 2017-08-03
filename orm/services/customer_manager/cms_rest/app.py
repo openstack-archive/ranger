@@ -1,11 +1,12 @@
-from pecan import make_app
-from cms_rest import model
-from orm_common.utils import utils
-from cms_rest.logger import get_logger
-from pecan.commands import CommandRunner
-from orm_common.policy import policy
-from cms_rest.utils import authentication
 import os
+
+from cms_rest.logger import get_logger
+from cms_rest import model
+from cms_rest.utils import authentication
+from orm_common.policy import policy
+from orm_common.utils import utils
+from pecan.commands import CommandRunner
+from pecan import make_app
 
 logger = get_logger(__name__)
 
@@ -33,4 +34,4 @@ def main():
     drive, path_and_file = os.path.splitdrive(dir_name)
     path, filename = os.path.split(path_and_file)
     runner = CommandRunner()
-    runner.run(['serve', path+'/config.py'])
+    runner.run(['serve', path + '/config.py'])

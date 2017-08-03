@@ -1,9 +1,9 @@
-from mock import patch
 import unittest
 
+from mock import patch
 from rms.storage import data_manager_factory
-from rms.storage.my_sql.data_manager import DataManager
 from rms.storage.my_sql import data_manager
+from rms.storage.my_sql.data_manager import DataManager
 
 
 class StorageFactoryTests(unittest.TestCase):

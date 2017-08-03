@@ -1,10 +1,11 @@
-import pprint
-import requests
 import json
-from pecan import conf
-from pecan import request
-from cms_rest.logic.error_base import ErrorStatus
+import pprint
+
+import requests
+
 from cms_rest.logger import get_logger
+from cms_rest.logic.error_base import ErrorStatus
+from pecan import conf, request
 
 LOG = get_logger(__name__)
 headers = {'content-type': 'application/json'}

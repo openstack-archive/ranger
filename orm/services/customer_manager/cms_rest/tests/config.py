@@ -1,4 +1,5 @@
 import os
+
 from cms_rest.tests.simple_hook_mock import SimpleHookMock
 
 global SimpleHookMock

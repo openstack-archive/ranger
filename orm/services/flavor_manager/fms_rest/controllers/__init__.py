@@ -1,7 +1,8 @@
 import os
+
+import fms_rest.di_providers as di_providers
 from fms_rest.logger import get_logger
 from orm_common.injector import injector
-import fms_rest.di_providers as di_providers
 
 logger = get_logger(__name__)
 

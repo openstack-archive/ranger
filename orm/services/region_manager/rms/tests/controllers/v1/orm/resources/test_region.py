@@ -1,12 +1,10 @@
 import json
-from mock import patch, MagicMock
 
+from mock import MagicMock, patch
 from rms.controllers.v2.orm.resources import regions
 from rms.model import model as PyModels
 from rms.tests import FunctionalTest
-
 from wsme.exc import ClientSideError
-
 
 result_inst = PyModels.Regions([PyModels.RegionData("2", "3", "4", "5", "6",
                                                     address=PyModels.Address("US", "NY", "HANEGEV", "AIRPORT_CITY", "5"),

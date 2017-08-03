@@ -1,9 +1,8 @@
+import logging
+
 from pecan import expose
 from pecan.rest import RestController
-from webob.exc import status_map
-
 import uuidgen.controllers.v1.root as root
-import logging
 
 LOG = logging.getLogger(__name__)
 
@@ -14,9 +13,8 @@ class RootController(RestController):
 
     @expose(template='json')
     def get(self):
-        """
-            Method to handle GET /
-            prameters: None
+        """Method to handle GET /
+            parameters: None
             return: dict describing uuid command version information
         """
         LOG.info("root -get versions")

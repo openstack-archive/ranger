@@ -1,5 +1,5 @@
-from pecan import make_app
 from orm import model
+from pecan import make_app
 
 
 def setup_app(config):

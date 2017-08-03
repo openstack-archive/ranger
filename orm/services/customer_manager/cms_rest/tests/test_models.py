@@ -1,7 +1,6 @@
-import mock
-from cms_rest.tests import FunctionalTest
-
 from cms_rest.model import Models as models
+from cms_rest.tests import FunctionalTest
+import mock
 
 GROUP_REGIONS = [
     "DPK",
@@ -31,8 +30,7 @@ class TestModels(FunctionalTest):
 
 
 def get_cust_model():
-    """
-    this function create a customer model object for testing
+    """this function create a customer model object for testing
     :return: new customer object
     """
 

@@ -1,15 +1,13 @@
 import copy
 import requests
-from fms_rest.tests import FunctionalTest
-from orm_common.injector import injector
-from mock import MagicMock
-from mock import patch
 import sqlalchemy
 
+from fms_rest.controllers.v1.orm.flavors import flavors
 from fms_rest.data.wsme import models
 from fms_rest.logic.error_base import ErrorStatus
-from fms_rest.controllers.v1.orm.flavors import flavors
-from fms_rest.tests import test_utils
+from fms_rest.tests import FunctionalTest, test_utils
+from mock import MagicMock, patch
+from orm_common.injector import injector
 
 utils_mock = None
 flavor_logic_mock = None

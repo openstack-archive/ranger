@@ -2,13 +2,12 @@ import logging
 import os
 import threading
 
+import git_factory
+from git_base import (GitInitError, GitResetError, GitUploadError,
+                      GitValidateError)
 from rds.ordupdate.ord_notifier import notify_ord
 from rds.sot import base_sot
 from rds.sot.base_sot import SoTError
-
-import git_factory
-from git_base import GitUploadError, GitInitError, GitResetError
-from git_base import GitValidateError
 
 logger = logging.getLogger(__name__)
 lock = threading.Lock()
@@ -226,8 +225,3 @@ def cleanup(git_impl):
     except GitResetError as exc:
         logger.error(exc.message)
         raise SoTError(exc.message)
-
-
-
-
-

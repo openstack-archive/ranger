@@ -1,14 +1,12 @@
-import mock
 import requests
-import sqlalchemy
-from wsme.exc import ClientSideError
 
 from cms_rest.controllers.v1.orm.customer import root
 from cms_rest.logic.error_base import ErrorStatus
-
 from cms_rest.model import Models
-from cms_rest.tests import FunctionalTest
-from cms_rest.tests import test_utils
+from cms_rest.tests import FunctionalTest, test_utils
+import mock
+import sqlalchemy
+from wsme.exc import ClientSideError
 
 customer_logic_mock = None
 

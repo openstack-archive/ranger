@@ -1,14 +1,13 @@
-from fms_rest.logger import get_logger
-from fms_rest.data.wsme.models import RegionWrapper, TenantWrapper, ExtraSpecsWrapper, Flavor
-from fms_rest.data.wsme.models import FlavorWrapper, Region, TagsWrapper
-from fms_rest.data.wsme.models import FlavorListFullResponse, Flavor
-from fms_rest.data.sql_alchemy.db_models import FlavorRegion, FlavorTenant
-from fms_rest.logic.error_base import ErrorStatus, NotFoundError, ConflictError
-from sqlalchemy.orm.exc import FlushError
-
-from orm_common.injector import injector
-import re
 import uuid
+
+from fms_rest.data.sql_alchemy.db_models import FlavorRegion, FlavorTenant
+from fms_rest.data.wsme.models import (ExtraSpecsWrapper, Flavor,
+                                       FlavorListFullResponse, FlavorWrapper,
+                                       Region, RegionWrapper, TagsWrapper,
+                                       TenantWrapper)
+from fms_rest.logger import get_logger
+from fms_rest.logic.error_base import ConflictError, ErrorStatus, NotFoundError
+from orm_common.injector import injector
 
 LOG = get_logger(__name__)
 

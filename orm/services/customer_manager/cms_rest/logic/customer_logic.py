@@ -1,21 +1,19 @@
-from cms_rest.model.Models import CustomerResultWrapper
-from cms_rest.model.Models import RegionResultWrapper
-from cms_rest.model.Models import UserResultWrapper
-from cms_rest.model.Models import CustomerSummaryResponse, CustomerSummary
-from cms_rest.rds_proxy import RdsProxy
-from cms_rest.data.data_manager import DataManager
-from cms_rest.data.sql_alchemy.models import UserRole
-from cms_rest.logic.error_base import ErrorStatus, NotFound, DuplicateEntryError
-from cms_rest.data.sql_alchemy.models import CustomerMetadata
-from orm_common.utils.cross_api_utils import get_regions_of_group, set_utils_conf
-from orm_common.utils import utils
-
-from pecan import conf, request
-
-import pecan
 import requests
 
+from cms_rest.data.data_manager import DataManager
+from cms_rest.data.sql_alchemy.models import CustomerMetadata, UserRole
 from cms_rest.logger import get_logger
+from cms_rest.logic.error_base import (DuplicateEntryError, ErrorStatus,
+                                       NotFound)
+from cms_rest.model.Models import (CustomerResultWrapper, CustomerSummary,
+                                   CustomerSummaryResponse,
+                                   RegionResultWrapper, UserResultWrapper)
+from cms_rest.rds_proxy import RdsProxy
+from orm_common.utils import utils
+from orm_common.utils.cross_api_utils import (get_regions_of_group,
+                                              set_utils_conf)
+import pecan
+from pecan import conf, request
 
 LOG = get_logger(__name__)
 
@@ -698,8 +696,7 @@ class CustomerLogic(object):
 
 
 def build_response(customer_uuid, transaction_id, context):
-    """
-        this function generate th customer action response JSON
+    """this function generate th customer action response JSON
     :param customer_uuid:
     :param transaction_id:
     :param context: create or update

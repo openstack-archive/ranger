@@ -1,9 +1,7 @@
 from functools import partial
 
-from .errors import (
-    FangError,
-    ProviderAlreadyRegisteredError,
-    ProviderNotFoundError)
+from .errors import (FangError, ProviderAlreadyRegisteredError,
+                     ProviderNotFoundError)
 
 
 class ResourceProviderRegister:

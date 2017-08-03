@@ -1,9 +1,8 @@
 import logging
 
-from pecan import conf
-from gittle import Gittle
-
 from git_base import BaseGit, GitInitError, GitUploadError
+from gittle import Gittle
+from pecan import conf
 
 logger = logging.getLogger(__name__)
 

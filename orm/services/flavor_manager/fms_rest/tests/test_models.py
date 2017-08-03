@@ -1,7 +1,6 @@
-import mock
-from fms_rest.tests import FunctionalTest
-
 from fms_rest.data.wsme import models
+from fms_rest.tests import FunctionalTest
+import mock
 
 GROUP_REGIONS = [
     "DPK",
@@ -31,8 +30,8 @@ class TestModels(FunctionalTest):
 
 
 def get_flavor_model():
-    """
-    this function create a customer model object for testing
+    """this function create a customer model object for testing
+
     :return: new customer object
     """
 

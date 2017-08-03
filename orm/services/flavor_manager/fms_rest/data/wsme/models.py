@@ -1,10 +1,8 @@
 import wsme
+
 from fms_rest.data.sql_alchemy import db_models
-
 from fms_rest.data.wsme.model import Model
-
 from fms_rest.logic.error_base import ErrorStatus
-
 from pecan import conf, request
 from orm_common.utils.cross_api_utils import set_utils_conf, get_regions_of_group
 
@@ -139,7 +137,7 @@ class RegionWrapper(Model):  # pragma: no cover
     regions = wsme.wsattr([Region], mandatory=False)
 
     def __init__(self, regions=[]):
-        """
+        """init
 
         :param regions: array of regions
         """
@@ -487,7 +485,7 @@ class FlavorWrapper(Model):
     flavor = wsme.wsattr(Flavor, mandatory=True, name='flavor')
 
     def __init__(self, flavor=Flavor()):
-        """
+        """init
 
         :param flavor: flavor dict
         """

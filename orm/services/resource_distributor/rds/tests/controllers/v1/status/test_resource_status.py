@@ -1,6 +1,5 @@
 """unittest for post resource."""
 from mock import patch
-
 import rds.controllers.v1.status.resource_status as resource
 from rds.tests.controllers.v1.functional_test import FunctionalTest
 

@@ -1,7 +1,6 @@
-import wsme
 from pecan import response
+import wsme
 from wsme import types as wtypes
-import inspect
 
 
 class ClientSideError(wsme.exc.ClientSideError):

@@ -1,8 +1,8 @@
-import mock
 from ims.logic import image_logic
-from ims.tests import FunctionalTest
 from ims.persistency.sql_alchemy.db_models import Image
 from ims.persistency.wsme import models
+from ims.tests import FunctionalTest
+import mock
 
 
 class RDSGetStatus():

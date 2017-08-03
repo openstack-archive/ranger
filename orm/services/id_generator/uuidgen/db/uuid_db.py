@@ -1,7 +1,8 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer
-from oslo_db.sqlalchemy import models
 import logging
+
+from oslo_db.sqlalchemy import models
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
 
 LOG = logging.getLogger(__name__)
 

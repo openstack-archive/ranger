@@ -5,15 +5,13 @@ import wsme
 
 from orm_common.utils import api_error_utils as err_utils
 from orm_common.utils import utils
-
+from pecan import request, rest
+from rms.model import model as PythonModel
 from rms.services import error_base
 from rms.services import services as GroupService
 from rms.utils import authentication
-from pecan import rest, request
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose
-from rms.model import model as PythonModel
-
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +50,7 @@ class GroupWrapper(wtypes.DynamicBase):
     groups = wsme.wsattr([Groups], mandatory=True)
 
     def __init__(self, groups=[]):
-        """
+        """init function
 
         :param group:
         """

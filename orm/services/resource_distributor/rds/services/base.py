@@ -15,8 +15,5 @@ class ErrorMesage(Error):
 
 
 class ConflictValue(Error):
-    """
-    block values if operation still in progress
-    """
+    """block values if operation still in progress"""
     pass
-

@@ -1,12 +1,11 @@
 import json
 import logging
 
-from mock import patch, MagicMock
-from wsme.exc import ClientSideError
-
 import rms.controllers.logs as logs
+from mock import MagicMock, patch
 from rms.controllers.logs import LogsController as logs_controller
 from rms.tests import FunctionalTest
+from wsme.exc import ClientSideError
 
 
 class TestGetConfiguration(FunctionalTest):

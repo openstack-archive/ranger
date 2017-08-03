@@ -1,16 +1,13 @@
 import logging
 
-from pecan import rest, request
-from pecan import conf
-
-from wsme import types as wtypes
-from wsmeext.pecan import wsexpose
+from orm_common.utils import api_error_utils as err_utils
+from pecan import request, rest
 from rms.model import url_parm
 from rms.services.error_base import ErrorStatus
 from rms.services import services
 from rms.utils import authentication
-
-from orm_common.utils import api_error_utils as err_utils
+from wsme import types as wtypes
+from wsmeext.pecan import wsexpose
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +16,7 @@ class LcpController(rest.RestController):
 
     @wsexpose(wtypes.text, rest_content_types='json')
     def get_all(self):
-        """
-            This function is called when receiving /lcp without a parameter.
+        """This function is called when receiving /lcp without a parameter.
             parameter:
                 None.
             return: entire list of lcp.
@@ -71,8 +67,8 @@ class LcpController(rest.RestController):
 
 
 def get_zones():
-    """
-    This function returns the lcp list from CSV file.
+    """This function returns the lcp list from CSV file.
+
     parameter:
         None.
     return:

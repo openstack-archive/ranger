@@ -1,8 +1,8 @@
-from pecan import conf
 import time
-from orm_common.injector import injector
 
 from fms_rest.logger import get_logger
+from orm_common.injector import injector
+from pecan import conf
 
 logger = get_logger(__name__)
 

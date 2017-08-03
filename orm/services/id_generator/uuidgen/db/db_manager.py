@@ -1,7 +1,8 @@
-from pecan import conf
-from oslo_db.sqlalchemy import session as db_session
-from uuid_db import UUID
 import logging
+
+from oslo_db.sqlalchemy import session as db_session
+from pecan import conf
+from uuid_db import UUID
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,9 @@
 """DB actions wrapper module."""
 import logging
-from rms.model.model import Groups
-from rms.model.model import Regions
+
+from rms.model.model import Groups, Regions
 from rms.services import error_base
-from rms.storage import base_data_manager
-from rms.storage import data_manager_factory
+from rms.storage import base_data_manager, data_manager_factory
 
 LOG = logging.getLogger(__name__)
 
@@ -25,7 +24,7 @@ def get_regions_data(url_parms):
 
 
 def get_region_by_id_or_name(region_id_or_name):
-    """
+    """get region by id
 
     :param region_id_or_name:
     :return: region object (wsme format)
@@ -46,7 +45,7 @@ def get_region_by_id_or_name(region_id_or_name):
 
 
 def update_region(region_id, region):
-    """
+    """update region
     :param region:
     :return:
     """
@@ -72,7 +71,7 @@ def update_region(region_id, region):
 
 
 def delete_region(region_id):
-    """
+    """delete region
 
     :param region_id:
     :return:
@@ -181,7 +180,7 @@ def get_groups_data(name):
 
 
 def get_all_groups():
-    """
+    """list all groups
 
     :return:
     """
@@ -200,7 +199,7 @@ def get_all_groups():
 
 
 def delete_group(group_id):
-    """
+    """delete group
 
     :param group_id:
     :return:

@@ -1,11 +1,12 @@
 import json
 import logging.handlers
-from pecan import conf
-from pecan import request
-import pecan.rest
-import requests
 import threading
 import time
+
+import requests
+
+from pecan import conf
+import pecan.rest
 import wsme
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose

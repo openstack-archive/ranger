@@ -1,6 +1,6 @@
 """model module."""
-from rms.services import error_base
 from pecan import conf
+from rms.services import error_base
 
 
 class Address(object):
@@ -8,7 +8,7 @@ class Address(object):
 
     def __init__(self, country=None, state=None, city=None,
                  street=None, zip=None):
-        """
+        """init
 
         :param country:
         :param state:
@@ -44,7 +44,7 @@ class RegionData(object):
                  ranger_agent_version=None, design_type=None, location_type=None,
                  vlcp_name=None, open_stack_version=None,
                  address=Address(), metadata={}, endpoints=[EndPoint()]):
-        """
+        """init
 
         :param status:
         :param id:
@@ -84,7 +84,7 @@ class RegionData(object):
                             "type {}".format(endpoint.type))
             try:
                 endpoints_types_must_have.remove(endpoint.type)
-            except:
+            except Exception:
                 pass
         if len(endpoints_types_must_have) > 0:
             raise error_base.InputValueError(
@@ -173,7 +173,7 @@ class GroupsWrraper(object):
     """list of groups."""
 
     def __init__(self, groups=None):
-        """
+        """init
 
         :param groups:
         """

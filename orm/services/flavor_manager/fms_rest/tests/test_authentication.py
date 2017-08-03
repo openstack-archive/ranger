@@ -1,8 +1,7 @@
-import mock
 from fms_rest.tests import FunctionalTest
-from pecan import conf
-
 from fms_rest.utils import authentication
+import mock
+from pecan import conf
 
 
 class TestUtil(FunctionalTest):

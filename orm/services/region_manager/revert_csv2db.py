@@ -1,10 +1,9 @@
-import logging
 import csv
+import logging
 
-from rms.storage.base_data_manager import SQLDBError
-
-from rms.storage.my_sql.data_manager import DataManager
 import config
+from rms.storage.base_data_manager import SQLDBError
+from rms.storage.my_sql.data_manager import DataManager
 
 logger = logging.getLogger(__name__)
 

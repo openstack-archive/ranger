@@ -1,7 +1,6 @@
-import mock
-from ims.tests import FunctionalTest
-
 from ims.persistency.wsme import models
+from ims.tests import FunctionalTest
+import mock
 
 GROUP_REGIONS = [
     "DPK",
@@ -31,8 +30,7 @@ class TestModels(FunctionalTest):
 
 
 def get_image_model():
-    """
-    this function create a customer model object for testing
+    """this function create a customer model object for testing
     :return: new customer object
     """
 

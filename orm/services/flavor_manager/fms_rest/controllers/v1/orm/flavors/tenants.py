@@ -1,14 +1,11 @@
-from pecan import rest, request
-from pecan.core import abort
-from wsmeext.pecan import wsexpose
-
 from fms_rest.data.wsme.models import TenantWrapper
-from fms_rest.logic.error_base import ErrorStatus
 from fms_rest.logger import get_logger
-
+from fms_rest.logic.error_base import ErrorStatus
+from fms_rest.utils import authentication
 from orm_common.injector import injector
 from orm_common.utils import api_error_utils as err_utils
-from fms_rest.utils import authentication
+from pecan import request, rest
+from wsmeext.pecan import wsexpose
 
 LOG = get_logger(__name__)
 

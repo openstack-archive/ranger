@@ -2,17 +2,16 @@ from pecan import rest, request, response
 import oslo_db
 from wsmeext.pecan import wsexpose
 
-from cms_rest.model.Models import Customer, CustomerResultWrapper, CustomerSummaryResponse
-from cms_rest.controllers.v1.orm.customer.users import DefaultUserController
-from cms_rest.controllers.v1.orm.customer.regions import RegionController
-from cms_rest.controllers.v1.orm.customer.metadata import MetadataController
 from cms_rest.controllers.v1.orm.customer.enabled import EnabledController
+from cms_rest.controllers.v1.orm.customer.metadata import MetadataController
+from cms_rest.controllers.v1.orm.customer.regions import RegionController
+from cms_rest.controllers.v1.orm.customer.users import DefaultUserController
 from cms_rest.logic.customer_logic import CustomerLogic
-
 from cms_rest.logic.error_base import ErrorStatus
-from orm_common.utils import utils
-from orm_common.utils import api_error_utils as err_utils
+from cms_rest.model.Models import Customer, CustomerResultWrapper, CustomerSummaryResponse
 from cms_rest.utils import authentication
+from orm_common.utils import api_error_utils as err_utils
+from orm_common.utils import utils
 
 from cms_rest.logger import get_logger
 

@@ -1,7 +1,7 @@
 """Get configuration module unittests."""
-from rds.tests.controllers.v1.functional_test import FunctionalTest
-from rds.controllers.v1.configuration import root
 from mock import patch
+from rds.controllers.v1.configuration import root
+from rds.tests.controllers.v1.functional_test import FunctionalTest
 
 
 class TestGetConfiguration(FunctionalTest):

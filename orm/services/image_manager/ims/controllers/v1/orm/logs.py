@@ -4,7 +4,6 @@ from pecan import rest
 import wsme
 from wsmeext.pecan import wsexpose
 
-
 logger = logging.getLogger(__name__)
 
 

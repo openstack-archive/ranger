@@ -2,16 +2,16 @@
 import unittest
 
 from mock import patch
-
 from rds.services import resource as ResourceService
-from rds.services.model.region_resource_id_status import Model, ResourceMetaData
-from rds.services.model.region_resource_id_status import StatusModel
+from rds.services.model.region_resource_id_status import (Model,
+                                                          ResourceMetaData,
+                                                          StatusModel)
 
 result = Model(
     status="success", timestamp="123456789", region="name",
     transaction_id=5, resource_id="1",
     ord_notifier="", err_msg="123", err_code="12", operation="create",
-    resource_extra_metadata=[ResourceMetaData(checksum=1,virtual_size=2,size=3)]
+    resource_extra_metadata=[ResourceMetaData(checksum=1, virtual_size=2, size=3)]
 )
 
 uuid = "uuid-12345"
@@ -26,13 +26,13 @@ class InputData(object):
                  external_transaction_id=""):
         """init function.
 
-        :param resource_id:
-        :param resource_type:
-        :param targets:
-        :param operation:
-        :param transaction_id:
-        :param model:
-        :param external_transaction_id:
+        : param resource_id:
+        : param resource_type:
+        : param targets:
+        : param operation:
+        : param transaction_id:
+        : param model:
+        : param external_transaction_id:
         """
         self.resource_id = resource_id
         self.targets = targets
@@ -298,17 +298,17 @@ jsondata = {
                             "ram": "10",
                             "keypairs": "10",
                             "injected_files": "10"
-                     },
+                        },
                         "storage": {"gigabytes": "10",
                                     "snapshots": "10",
                                     "volumes": "10"
                                     },
-                        "network":{
-                                 "router": "10",
-                                 "floatingip": "10",
-                                 "port": "10",
-                                 "network": "10",
-                                 "subnet": "10"
+                        "network": {
+                            "router": "10",
+                            "floatingip": "10",
+                            "port": "10",
+                            "network": "10",
+                            "subnet": "10"
                         }}],
             "users":
                 [
@@ -552,64 +552,64 @@ targets = [{'users': [{'id': 'userId1', 'roles': ['admin', 'other']},
                                     'floatingip': '10'}}]}]
 
 json_data_image = {
-   "internal_id":1,
-   "id":"uuu1id12-uuid-uuid-uuid",
-   "name":"Ubuntu",
-   "enabled": 1,
-   "protected": 1,
-   "url": "https://mirrors.it.att.com/images/image-name",
-   "visibility": "public",
-   "disk_format": "raw",
-   "container_format": "bare",
-   "min_disk":2,
-   "min_ram":0,
-   "regions":[
-      {
-         "name":"North",
-         "type":"single",
-         "action": "delete",
-         "image_internal_id":1
-      },
-      {
-         "name":"North",
-         "action": "create",
-         "type":"single",
-         "image_internal_id":1
-      }
-   ],
-   "image_properties":[
-      {
-         "key_name":"Key1",
-         "key_value":"Key1.value",
-         "image_internal_id":1
-      },
-      {
-         "key_name":"Key2",
-         "key_value":"Key2.value",
-         "image_internal_id":1
-      }
-   ],
-   "image_tenant":[
-      {
-         "tenant_id":"abcd-efgh-ijkl-4567",
-         "image_internal_id":1
-      },
-      {
-         "tenant_id":"abcd-efgh-ijkl-4567",
-         "image_internal_id":1
-      }
-   ],
-   "image_tags":[
-      {
-         "tag":"abcd-efgh-ijkl-4567",
-         "image_internal_id":1
-      },
-      {
-         "tag":"abcd-efgh-ijkl-4567",
-         "image_internal_id":1
-      }
-   ],
-   "status":"complete",
+    "internal_id": 1,
+    "id": "uuu1id12-uuid-uuid-uuid",
+    "name": "Ubuntu",
+    "enabled": 1,
+    "protected": 1,
+    "url": "https://mirrors.it.att.com/images/image-name",
+    "visibility": "public",
+    "disk_format": "raw",
+    "container_format": "bare",
+    "min_disk": 2,
+    "min_ram": 0,
+    "regions": [
+        {
+            "name": "North",
+            "type": "single",
+            "action": "delete",
+            "image_internal_id": 1
+        },
+        {
+            "name": "North",
+            "action": "create",
+            "type": "single",
+            "image_internal_id": 1
+        }
+    ],
+    "image_properties": [
+        {
+            "key_name": "Key1",
+            "key_value": "Key1.value",
+            "image_internal_id": 1
+        },
+        {
+            "key_name": "Key2",
+            "key_value": "Key2.value",
+            "image_internal_id": 1
+        }
+    ],
+    "image_tenant": [
+        {
+            "tenant_id": "abcd-efgh-ijkl-4567",
+            "image_internal_id": 1
+        },
+        {
+            "tenant_id": "abcd-efgh-ijkl-4567",
+            "image_internal_id": 1
+        }
+    ],
+    "image_tags": [
+        {
+            "tag": "abcd-efgh-ijkl-4567",
+            "image_internal_id": 1
+        },
+        {
+            "tag": "abcd-efgh-ijkl-4567",
+            "image_internal_id": 1
+        }
+    ],
+    "status": "complete",
 }
 
 input_data_resource = {'resource_id': '1e24981a-fa51-11e5-86aa-5e5517507c66',
@@ -692,44 +692,46 @@ input_data_resource = {'resource_id': '1e24981a-fa51-11e5-86aa-5e5517507c66',
                        'operation': 'create',
                        'transaction_id': ''}
 
-expected_image_input_data = {'resource_id': 'uuu1id12-uuid-uuid-uuid',
-                             'targets': [
-                                 {'action': 'delete', 'image_internal_id': 1,
-                                  'type': 'single', 'name': 'North'},
-                                 {'action': 'create', 'image_internal_id': 1,
-                                  'type': 'single', 'name': 'North'}],
-                             'resource_type': 'image',
-                             'model': {'status': 'complete', 'name': 'Ubuntu',
-                                       'internal_id': 1,
-                                       'url': 'https://mirrors.it.att.com/images/image-name',
-                                       'disk_format': 'raw', 'min_ram': 0,
-                                       'enabled': 1, 'visibility': 'public',
-                                       'image_tags': [{'image_internal_id': 1,
-                                                       'tag': 'abcd-efgh-ijkl-4567'},
-                                                      {'image_internal_id': 1,
-                                                       'tag': 'abcd-efgh-ijkl-4567'}],
-                                       'regions': [{'action': 'delete',
-                                                    'image_internal_id': 1,
-                                                    'type': 'single',
-                                                    'name': 'North'},
-                                                   {'action': 'create',
-                                                    'image_internal_id': 1,
-                                                    'type': 'single',
-                                                    'name': 'North'}],
-                                       'image_properties': [
-                                           {'key_name': 'Key1',
-                                            'key_value': 'Key1.value',
-                                            'image_internal_id': 1},
-                                           {'key_name': 'Key2',
-                                            'key_value': 'Key2.value',
-                                            'image_internal_id': 1}],
-                                       'protected': 1, 'image_tenant': [
-                                     {'tenant_id': 'abcd-efgh-ijkl-4567',
-                                      'image_internal_id': 1},
-                                     {'tenant_id': 'abcd-efgh-ijkl-4567',
-                                      'image_internal_id': 1}],
-                                       'container_format': 'bare',
-                                       'min_disk': 2,
-                                       'id': 'uuu1id12-uuid-uuid-uuid'},
-                             'external_transaction_id': 'uuid-12345',
-                             'operation': 'create', 'transaction_id': ''}
+expected_image_input_data = {
+    'resource_id': 'uuu1id12-uuid-uuid-uuid',
+    'targets': [
+        {
+            'action': 'delete', 'image_internal_id': 1,
+            'type': 'single', 'name': 'North'},
+        {
+            'action': 'create', 'image_internal_id': 1,
+            'type': 'single', 'name': 'North'}],
+    'resource_type': 'image',
+    'model': {
+        'status': 'complete', 'name': 'Ubuntu',
+        'internal_id': 1,
+        'url': 'https://mirrors.it.att.com/images/image-name',
+        'disk_format': 'raw', 'min_ram': 0,
+        'enabled': 1, 'visibility': 'public',
+        'image_tags': [
+            {'image_internal_id': 1, 'tag': 'abcd-efgh-ijkl-4567'},
+            {'image_internal_id': 1, 'tag': 'abcd-efgh-ijkl-4567'}],
+        'regions': [
+            {
+                'action': 'delete', 'image_internal_id': 1,
+                'type': 'single', 'name': 'North'},
+            {
+                'action': 'create', 'image_internal_id': 1,
+                'type': 'single', 'name': 'North'}],
+        'image_properties': [
+            {
+                'key_name': 'Key1',
+                'key_value': 'Key1.value',
+                'image_internal_id': 1},
+            {
+                'key_name': 'Key2',
+                'key_value': 'Key2.value',
+                'image_internal_id': 1}],
+        'protected': 1, 'image_tenant': [
+            {'tenant_id': 'abcd-efgh-ijkl-4567', 'image_internal_id': 1},
+            {'tenant_id': 'abcd-efgh-ijkl-4567', 'image_internal_id': 1}],
+        'container_format': 'bare',
+        'min_disk': 2,
+        'id': 'uuu1id12-uuid-uuid-uuid'},
+    'external_transaction_id': 'uuid-12345',
+    'operation': 'create', 'transaction_id': ''}

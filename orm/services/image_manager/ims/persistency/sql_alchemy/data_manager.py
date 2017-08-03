@@ -1,14 +1,8 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.event import listen
-from sqlalchemy import exc
-from pecan import conf
-from oslo_db.sqlalchemy import session as db_session
 from ims.logger import get_logger
-
 from ims.persistency.sql_alchemy.image.image_record import ImageRecord
-from ims.logic.error_base import DuplicateEntityError
-
+from oslo_db.sqlalchemy import session as db_session
+from pecan import conf
+from sqlalchemy.event import listen
 
 LOG = get_logger(__name__)
 

@@ -1,6 +1,3 @@
-import subprocess
-
-from pecan import conf
 
 
 class BaseGit(object):
@@ -32,4 +29,3 @@ class GitResetError(Exception):
 
 class GitValidateError(Exception):
     pass
-

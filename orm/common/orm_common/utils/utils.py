@@ -1,9 +1,11 @@
-import requests
 import logging
-from pecan import conf
-from audit_client.api import audit
-import time
 import pprint
+import time
+
+import requests
+
+from audit_client.api import audit
+from pecan import conf
 
 # from cms_rest.logger import get_logger
 #
@@ -218,8 +220,7 @@ def get_resource_status(resource_id):
 
 
 def get_time_human():
-    """
-    this function return the timestamp for output JSON
+    """this function return the timestamp for output JSON
     :return: timestamp in wanted format
     """
     return time.strftime("%a, %b %d %Y, %X (%Z)", time.gmtime())

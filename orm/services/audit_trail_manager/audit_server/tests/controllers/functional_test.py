@@ -1,8 +1,9 @@
 """Base classes for API tests."""
 
+import unittest
+
 import pecan
 import pecan.testing
-import unittest
 
 
 class FunctionalTest(unittest.TestCase):

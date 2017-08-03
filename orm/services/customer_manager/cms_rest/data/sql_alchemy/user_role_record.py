@@ -1,10 +1,10 @@
-from cms_rest.data.sql_alchemy.models import *
-from cms_rest.data.sql_alchemy.customer_record import CustomerRecord
 from cms_rest.data.sql_alchemy.cms_user_record import CmsUserRecord
+from cms_rest.data.sql_alchemy.customer_record import CustomerRecord
+from cms_rest.data.sql_alchemy.models import *
 from cms_rest.data.sql_alchemy.region_record import RegionRecord
+from cms_rest.logger import get_logger
 from cms_rest.logic.error_base import NotFound
 
-from cms_rest.logger import get_logger
 LOG = get_logger(__name__)
 
 

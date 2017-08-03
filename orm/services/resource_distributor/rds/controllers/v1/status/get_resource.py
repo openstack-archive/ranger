@@ -1,13 +1,12 @@
 """handle get resource module."""
 import logging
 
-import wsme
 from pecan import rest
-from wsme import types as wtypes
-from wsmeext.pecan import wsexpose
-
 from rds.controllers.v1.base import EntityNotFoundError
 from rds.services import region_resource_id_status as regionResourceIdStatus
+import wsme
+from wsme import types as wtypes
+from wsmeext.pecan import wsexpose
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +19,7 @@ class ResourceMetaData(wtypes.DynamicBase):
     size = wsme.wsattr(wtypes.text, mandatory=True)
 
     def __init__(self, size='', virtual_size='', checksum=''):
-        """
+        """init
 
         :param size:
         :param virtual_size:

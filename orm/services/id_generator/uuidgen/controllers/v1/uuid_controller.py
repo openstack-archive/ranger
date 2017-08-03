@@ -4,16 +4,13 @@ import uuid
 
 from pecan import expose, response
 from pecan.rest import RestController
-
 from uuidgen.db.db_manager import DBManager
 
 LOG = logging.getLogger(__name__)
 
 
 def respond(reason, code, message):
-    """
-       A helper function to create a response dict with the given values
-    """
+    """A helper function to create a response dict with the given values"""
     return {
         reason: {
             "code": code,
@@ -25,8 +22,8 @@ def respond(reason, code, message):
 class UUIDController(RestController):
     @expose(template='json')
     def post(self, **kw):
-        """
-            Method to handle POST /v1/uuids - create and return a new uuid
+        """Method to handle POST /v1/uuids
+        create and return a new uuid
             prameters:
                 uuid_type (optional)
             return: dict describing success or failure of post command

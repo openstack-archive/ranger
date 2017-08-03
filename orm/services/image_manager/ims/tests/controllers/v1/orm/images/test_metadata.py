@@ -1,10 +1,9 @@
-import mock
 import json
-from wsme.exc import ClientSideError
-from ims.tests import FunctionalTest
 
 from ims.controllers.v1.orm.images import metadata
-
+from ims.tests import FunctionalTest
+import mock
+from wsme.exc import ClientSideError
 
 metadata_input = {
     "metadata": {

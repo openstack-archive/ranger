@@ -1,12 +1,8 @@
+import time
+from unittest import TestCase
+
 import mock
 from orm_common.utils import cross_api_utils
-from testfixtures import log_capture
-from unittest import TestCase
-import requests
-import pecan
-import logging
-import pprint
-import time
 
 
 class TestCrossApiUtil(TestCase):

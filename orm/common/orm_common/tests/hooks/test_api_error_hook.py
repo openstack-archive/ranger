@@ -1,8 +1,9 @@
 import json
+import logging
+from unittest import TestCase
+
 import mock
 from orm_common.hooks import api_error_hook
-from unittest import TestCase
-import logging
 
 logger = logging.getLogger(__name__)
 

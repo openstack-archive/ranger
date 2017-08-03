@@ -17,8 +17,7 @@
 
 # THIS FILE IS MANAGED BY THE GLOBAL REQUIREMENTS REPO - DO NOT EDIT
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
     name='audit_client',

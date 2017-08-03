@@ -2,16 +2,15 @@
 import logging
 import time
 
-import wsme
 from pecan import rest
-from rds.controllers.v1.base import InputValueError, ClientSideError
+from rds.controllers.v1.base import InputValueError
+from rds.controllers.v1.status import get_resource
+from rds.services.base import ErrorMesage, InputError
+from rds.services import region_resource_id_status as regionResourceIdStatus
+from rds.utils import utils
+import wsme
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose
-
-from rds.controllers.v1.status import get_resource
-from rds.services import region_resource_id_status as regionResourceIdStatus
-from rds.services.base import InputError, ErrorMesage
-from rds.utils import utils
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ class MetaData(wtypes.DynamicBase):
     size = wsme.wsattr(wtypes.text, mandatory=True)
 
     def __init__(self, checksum=None, virtual_size=None, size=None):
-        """
+        """init
 
         :param checksum:
         :param virtual_size:
@@ -126,7 +125,7 @@ class Status(rest.RestController):
         logger.info("post status")
         logger.debug("parse json!")
         data_to_save = dict(
-            timestamp=int(time.time())*1000,
+            timestamp=int(time.time()) * 1000,
             region=status_input.rds_listener.region,
             resource_id=status_input.rds_listener.resource_id,
             status=status_input.rds_listener.status,

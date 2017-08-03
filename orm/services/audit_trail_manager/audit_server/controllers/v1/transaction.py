@@ -1,15 +1,15 @@
 """transaction controller module."""
 
+import base
+import logging
+import wsme
+
 from audit_server.model.transaction import Model as TransactionModel
 from audit_server.model.transaction_query import Model as QueryModel
 from audit_server.services import transaction as transaction_service
-import base
-import logging
 from pecan import rest
-import wsme
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose
-
 
 logger = logging.getLogger(__name__)
 

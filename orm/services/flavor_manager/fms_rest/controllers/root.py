@@ -1,28 +1,14 @@
-from pecan import conf, expose
-from pecan import request
-
-from webob.exc import status_map
-from pecan.secure import SecureController
 from fms_rest.controllers.v1.v1 import V1Controller
-from fms_rest.utils import authentication
+from pecan import conf, expose
+from webob.exc import status_map
 
 
 class RootController(object):
     v1 = V1Controller()
 
-    '''
-    @classmethod
-    def check_permissions(cls):
-        # Extract the required values from the request header
-        headers = request.headers
-        token_to_validate = headers.get('X-Auth-Token')
-        lcp_id = headers.get('X-Auth-Region')
-        return authentication.check_permissions(conf, token_to_validate, lcp_id)
-    '''
     @expose(template='json')
     def get(self):
-        """
-            Method to handle GET /
+        """Method to handle GET /
             prameters: None
             return: dict describing flavor command version information
         """

@@ -2,12 +2,11 @@
 
 import unittest
 
-from mock import patch
-
 from audit_server.model.transaction import Model as TransactionModel
 from audit_server.model.transaction_query import Model as TransactionQuery
 from audit_server.services import transaction as TransactionService
 from audit_server.storage import factory
+from mock import patch
 
 
 class Test(unittest.TestCase):

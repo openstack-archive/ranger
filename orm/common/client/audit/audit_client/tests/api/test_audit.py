@@ -5,10 +5,9 @@ import threading
 import unittest
 import urllib2
 
-from mock import patch
-
 from audit_client.api import audit
 from audit_client.api.exceptions.audit_exception import AuditException
+from mock import patch
 
 
 class Test(unittest.TestCase):

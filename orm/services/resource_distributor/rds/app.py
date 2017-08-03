@@ -1,15 +1,12 @@
 import logging
 import os
 
-from pecan import make_app, conf
-from pecan.commands import CommandRunner
-
-from services import region_resource_id_status
-from storage import factory
-from sot import sot_factory
-
 from audit_client.api import audit
-
+from pecan import conf, make_app
+from pecan.commands import CommandRunner
+from services import region_resource_id_status
+from sot import sot_factory
+from storage import factory
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +67,7 @@ def main():
     drive, path_and_file = os.path.splitdrive(dir_name)
     path, filename = os.path.split(path_and_file)
     runner = CommandRunner()
-    runner.run(['serve', path+'/config.py'])
+    runner.run(['serve', path + '/config.py'])
 
 if __name__ == "__main__":
     main()

@@ -1,16 +1,14 @@
+import logging
 import time
 
+import oslo_db
 from oslo_db.sqlalchemy import session as db_session
-from sqlalchemy import Column, Integer, Text, BigInteger, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative.api import declarative_base
-
+from pecan import conf
 from rds.services.model.region_resource_id_status import Model, StatusModel
 from rds.storage import region_resource_id_status
-import logging
-import oslo_db
-
-from pecan import conf
+from sqlalchemy import BigInteger, Column, ForeignKey, Integer, Text
+from sqlalchemy.ext.declarative.api import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 logger = logging.getLogger(__name__)
@@ -203,10 +201,8 @@ class Connection(region_resource_id_status.Base):
             return None
 
     def get_timstamp_pair(self):
-        timestamp = int(time.time())*1000
+        timestamp = int(time.time()) * 1000
         # assume same time period for all resource types
         max_interval_time_in_seconds = conf.region_resource_id_status.max_interval_time.default * 60
         ref_timestamp = (int(time.time()) - max_interval_time_in_seconds) * 1000
         return timestamp, ref_timestamp
-
-

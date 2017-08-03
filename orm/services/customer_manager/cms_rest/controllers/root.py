@@ -1,9 +1,5 @@
-from pecan import expose, request, response
-from webob.exc import status_map
-from pecan.secure import SecureController
 from cms_rest.controllers.v1 import root as v1
-from cms_rest.utils import authentication
-from pecan import conf
+from pecan import expose
 
 
 class RootController(object):
@@ -12,8 +8,7 @@ class RootController(object):
 
     @expose(template='json')
     def _default(self):
-        """
-            Method to handle GET /
+        """Method to handle GET /
             parameters: None
             return: dict describing cms rest version information
         """

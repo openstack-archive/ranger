@@ -218,16 +218,13 @@ desired rule name.
 import logging
 import os
 
+import _parser
 from oslo_config import cfg
-from oslo_serialization import jsonutils
-import six
-
 from oslo_policy import _checks
 from oslo_policy._i18n import _
-from oslo_policy import opts
+from oslo_serialization import jsonutils
 
-import _parser
-
+import six
 
 LOG = logging.getLogger(__name__)
 

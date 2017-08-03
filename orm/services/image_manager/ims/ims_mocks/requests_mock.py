@@ -1,9 +1,9 @@
 import copy
 import uuid
-from mock import MagicMock
-from ims.persistency.sql_alchemy.data_manager import DataManager
 
 from ims.logger import get_logger
+from ims.persistency.sql_alchemy.data_manager import DataManager
+from mock import MagicMock
 
 logger = get_logger(__name__)
 

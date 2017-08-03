@@ -1,5 +1,4 @@
 """Get configuration module unittests."""
-from fms_rest.controllers.v1.orm import configuration
 from fms_rest.tests import FunctionalTest
 from mock import patch
 

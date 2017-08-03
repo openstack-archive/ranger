@@ -1,8 +1,7 @@
 from ims.logic import metadata_logic
-from ims.tests import FunctionalTest
 from ims.persistency.sql_alchemy.db_models import ImageRegion
-from ims.persistency.wsme.models import MetadataWrapper, Metadata
-from ims.persistency.wsme import models
+from ims.persistency.wsme.models import Metadata, MetadataWrapper
+from ims.tests import FunctionalTest
 import mock
 
 

@@ -1,11 +1,10 @@
+import logging
+import pprint
+from unittest import TestCase
+
 import mock
 from orm_common.utils import utils
 from testfixtures import log_capture
-from unittest import TestCase
-import requests
-import pecan
-import logging
-import pprint
 
 
 class TestUtil(TestCase):

@@ -1,9 +1,10 @@
+from cms_rest.logic.error_base import ErrorStatus
+from cms_rest.model.Model import Model
+from orm_common.utils.cross_api_utils import (get_regions_of_group,
+                                              set_utils_conf)
+from pecan import conf
 import wsme
 from wsme import types as wtypes
-from cms_rest.model.Model import Model
-from cms_rest.logic.error_base import ErrorStatus
-from pecan import conf
-from orm_common.utils.cross_api_utils import set_utils_conf, get_regions_of_group
 
 
 class Enabled(Model):
@@ -41,8 +42,7 @@ class Compute(Model):
                  vcpus=None, metadata_items=None, injected_file_content_bytes=None,
                  floating_ips='', fixed_ips='', injected_file_path_bytes='',
                  server_groups='', server_group_members=''):
-        """
-        Create a new compute instance.
+        """Create a new compute instance.
         :param instances:
         :param injected_files:
         :param key_pairs:
@@ -91,8 +91,7 @@ class Storage(Model):
     volumes = wsme.wsattr(wsme.types.text, mandatory=True)
 
     def __init__(self, gigabytes='', snapshots='', volumes=''):
-        """
-        create a new Storage instance.
+        """create a new Storage instance.
         :param gigabytes:
         :param snapshots:
         :param volumes:
@@ -125,8 +124,7 @@ class Network(Model):
                  health_monitor='', member='', nat_instance='',
                  pool='', route_table='', vip=''):
 
-        """
-        Create a new Network instance.
+        """Create a new Network instance.
         :param floating_ips:  num of floating_ips
         :param networks:  num of networks
         :param ports:  num of ports
@@ -268,8 +266,7 @@ class Customer(Model):
             self.uuid = uuid
 
     def validate_model(self, context=None):
-        """
-        this function check if the customer model meet the demands
+        """this function check if the customer model meet the demands
         :param context: i.e. 'create 'update'
         :return: none
         """

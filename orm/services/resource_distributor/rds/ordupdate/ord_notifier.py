@@ -1,15 +1,13 @@
 """ORD trigger main module."""
 
 import json
+import logging
 import time
 
-import logging
 import requests
 
-from pecan import conf
-
 from audit_client.api import audit
-
+from pecan import conf
 from rds.services import region_resource_id_status as regionResourceIdStatus
 
 # REST API constants
@@ -145,9 +143,9 @@ def _notify(ord_url,
     # Make sure the ORD sent an ACK
     if response.status_code != ACK_CODE:
         message = 'Did not receive an ACK from ORD %s, status code: %d' % (
-                ord_url, response.status_code, )
+            ord_url, response.status_code, )
         encoded_message = message.replace('\n', '_').replace('\r', '_')
-	if encoded_message != message:
+        if encoded_message != message:
             encoded_message = encoded_message + "(encoded)"
         logger.error(encoded_message)
         raise NotifyNotAcknowledgedError(message)
@@ -284,5 +282,6 @@ def notify_ord(transaction_id,
         _update_audit(region_id, application_id, tracking_id, transaction_id,
                       transaction_type, resource_id, user_id, external_id,
                       event_details, status)
-        logger.debug("Create Resource Requested to ORD: region=%s resource_id=%s status=%s"
-            % (region_id, resource_id, status))
+        logger.debug(
+            "Create Resource Requested to ORD: region=%s resource_id=%s status=%s" % (
+                region_id, resource_id, status))

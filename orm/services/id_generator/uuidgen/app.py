@@ -1,7 +1,8 @@
-import os
 import logging
-from pecan import make_app
+import os
+
 from pecan.commands import CommandRunner
+from pecan import make_app
 from uuidgen import model
 
 logger = logging.getLogger(__name__)
@@ -23,4 +24,4 @@ def main():
     drive, path_and_file = os.path.splitdrive(dir_name)
     path, filename = os.path.split(path_and_file)
     runner = CommandRunner()
-    runner.run(['serve', path+'/config.py'])
+    runner.run(['serve', path + '/config.py'])

@@ -5,10 +5,8 @@ import logging
 from keystone_utils import tokens
 from orm_common.utils import api_error_utils as err_utils
 from orm_common.utils import dictator
-from wsme.exc import ClientSideError
-
-
 import qolicy
+from wsme.exc import ClientSideError
 
 logger = logging.getLogger(__name__)
 _ENFORCER = None

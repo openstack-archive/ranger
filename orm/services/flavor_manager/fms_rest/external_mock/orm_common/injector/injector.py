@@ -1,6 +1,7 @@
-from orm_common.injector import fang
-import os
 import imp
+import os
+
+from orm_common.injector import fang
 
 _di = fang.Di()
 logger = None

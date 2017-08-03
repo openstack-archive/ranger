@@ -1,12 +1,12 @@
-from cms_rest.data.sql_alchemy.models import CustomerMetadata
+import json
+
 from cms_rest.data.data_manager import DataManager
-from cms_rest.rds_proxy import RdsProxy
+from cms_rest.data.sql_alchemy.models import CustomerMetadata
+from cms_rest.logger import get_logger
 from cms_rest.model.Models import CustomerResultWrapper
+from cms_rest.rds_proxy import RdsProxy
 from orm_common.utils import utils
 from pecan import request
-from pecan import conf
-import json
-from cms_rest.logger import get_logger
 
 logger = get_logger(__name__)
 

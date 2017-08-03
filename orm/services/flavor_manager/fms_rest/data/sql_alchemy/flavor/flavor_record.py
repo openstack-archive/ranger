@@ -1,8 +1,6 @@
 
-from fms_rest.data.sql_alchemy.db_models import Flavor
-from fms_rest.data.sql_alchemy.db_models import FlavorExtraSpec
-from fms_rest.data.sql_alchemy.db_models import FlavorRegion
-from fms_rest.data.sql_alchemy.db_models import FlavorTenant
+from fms_rest.data.sql_alchemy.db_models import (Flavor, FlavorRegion,
+                                                 FlavorTenant)
 from fms_rest.logger import get_logger
 from sqlalchemy.sql import or_
 

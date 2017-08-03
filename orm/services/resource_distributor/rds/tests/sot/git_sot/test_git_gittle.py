@@ -1,11 +1,10 @@
-import mock
-from mock import patch
-
 import unittest
 
+import mock
+from mock import patch
 from rds.sot.git_sot import git_gittle
-from rds.sot.git_sot.git_gittle import GitGittle
 from rds.sot.git_sot.git_base import GitInitError, GitUploadError
+from rds.sot.git_sot.git_gittle import GitGittle
 
 
 class GitGittleTests(unittest.TestCase):
@@ -53,4 +52,3 @@ class GitGittleTests(unittest.TestCase):
         self.my_git.repo = mock.MagicMock()
         self.my_git.repo.commit = mock.MagicMock(side_effect=Exception("Failed to commit"))
         self.assertRaises(GitUploadError, self.my_git.git_upload_changes)
-
