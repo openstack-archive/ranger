@@ -1,10 +1,11 @@
 """test_base module."""
 
 
-from audit_server.controllers.v1.base import ClientSideError
-from audit_server.controllers.v1.base import EntityNotFoundError
-from audit_server.controllers.v1.base import InputValueError
 import unittest
+
+from audit_server.controllers.v1.base import (ClientSideError,
+                                              EntityNotFoundError,
+                                              InputValueError)
 
 
 class Test(unittest.TestCase):

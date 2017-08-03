@@ -1,12 +1,11 @@
-import requests
 import json
 import logging
 
+import requests
+
 from pecan import conf
-
-from rds.utils import authentication as AuthService
 from rds.services.base import ErrorMesage
-
+from rds.utils import authentication as AuthService
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +19,7 @@ def _set_headers():
         if token_id:
             headers['X-Auth-Token'] = token_id
             headers['X-Auth-Region'] = region
-    except:
+    except Exception:
         logger.error("no token")
 
 

@@ -1,8 +1,9 @@
 """test_base module."""
 
 
-from audit_server.services.base import Error
 import unittest
+
+from audit_server.services.base import Error
 
 
 class Test(unittest.TestCase):

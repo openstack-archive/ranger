@@ -1,17 +1,15 @@
+from cms_rest.controllers.v1.orm.customer.users import UserController
+from cms_rest.logger import get_logger
+from cms_rest.logic.customer_logic import CustomerLogic
+from cms_rest.logic.error_base import ErrorStatus
+from cms_rest.model.Models import Region, RegionResultWrapper
+from cms_rest.utils import authentication
+from orm_common.utils import api_error_utils as err_utils
+from orm_common.utils import utils
 from oslo_db.exception import DBDuplicateEntry
-from pecan import rest, request
+from pecan import request, rest
 from wsmeext.pecan import wsexpose
 
-from orm_common.utils import utils
-from orm_common.utils import api_error_utils as err_utils
-
-from cms_rest.controllers.v1.orm.customer.users import UserController
-from cms_rest.model.Models import Region, RegionResultWrapper
-from cms_rest.logic.customer_logic import CustomerLogic
-from cms_rest.logic.error_base import ErrorStatus, DuplicateEntryError
-from cms_rest.utils import authentication
-
-from cms_rest.logger import get_logger
 LOG = get_logger(__name__)
 
 

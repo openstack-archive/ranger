@@ -1,20 +1,19 @@
-import oslo_db
-from oslo_db.sqlalchemy import session as db_session
-from sqlalchemy.event import listen
-from sqlalchemy import or_
-from cms_rest.logic.error_base import ErrorStatus
-
-from pecan import conf
-
 import logging
 
-from cms_rest.data.sql_alchemy.models import CmsRole, CmsUser, Customer, \
-    CustomerRegion, Quota, QuotaFieldDetail, \
-    Region, UserRole
 from cms_rest.data.sql_alchemy.customer_record import CustomerRecord
 from cms_rest.data.sql_alchemy.customer_region_record import \
     CustomerRegionRecord
+from cms_rest.data.sql_alchemy.models import (CmsRole, CmsUser, Customer,
+                                              CustomerRegion, Quota,
+                                              QuotaFieldDetail, Region,
+                                              UserRole)
 from cms_rest.data.sql_alchemy.user_role_record import UserRoleRecord
+from cms_rest.logic.error_base import ErrorStatus
+import oslo_db
+from oslo_db.sqlalchemy import session as db_session
+from pecan import conf
+from sqlalchemy.event import listen
+from sqlalchemy import or_
 
 LOG = logging.getLogger(__name__)
 

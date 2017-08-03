@@ -1,10 +1,10 @@
 """Token utility module."""
 import logging
+
 import requests
 
 from keystoneclient.v2_0 import client as v2_client
 from keystoneclient.v3 import client as v3_client
-
 from orm_common.utils import dictator
 
 _verify = False

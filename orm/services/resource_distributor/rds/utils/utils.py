@@ -1,9 +1,11 @@
 """module"""
 import logging
+
 import requests
+
 from pecan import conf
-from rds.services.base import ErrorMesage
 from rds.proxies import ims_proxy
+from rds.services.base import ErrorMesage
 
 logger = logging.getLogger(__name__)
 
@@ -71,4 +73,3 @@ def add_rms_status_to_regions(resource_regions, resource_type):
         # if region not found in rms
         region['rms_status'] = "region_not_found_in_rms"
     return resource_regions
-

@@ -1,7 +1,7 @@
 import os
-from unittest import TestCase
 from pecan import set_config
 from pecan.testing import load_test_app
+from unittest import TestCase
 
 __all__ = ['FunctionalTest']
 

@@ -1,7 +1,8 @@
 """test_get_audits_result module."""
 
-from audit_client.api.model.get_audits_result import AuditsResult
 import unittest
+
+from audit_client.api.model.get_audits_result import AuditsResult
 
 
 class Test(unittest.TestCase):

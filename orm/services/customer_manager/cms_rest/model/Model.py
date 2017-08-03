@@ -1,6 +1,5 @@
-import inspect
-from wsme import types as wtypes
 from wsme.rest.json import tojson
+from wsme import types as wtypes
 
 
 class Model(wtypes.DynamicBase):

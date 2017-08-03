@@ -1,10 +1,6 @@
-import subprocess
 import unittest
-import mock
-from mock import patch
 
-from rds.sot.git_sot import git_base
-from rds.sot.git_sot.git_base import BaseGit, GitResetError
+from rds.sot.git_sot.git_base import BaseGit
 
 
 class BaseGitTests(unittest.TestCase):
@@ -60,4 +56,3 @@ class BaseGitTests(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             base_git = BaseGit()
             base_git.validate_git()
-

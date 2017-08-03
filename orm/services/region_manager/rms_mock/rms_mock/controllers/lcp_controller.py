@@ -1,6 +1,6 @@
-import pecan
 import logging
 
+import pecan
 from pecan import rest
 
 LOG = logging.getLogger(__name__)

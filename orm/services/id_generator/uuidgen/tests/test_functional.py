@@ -1,9 +1,9 @@
-import mock
-from uuidgen.tests import FunctionalTest
-import re
-import uuidgen.controllers.v1.uuid_controller as uuid_controller
-import uuidgen.controllers.v1.uuid_controller
 import json
+import re
+
+import mock
+import uuidgen.controllers.v1.uuid_controller as uuid_controller
+from uuidgen.tests import FunctionalTest
 
 
 class MyException(Exception):

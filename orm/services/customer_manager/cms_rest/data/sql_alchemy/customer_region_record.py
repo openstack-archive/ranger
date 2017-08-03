@@ -1,7 +1,6 @@
-from cms_rest.data.sql_alchemy.models import CustomerRegion
 from cms_rest.data.sql_alchemy.customer_record import CustomerRecord
+from cms_rest.data.sql_alchemy.models import CustomerRegion
 from cms_rest.data.sql_alchemy.region_record import RegionRecord
-
 from cms_rest.logger import get_logger
 
 LOG = get_logger(__name__)

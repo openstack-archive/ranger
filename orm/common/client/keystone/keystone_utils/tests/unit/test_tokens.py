@@ -1,8 +1,8 @@
 """keystone_utils token validator unittests."""
-import mock
 import unittest
 
 from keystone_utils import tokens
+import mock
 
 
 class MyResponse(object):
@@ -191,7 +191,7 @@ class TokensTest(unittest.TestCase):
                           tokens.get_token_user, 'a', mock.MagicMock(), 'c')
 
     def test_get_token_user_invalid_keystone_version(self):
-        conf = tokens.TokenConf(*(None,)*5)
+        conf = tokens.TokenConf(*(None,) * 5)
         self.assertRaises(ValueError, tokens.get_token_user, 'a', conf, 'c',
                           'd')
 
@@ -200,7 +200,7 @@ class TokensTest(unittest.TestCase):
         ks = mock.MagicMock()
         ks.tokens.validate.side_effect = tokens.v3_client.exceptions.NotFound()
         mock_get_keystone_client.return_value = ks
-        conf = tokens.TokenConf(*('3',)*5)
+        conf = tokens.TokenConf(*('3',) * 5)
         self.assertIsNone(tokens.get_token_user('a', conf, 'c', 'd'))
 
     @mock.patch.object(tokens, '_get_keystone_client')
@@ -212,7 +212,7 @@ class TokensTest(unittest.TestCase):
         ks.tokens.validate.return_value = token_info
         mock_get_keystone_client.return_value = ks
 
-        conf = tokens.TokenConf(*('2.0',)*5)
+        conf = tokens.TokenConf(*('2.0',) * 5)
         result = tokens.get_token_user('a', conf, 'c', 'd')
 
         self.assertEqual(result.token, 'a')

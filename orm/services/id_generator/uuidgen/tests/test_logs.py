@@ -1,8 +1,9 @@
 """Set log level module unittests."""
-# import logging
+
 # import mock
 # from mock import patch
 from uuidgen.controllers.v1 import logs
+# import logging
 from uuidgen.tests import FunctionalTest
 
 

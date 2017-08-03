@@ -1,7 +1,6 @@
-import mock
-from fms_rest.tests import FunctionalTest
-
 from fms_rest.data.wsme import models
+from fms_rest.tests import FunctionalTest
+import mock
 
 GROUP_REGIONS = [
     "DPK",

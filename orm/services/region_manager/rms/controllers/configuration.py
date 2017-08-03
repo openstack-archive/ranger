@@ -3,13 +3,9 @@
 import logging
 
 from orm_common.utils import utils
-
-from pecan import conf
-from pecan import request
-from pecan import rest
-from wsmeext.pecan import wsexpose
-
+from pecan import conf, request, rest
 from rms.utils import authentication
+from wsmeext.pecan import wsexpose
 
 logger = logging.getLogger(__name__)
 

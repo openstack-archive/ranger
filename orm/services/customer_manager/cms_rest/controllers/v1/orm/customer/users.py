@@ -1,15 +1,13 @@
-from pecan import rest, request
-from wsmeext.pecan import wsexpose
-
-from orm_common.utils import utils
-from orm_common.utils import api_error_utils as err_utils
-
-from cms_rest.model.Models import User, UserResultWrapper
+from cms_rest.logger import get_logger
 from cms_rest.logic.customer_logic import CustomerLogic
 from cms_rest.logic.error_base import ErrorStatus, NotFound
+from cms_rest.model.Models import User, UserResultWrapper
 from cms_rest.utils import authentication
+from orm_common.utils import api_error_utils as err_utils
+from orm_common.utils import utils
+from pecan import request, rest
+from wsmeext.pecan import wsexpose
 
-from cms_rest.logger import get_logger
 LOG = get_logger(__name__)
 
 

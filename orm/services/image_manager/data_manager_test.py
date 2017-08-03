@@ -1,15 +1,15 @@
-from ims.logger import get_logger
+import os
 import traceback
 
+from ims.logger import get_logger
 from ims.persistency.sql_alchemy.data_manager import DataManager
-
+from ims.persistency.sql_alchemy.db_models import (Image, ImageCustomer,
+                                                   ImageProperty, ImageRegion)
+from pecan import conf
+from pecan.testing import load_test_app
 
 # conf = imp.load_source('config.py', '../config.py')
 
-from pecan.testing import load_test_app
-import os
-from pecan import conf
-from ims.persistency.sql_alchemy.db_models import Image, ImageProperty, ImageRegion, ImageCustomer
 
 image_id = "Id 11"  # image id
 

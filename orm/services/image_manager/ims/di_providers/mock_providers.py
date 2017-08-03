@@ -1,9 +1,6 @@
-from ims.ims_mocks import requests_mock
-from ims.ims_mocks import audit_mock
-
+from ims.ims_mocks import audit_mock, requests_mock
+from ims.logic import image_logic, metadata_logic
 from ims.persistency.sql_alchemy.data_manager import DataManager
-from ims.logic import image_logic
-from ims.logic import metadata_logic
 from ims.proxies import rds_proxy
 from orm_common.utils import utils
 

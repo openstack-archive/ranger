@@ -1,14 +1,13 @@
 """Services module unittests."""
 import mock
 from mock import patch
-from rms.services import services
-# from rms.model import url_parm as parms
-
-from rms.tests import FunctionalTest
-from rms.tests.controllers.v1.orm.resources.test_region import full_region
-from rms.controllers.v2.orm.resources import regions
 from pecan import conf
-from rms.model import model as PyModels
+from rms.controllers.v2.orm.resources import regions
+from rms.services import services
+from rms.tests.controllers.v1.orm.resources.test_region import full_region
+from rms.tests import FunctionalTest
+
+# from rms.model import url_parm as parms
 
 
 class db(object):

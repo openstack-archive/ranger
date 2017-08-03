@@ -1,6 +1,6 @@
-from pecan import expose, redirect
-from webob.exc import status_map
 from lcp_controller import LcpController
+from pecan import expose
+from webob.exc import status_map
 
 
 class RootController(object):

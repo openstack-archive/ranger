@@ -1,7 +1,6 @@
 from ims.persistency.sql_alchemy import data_manager
-from ims.tests import FunctionalTest
 from ims.persistency.sql_alchemy.db_models import Image
-
+from ims.tests import FunctionalTest
 import mock
 
 

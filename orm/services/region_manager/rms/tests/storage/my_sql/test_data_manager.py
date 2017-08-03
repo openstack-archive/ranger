@@ -1,10 +1,9 @@
 import unittest
 
 import mock
-
 from rms.services import error_base
-from rms.storage.my_sql import data_manager, data_models
 from rms.storage.base_data_manager import DuplicateEntryError
+from rms.storage.my_sql import data_manager, data_models
 
 end_point_list = [{"type": "ord",
                    "url": "http://ord.com"}]

@@ -1,6 +1,6 @@
-from fms_rest.tests import FunctionalTest
 from fms_rest.data.sql_alchemy import db_models
 import fms_rest.data.wsme.models as wsme_models
+from fms_rest.tests import FunctionalTest
 
 
 class TestWsmeModels(FunctionalTest):

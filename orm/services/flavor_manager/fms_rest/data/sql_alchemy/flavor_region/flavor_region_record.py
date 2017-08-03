@@ -1,7 +1,7 @@
-from sqlalchemy import and_
 from fms_rest.data.sql_alchemy.db_models import FlavorRegion
-
 from fms_rest.logger import get_logger
+from sqlalchemy import and_
+
 LOG = get_logger(__name__)
 
 

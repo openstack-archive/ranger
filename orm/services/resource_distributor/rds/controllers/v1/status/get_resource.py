@@ -1,13 +1,12 @@
 """handle get resource module."""
 import logging
 
-import wsme
 from pecan import rest
-from wsme import types as wtypes
-from wsmeext.pecan import wsexpose
-
 from rds.controllers.v1.base import EntityNotFoundError
 from rds.services import region_resource_id_status as regionResourceIdStatus
+import wsme
+from wsme import types as wtypes
+from wsmeext.pecan import wsexpose
 
 logger = logging.getLogger(__name__)
 

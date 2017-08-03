@@ -1,16 +1,15 @@
 import logging
 
 import oslo_db
+from data_models import (Group, GroupRegion, Region, RegionEndPoint,
+                         RegionMetaData)
 from oslo_db.sqlalchemy import session as db_session
+from rms.model import model as PythonModels
+from rms.services import error_base as ServiceBase
+from rms.storage.base_data_manager import (BaseDataManager,
+                                           DuplicateEntryError, EntityNotFound)
 from sqlalchemy.ext.declarative.api import declarative_base
 from sqlalchemy.sql import or_
-
-from rms.services import error_base as ServiceBase
-from data_models import Region, RegionEndPoint, Group
-from data_models import RegionMetaData, GroupRegion
-from rms.services import error_base
-from rms.storage.base_data_manager import BaseDataManager, DuplicateEntryError, EntityNotFound
-from rms.model import model as PythonModels
 
 Base = declarative_base()
 logger = logging.getLogger(__name__)

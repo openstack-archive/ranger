@@ -1,12 +1,11 @@
 """Image model module."""
-import wsme
-from pecan import conf
-from pecan import request
-
 from ims.logic.error_base import ErrorStatus
-from ims.persistency.wsme.base import Model
 from ims.persistency.sql_alchemy import db_models
-from orm_common.utils.cross_api_utils import set_utils_conf, get_regions_of_group
+from ims.persistency.wsme.base import Model
+from orm_common.utils.cross_api_utils import (get_regions_of_group,
+                                              set_utils_conf)
+from pecan import conf, request
+import wsme
 
 
 class Metadata(Model):

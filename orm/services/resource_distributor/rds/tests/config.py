@@ -74,7 +74,7 @@ yaml_configs = {
             }
         }
     },
-    'flavor_yaml':{
+    'flavor_yaml': {
         'yaml_version': '2013-05-23',
         'yaml_args': {
             'rxtx_factor': 1
@@ -161,10 +161,8 @@ logging = {
         },
         'color': {
             '()': 'pecan.log.ColorFormatter',
-            'format':'%(asctime)s [%(padded_color_levelname)s] [%(name)s] [%(threadName)s] %(message)s',
+            'format': '%(asctime)s [%(padded_color_levelname)s] [%(name)s] [%(threadName)s] %(message)s',
             '__force_dict__': True
         }
     }
 }
-
-

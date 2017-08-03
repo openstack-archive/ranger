@@ -1,11 +1,12 @@
-from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, validates
-from oslo_db.sqlalchemy import models
+from __builtin__ import reversed
 
 from fms_rest.logger import get_logger
-from __builtin__ import reversed
 from fms_rest.logic.error_base import ErrorStatus
+from oslo_db.sqlalchemy import models
+from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, validates
+
 LOG = get_logger(__name__)
 
 Base = declarative_base()

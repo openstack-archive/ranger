@@ -1,10 +1,10 @@
 import requests
-from fms_rest.tests import FunctionalTest
-from orm_common.injector import injector
-from mock import MagicMock
 
 from fms_rest.data.wsme import models
 from fms_rest.logic.error_base import ErrorStatus
+from fms_rest.tests import FunctionalTest
+from mock import MagicMock
+from orm_common.injector import injector
 
 utils_mock = None
 tenant_logic_mock = None

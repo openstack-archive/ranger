@@ -1,20 +1,16 @@
-from pecan import rest, request, response, expose
-from pecan.core import abort
-
-from wsmeext.pecan import wsexpose
-
+from fms_rest.controllers.v1.orm.flavors.os_extra_specs import \
+    OsExtraSpecsController
 from fms_rest.controllers.v1.orm.flavors.regions import RegionController
-from fms_rest.controllers.v1.orm.flavors.tenants import TenantController
-from fms_rest.controllers.v1.orm.flavors.os_extra_specs import OsExtraSpecsController
 from fms_rest.controllers.v1.orm.flavors.tags import TagsController
-
-from fms_rest.data.wsme.models import FlavorWrapper, FlavorListFullResponse
-from fms_rest.logic.error_base import ErrorStatus
+from fms_rest.controllers.v1.orm.flavors.tenants import TenantController
+from fms_rest.data.wsme.models import FlavorListFullResponse, FlavorWrapper
 from fms_rest.logger import get_logger
+from fms_rest.logic.error_base import ErrorStatus
 from fms_rest.utils import authentication
-
 from orm_common.injector import injector
 from orm_common.utils import api_error_utils as err_utils
+from pecan import request, rest
+from wsmeext.pecan import wsexpose
 
 di = injector.get_di()
 LOG = get_logger(__name__)

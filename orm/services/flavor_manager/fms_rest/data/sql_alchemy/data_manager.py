@@ -10,15 +10,13 @@
  * For more information visit http://www.igenxsoft.com
 '''
 
-from sqlalchemy.event import listen
-from pecan import conf
-from oslo_db.sqlalchemy import session as db_session
-
 import logging
-
 
 # from fms_rest.logic.error_base import DuplicateEntityError
 from fms_rest.data.sql_alchemy.flavor.flavor_record import FlavorRecord
+from oslo_db.sqlalchemy import session as db_session
+from pecan import conf
+from sqlalchemy.event import listen
 
 LOG = logging.getLogger(__name__)
 

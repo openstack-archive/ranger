@@ -1,6 +1,6 @@
 """model module."""
-from rms.services import error_base
 from pecan import conf
+from rms.services import error_base
 
 
 class Address(object):
@@ -84,7 +84,7 @@ class RegionData(object):
                             "type {}".format(endpoint.type))
             try:
                 endpoints_types_must_have.remove(endpoint.type)
-            except:
+            except Exception:
                 pass
         if len(endpoints_types_must_have) > 0:
             raise error_base.InputValueError(

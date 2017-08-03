@@ -2,19 +2,14 @@
 import logging
 import time
 
-from pecan import conf
-from pecan import request
+from pecan import conf, request
 from rds.services import region_resource_id_status as regionResourceIdStatus
-from rds.services import yaml_customer_builder
-from rds.services import yaml_flavor_bulder
-from rds.services import yaml_image_builder
-from rds.services.base import ConflictValue
-from rds.services.base import ErrorMesage
+from rds.services import (yaml_customer_builder, yaml_flavor_bulder,
+                          yaml_image_builder)
+from rds.services.base import ConflictValue, ErrorMesage
 from rds.services.model.resource_input import ResourceData as InputData
 from rds.sot import sot_factory
-from rds.utils import uuid_utils
-from rds.utils import utils
-
+from rds.utils import utils, uuid_utils
 
 my_logger = logging.getLogger(__name__)
 
@@ -43,8 +38,8 @@ def _get_inputs_from_resource_type(jsondata,
 
 
 def _region_valid(region):
-    if 'rms_status' in region and region[
-        'rms_status'] not in conf.allow_region_statuses:
+    if ('rms_status' in region
+            and region['rms_status'] not in conf.allow_region_statuses):
         return False
     return True
 
@@ -141,8 +136,9 @@ def _check_resource_status(input_data):
 
 def update_sot(input_data):
     """create resource."""
-    my_logger.debug("build yaml file for %s id: %s" % (input_data.resource_type,
-                     input_data.resource_id))
+    my_logger.debug(
+        "build yaml file for %s id: %s" % (input_data.resource_type,
+                                           input_data.resource_id))
     targetslist = _create_data_to_sot(input_data)
     my_logger.debug("upload yaml to SoT")
     _upload_to_sot(input_data.resource_id,

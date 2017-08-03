@@ -1,8 +1,7 @@
-import mock
 import unittest
 
+import mock
 from orm_common.policy import policy
-from orm_common.utils import api_error_utils as err_utils
 
 
 class TestException(Exception):

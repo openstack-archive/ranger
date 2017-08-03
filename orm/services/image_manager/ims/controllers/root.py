@@ -1,11 +1,6 @@
-from pecan import conf
-from pecan import rest
-from pecan import expose, request
-
-from webob.exc import status_map
-from pecan.secure import SecureController
 from ims.controllers.v1.v1 import V1Controller
-from ims.utils import authentication
+from pecan import conf, expose
+from webob.exc import status_map
 
 
 class RootController(object):

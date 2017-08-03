@@ -1,9 +1,10 @@
+from cms_rest.logic.error_base import ErrorStatus
+from cms_rest.model.Model import Model
+from orm_common.utils.cross_api_utils import (get_regions_of_group,
+                                              set_utils_conf)
+from pecan import conf
 import wsme
 from wsme import types as wtypes
-from cms_rest.model.Model import Model
-from cms_rest.logic.error_base import ErrorStatus
-from pecan import conf
-from orm_common.utils.cross_api_utils import set_utils_conf, get_regions_of_group
 
 
 class Enabled(Model):

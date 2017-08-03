@@ -1,24 +1,19 @@
 """rest module."""
 import logging
-
-from pecan import rest, request
 import wsme
-from wsme import types as wtypes
-from wsmeext.pecan import wsexpose
 
-from rms.model import url_parm
-from rms.model import model as PythonModel
-from rms.services import error_base
-from rms.services import services as RegionService
-
-from rms.controllers.v2.orm.resources.metadata import RegionMetadataController
-from rms.controllers.v2.orm.resources.status import RegionStatusController
-
-from rms.utils import authentication
-
-from orm_common.policy import policy
 from orm_common.utils import api_error_utils as err_utils
 from orm_common.utils import utils
+from pecan import request, rest
+from rms.controllers.v2.orm.resources.metadata import RegionMetadataController
+from rms.controllers.v2.orm.resources.status import RegionStatusController
+from rms.model import model as PythonModel
+from rms.model import url_parm
+from rms.services import error_base
+from rms.services import services as RegionService
+from rms.utils import authentication
+from wsme import types as wtypes
+from wsmeext.pecan import wsexpose
 
 logger = logging.getLogger(__name__)
 

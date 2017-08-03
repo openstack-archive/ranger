@@ -1,8 +1,9 @@
 from cms_rest.data.sql_alchemy import models as sql_models
 from cms_rest.logic import customer_logic
-from cms_rest.tests import FunctionalTest
 from cms_rest.logic.error_base import ErrorStatus
 import cms_rest.model.Models as models
+from cms_rest.tests import FunctionalTest
+
 import mock
 
 customer = None

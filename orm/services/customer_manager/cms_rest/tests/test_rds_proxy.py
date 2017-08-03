@@ -1,12 +1,9 @@
-import mock
-from mock import MagicMock
-from cms_rest.tests import FunctionalTest
-from cms_rest.logger import get_logger
-from testfixtures import log_capture, compare, Comparison as C
-import logging
-from cms_rest import rds_proxy
 from cms_rest.data.sql_alchemy import models
 from cms_rest.logic.error_base import ErrorStatus
+from cms_rest import rds_proxy
+from cms_rest.tests import FunctionalTest
+import mock
+from testfixtures import log_capture
 
 
 class Response:

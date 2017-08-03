@@ -1,9 +1,9 @@
+import logging
+import os
+from unittest import TestCase
+
 import mock
 from orm_common.injector import injector
-from unittest import TestCase
-import os
-import logging
-from orm_common.injector.fang.resource_provider_register import ResourceProviderRegister
 
 logger = logging.getLogger(__name__)
 

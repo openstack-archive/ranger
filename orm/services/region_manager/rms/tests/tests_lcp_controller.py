@@ -1,18 +1,12 @@
-from mock import patch, MagicMock
-from wsme.exc import ClientSideError
-
-from rms.services import services
-from rms.controllers import lcp_controller
-
-from rms.model.model import RegionData, Regions, EndPoint
-from rms.services.error_base import NotFoundError
-
 import json
 
+from mock import MagicMock, patch
 from rms.controllers import lcp_controller as lcps
-
+from rms.model.model import EndPoint, RegionData, Regions
+from rms.services.error_base import NotFoundError
+from rms.services import services
 from rms.tests import FunctionalTest
-
+from wsme.exc import ClientSideError
 
 TEST_REGIONS_DATA = [
     {

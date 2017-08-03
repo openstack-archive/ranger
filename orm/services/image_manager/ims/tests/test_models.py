@@ -1,7 +1,6 @@
-import mock
-from ims.tests import FunctionalTest
-
 from ims.persistency.wsme import models
+from ims.tests import FunctionalTest
+import mock
 
 GROUP_REGIONS = [
     "DPK",

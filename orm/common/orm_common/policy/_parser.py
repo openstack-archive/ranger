@@ -21,9 +21,7 @@ import re
 import six
 
 import _checks
-
 from oslo_policy._i18n import _LE
-
 
 LOG = logging.getLogger(__name__)
 

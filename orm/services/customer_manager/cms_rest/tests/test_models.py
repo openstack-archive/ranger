@@ -1,7 +1,6 @@
-import mock
-from cms_rest.tests import FunctionalTest
-
 from cms_rest.model import Models as models
+from cms_rest.tests import FunctionalTest
+import mock
 
 GROUP_REGIONS = [
     "DPK",

@@ -1,16 +1,13 @@
 import logging
 
-from pecan import rest, request
-from pecan import conf
-
-from wsme import types as wtypes
-from wsmeext.pecan import wsexpose
+from orm_common.utils import api_error_utils as err_utils
+from pecan import request, rest
 from rms.model import url_parm
 from rms.services.error_base import ErrorStatus
 from rms.services import services
 from rms.utils import authentication
-
-from orm_common.utils import api_error_utils as err_utils
+from wsme import types as wtypes
+from wsmeext.pecan import wsexpose
 
 logger = logging.getLogger(__name__)
 

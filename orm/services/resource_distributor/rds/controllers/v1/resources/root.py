@@ -5,16 +5,14 @@ import logging.handlers
 import time
 
 import pecan
-import wsme
 from pecan import rest
+from rds.controllers.v1.base import (ClientSideError, LockedEntity,
+                                     NotAllowedError)
+from rds.services.base import ConflictValue
+from rds.services import resource as ResourceService
+import wsme
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose
-
-from rds.controllers.v1.base import ClientSideError
-from rds.controllers.v1.base import LockedEntity
-from rds.controllers.v1.base import NotAllowedError
-from rds.services import resource as ResourceService
-from rds.services.base import ConflictValue
 
 my_logger = logging.getLogger(__name__)
 
@@ -192,7 +190,7 @@ class CreateNewResource(rest.RestController):
                                              resource_type,
                                              resource_id)
             res = Result(**{resource_type: CreatedResource(id=resource_id,
-                                                           created='%d' % (time.time()*1000),
+                                                           created='%d' % (time.time() * 1000),
                                                            links=Links(site_link))})
             return res
         except ConflictValue as e:
@@ -233,11 +231,11 @@ class CreateNewResource(rest.RestController):
             site_link = "%s/v1/rds/%s/%s" % (base_url,
                                              resource_type,
                                              resource_id)
-            res = Result(**{resource_type: CreatedResource(id=resource_id,
-                                                           updated='%d' % (
-                                                           time.time() * 1000),
-                                                           links=Links(
-                                                               site_link))})
+            res = Result(**{
+                resource_type: CreatedResource(
+                    id=resource_id,
+                    updated='%d' % (time.time() * 1000),
+                    links=Links(site_link))})
             return res
         except ConflictValue as e:
             my_logger.error("the request blocked need to wait "

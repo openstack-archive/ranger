@@ -1,9 +1,8 @@
+import logging
+
 from pecan import expose
 from pecan.rest import RestController
-from webob.exc import status_map
-
 import uuidgen.controllers.v1.root as root
-import logging
 
 LOG = logging.getLogger(__name__)
 

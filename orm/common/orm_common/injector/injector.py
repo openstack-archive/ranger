@@ -1,8 +1,8 @@
+import imp
+import os
+
 from orm_common.injector import fang
 from orm_common.utils.sanitize import sanitize_symbol_name
-
-import os
-import imp
 
 _di = fang.Di()
 logger = None

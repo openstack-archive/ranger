@@ -1,4 +1,3 @@
-from mock import MagicMock
 from fms_rest.logger import get_logger
 
 logger = get_logger(__name__)

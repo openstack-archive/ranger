@@ -1,9 +1,7 @@
 """unittest get resource status."""
 from mock import MagicMock
-
 import rds.controllers.v1.status.get_resource as resource
-from rds.services.model.region_resource_id_status import Model
-from rds.services.model.region_resource_id_status import StatusModel
+from rds.services.model.region_resource_id_status import Model, StatusModel
 from rds.tests.controllers.v1.functional_test import FunctionalTest
 
 

@@ -1,12 +1,10 @@
 """python module."""
 
-import json
 import logging
+
 import requests
 
 from pecan import conf
-from rds.services.base import ErrorMesage
-
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,8 @@
-from rds.tests import config as conf
-import mock
-import time
 import unittest
 
+import mock
 from rds.services import region_resource_id_status
+from rds.tests import config as conf
 
 
 class MyResult(object):

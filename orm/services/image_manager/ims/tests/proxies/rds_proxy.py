@@ -1,6 +1,6 @@
-import mock
 from ims.proxies import rds_proxy
 from ims.tests import FunctionalTest
+import mock
 
 
 class Response:

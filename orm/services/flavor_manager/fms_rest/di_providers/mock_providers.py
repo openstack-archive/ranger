@@ -1,6 +1,4 @@
-from fms_mocks import requests_mock
-from fms_mocks import audit_mock
-
+from fms_mocks import audit_mock, requests_mock
 from fms_rest.data.sql_alchemy.data_manager import DataManager
 from fms_rest.logic import flavor_logic
 from fms_rest.proxies import rds_proxy

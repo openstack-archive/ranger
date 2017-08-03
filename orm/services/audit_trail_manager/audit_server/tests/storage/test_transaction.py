@@ -1,8 +1,9 @@
 """test_transaction module."""
 
 
-from audit_server.storage.transaction import Base
 import unittest
+
+from audit_server.storage.transaction import Base
 
 
 class Test(unittest.TestCase):

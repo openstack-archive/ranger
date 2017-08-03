@@ -1,9 +1,7 @@
-from pecan import make_app
-from rms_mock import model
-from pecan import make_app, conf
 from pecan.commands import CommandRunner
-
+from pecan import make_app
 from rms import model
+from rms_mock import model
 
 
 def setup_app(config):

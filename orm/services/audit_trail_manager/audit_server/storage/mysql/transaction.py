@@ -2,14 +2,12 @@
 
 import logging
 
-from sqlalchemy import Column, Integer, Text, BigInteger, asc
-from sqlalchemy import create_engine
+from audit_server.model.transaction import Model
+from audit_server.storage import transaction
+from sqlalchemy import BigInteger, Column, Integer, Text, asc, create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative.api import declarative_base
 from sqlalchemy.orm import sessionmaker
-
-from audit_server.model.transaction import Model
-from audit_server.storage import transaction
 
 Base = declarative_base()
 logger = logging.getLogger(__name__)

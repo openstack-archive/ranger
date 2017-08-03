@@ -1,14 +1,13 @@
 """Native (bash commands) Git module."""
 import logging
-import subprocess, shlex
+import shlex
+import subprocess
 from threading import Timer
-
 import time
-from pecan import conf
 
-from git_base import BaseGit
-from git_base import GitUploadError, GitInitError, GitResetError
-from git_base import GitValidateError
+from git_base import (BaseGit, GitInitError, GitResetError, GitUploadError,
+                      GitValidateError)
+from pecan import conf
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +22,8 @@ class GitNative(BaseGit):
                         "Git server url: {}, "
                         "Git command timeout: "
                         "{} seconds".format(conf.git.local_repository_path,
-                                    conf.git.git_server_url,
-                                    conf.git.git_cmd_timeout))
+                                            conf.git.git_server_url,
+                                            conf.git.git_cmd_timeout))
 
             out, error = self._git_pull(conf.git.local_repository_path)
             if self._is_conflict(out) or self._is_error(error):

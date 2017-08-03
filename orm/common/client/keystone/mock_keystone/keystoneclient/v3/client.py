@@ -1,4 +1,3 @@
-from keystoneclient import exceptions
 
 
 class Client(object):

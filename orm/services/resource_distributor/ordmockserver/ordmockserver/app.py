@@ -1,5 +1,5 @@
-from pecan import make_app
 from ordmockserver import model
+from pecan import make_app
 
 
 def setup_app(config):

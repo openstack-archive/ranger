@@ -1,6 +1,6 @@
-import mock
 import unittest
 
+import mock
 from orm_common.policy import _checks
 from wsme.exc import ClientSideError
 

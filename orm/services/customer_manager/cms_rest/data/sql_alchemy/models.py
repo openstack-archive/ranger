@@ -1,11 +1,10 @@
-from sqlalchemy import Column, Integer, String, SmallInteger, ForeignKey
-from sqlalchemy.orm import relationship
 from cms_rest.data.sql_alchemy.base import Base
-import wsme
-
+import cms_rest.model.Models as WsmeModels
 from oslo_db.sqlalchemy import models
 
-import cms_rest.model.Models as WsmeModels
+from sqlalchemy import Column, ForeignKey, Integer, SmallInteger, String
+from sqlalchemy.orm import relationship
+import wsme
 
 
 class CMSBaseModel(models.ModelBase):

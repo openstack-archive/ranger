@@ -1,11 +1,10 @@
 """Configuration rest API input module."""
 
 import logging
-from orm_common.utils import utils
-from pecan import conf
-from pecan import rest
-from wsmeext.pecan import wsexpose
 
+from orm_common.utils import utils
+from pecan import conf, rest
+from wsmeext.pecan import wsexpose
 
 logger = logging.getLogger(__name__)
 

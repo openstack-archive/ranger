@@ -1,6 +1,6 @@
+from orm_common.utils import utils
 from pecan import abort
 from pecan.hooks import PecanHook
-from orm_common.utils import utils
 
 
 class TransactionIdHook(PecanHook):

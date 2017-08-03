@@ -1,9 +1,8 @@
 # coding: utf-8
-from sqlalchemy import Column, ForeignKey, Index, Integer, String, Table
-from sqlalchemy.orm import relationship
+from rms.model.model import Address, EndPoint, RegionData
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-
-from rms.model.model import EndPoint, RegionData, Regions, Address
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 metadata = Base.metadata

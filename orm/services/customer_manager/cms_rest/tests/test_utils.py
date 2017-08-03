@@ -1,4 +1,5 @@
 import json
+
 from wsme.exc import ClientSideError
 
 

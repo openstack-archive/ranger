@@ -1,6 +1,7 @@
+from unittest import TestCase
+
 import mock
 from orm_common.hooks import security_headers_hook
-from unittest import TestCase
 
 
 class MyHeaders(object):

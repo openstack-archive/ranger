@@ -19,4 +19,3 @@ class ConflictValue(Error):
     block values if operation still in progress
     """
     pass
-

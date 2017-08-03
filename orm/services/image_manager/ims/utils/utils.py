@@ -1,5 +1,6 @@
-from pecan import conf, request
 import time
+
+from pecan import request
 
 
 def convert_time_human(time_stamp):

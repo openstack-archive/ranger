@@ -1,9 +1,8 @@
-import mock
-from fms_rest.tests import FunctionalTest
-from fms_rest import proxies
 from fms_rest.data.sql_alchemy import db_models
-from fms_rest.logic.error_base import ErrorStatus
-from testfixtures import log_capture, compare
+from fms_rest import proxies
+from fms_rest.tests import FunctionalTest
+import mock
+from testfixtures import log_capture
 
 
 class Response:

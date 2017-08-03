@@ -1,13 +1,13 @@
 """Status (activate/deactivate) Image rest API input module."""
 
-from pecan import conf, rest, request
-from wsmeext.pecan import wsexpose
 from ims.logger import get_logger
-from orm_common.injector import injector
 from ims.logic.error_base import ErrorStatus
 from ims.persistency.wsme.models import Enabled, ImageWrapper
-from orm_common.utils import api_error_utils as err_utils
 from ims.utils import authentication as auth
+from orm_common.injector import injector
+from orm_common.utils import api_error_utils as err_utils
+from pecan import request, rest
+from wsmeext.pecan import wsexpose
 
 di = injector.get_di()
 

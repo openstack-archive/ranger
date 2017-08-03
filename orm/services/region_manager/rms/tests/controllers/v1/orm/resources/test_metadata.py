@@ -1,11 +1,9 @@
 import json
 
-from mock import patch, MagicMock
-
+from mock import MagicMock, patch
 from rms.controllers.v2.orm.resources import metadata
 from rms.model.model import *
 from rms.tests import FunctionalTest
-
 from wsme.exc import ClientSideError
 
 result_inst = RegionData("1", "2", "3", "4", "5", "6",

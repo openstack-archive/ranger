@@ -1,7 +1,7 @@
-from pecan import expose, redirect, response
-from pecan import *
-from webob.exc import status_map
 from OrdNotifier import root
+from pecan import *
+from pecan import expose
+from webob.exc import status_map
 
 
 class CatalogController(object):
@@ -43,5 +43,4 @@ class RootController(object):
         return dict(status=status, message=message)
 
     cat = CatalogController()
-    #customer=root.CreateNewCustomer()
     v1 = RootOne()

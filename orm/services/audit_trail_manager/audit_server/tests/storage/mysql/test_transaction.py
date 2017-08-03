@@ -2,16 +2,13 @@
 
 import unittest
 
+from audit_server.model.transaction import Model as TransactionModel
+from audit_server.model.transaction_query import Model as TransactionQueryModel
+from audit_server.storage.mysql.transaction import Connection, Record
 from mock import patch
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
-
-
-from audit_server.model.transaction import Model as TransactionModel
-from audit_server.model.transaction_query import Model as TransactionQueryModel
-from audit_server.storage.mysql.transaction import Connection
-from audit_server.storage.mysql.transaction import Record
 
 
 class Test(unittest.TestCase):

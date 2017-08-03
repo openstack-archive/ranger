@@ -1,10 +1,8 @@
 import wsme
+
 from fms_rest.data.sql_alchemy import db_models
-
 from fms_rest.data.wsme.model import Model
-
 from fms_rest.logic.error_base import ErrorStatus
-
 from pecan import conf, request
 from orm_common.utils.cross_api_utils import set_utils_conf, get_regions_of_group
 

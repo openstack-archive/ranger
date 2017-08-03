@@ -1,15 +1,12 @@
-from ims.logger import get_logger
-from ims.persistency.wsme.models import ImageWrapper, ImageSummaryResponse
-from ims.persistency.wsme.models import Region, ImageSummary, RegionWrapper
-from ims.persistency.sql_alchemy.db_models import ImageRegion, ImageCustomer
-from ims.logic.error_base import ErrorStatus, NotFoundError, NoContentError
-from ims.utils import utils as ImsUtils
-
-from orm_common.utils import utils
-from orm_common.injector import injector
 import time
 
-from pecan import request, conf
+from ims.logger import get_logger
+from ims.logic.error_base import ErrorStatus, NotFoundError
+from ims.persistency.sql_alchemy.db_models import ImageCustomer, ImageRegion
+from ims.persistency.wsme.models import (ImageSummary, ImageSummaryResponse,
+                                         ImageWrapper, RegionWrapper)
+from ims.utils import utils as ImsUtils
+from orm_common.injector import injector
 
 LOG = get_logger(__name__)
 
