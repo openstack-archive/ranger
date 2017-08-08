@@ -1,0 +1,9 @@
+Code-Review+1: Michael Glaser <michael.glaser@att.com>
+Code-Review+2: Hari <hosingh000@gmail.com>
+Workflow+1: Hari <hosingh000@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 08 Aug 2017 21:40:51 +0000
+Reviewed-on: https://review.openstack.org/490940
+Project: openstack/ranger
+Branch: refs/heads/master
