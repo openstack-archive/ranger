@@ -1,4 +1,5 @@
 from .errors import ProviderNotFoundError
+import logging
 
 
 # This is effectively what is sometimes termed a "dependency injection
@@ -38,7 +39,7 @@ class DependencyResolver:
             try:
                 self.resolve(resource_name)
             except ProviderNotFoundError as e:
-                # TODO: Add error logging here
+                logging.error(e)
                 return False
         else:
             return True
