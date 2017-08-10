@@ -6,9 +6,9 @@ import threading
 import time
 import urllib2
 
-from audit_client.api.exceptions.audit_exception import AuditException
-from audit_client.api.model.get_audits_result import AuditsResult
-from audit_client.api.model.transaction import Transaction
+from orm.common.client.audit.audit_client.api.exceptions.audit_exception import AuditException
+from orm.common.client.audit.audit_client.api.model.get_audits_result import AuditsResult
+from orm.common.client.audit.audit_client.api.model.transaction import Transaction
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import time
 from unittest import TestCase
 
 import mock
-from orm_common.utils import cross_api_utils
+from orm.common.orm_common.utils import cross_api_utils
 
 
 class TestCrossApiUtil(TestCase):
@@ -24,25 +24,25 @@ class TestCrossApiUtil(TestCase):
         cross_api_utils.set_utils_conf(None)
         self.assertRaises(AssertionError, cross_api_utils._check_conf_initialization)
 
-    @mock.patch('orm_common.utils.cross_api_utils.get_rms_region_group')
+    @mock.patch('orm.common.orm_common.utils.cross_api_utils.get_rms_region_group')
     def test_is_region_group_exist(self, mock_rms_region_group):
         mock_rms_region_group.return_value = 'test_group'
         exist = cross_api_utils.is_region_group_exist('test_group_name')
         self.assertEqual(exist, True)
 
-    @mock.patch('orm_common.utils.cross_api_utils.get_rms_region_group')
+    @mock.patch('orm.common.orm_common.utils.cross_api_utils.get_rms_region_group')
     def test_is_region_group_exist_false(self, mock_rms_region_group):
         mock_rms_region_group.return_value = None
         exist = cross_api_utils.is_region_group_exist('test_group_name')
         self.assertEqual(exist, False)
 
-    @mock.patch('orm_common.utils.cross_api_utils.get_rms_region_group')
+    @mock.patch('orm.common.orm_common.utils.cross_api_utils.get_rms_region_group')
     def test_get_regions_of_group(self, mock_rms_region_group):
         mock_rms_region_group.return_value = {'regions': 'group'}
         exist = cross_api_utils.get_regions_of_group('test_group_name')
         self.assertEqual(exist, 'group')
 
-    @mock.patch('orm_common.utils.cross_api_utils.get_rms_region_group')
+    @mock.patch('orm.common.orm_common.utils.cross_api_utils.get_rms_region_group')
     def test_get_regions_of_group_false(self, mock_rms_region_group):
         mock_rms_region_group.return_value = None
         exist = cross_api_utils.get_regions_of_group('test_group_name')
