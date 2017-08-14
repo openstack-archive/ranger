@@ -3,7 +3,7 @@ import pprint
 from unittest import TestCase
 
 import mock
-from orm_common.utils import utils
+from orm.common.orm_common.utils import utils
 from testfixtures import log_capture
 
 
@@ -25,12 +25,12 @@ class TestUtil(TestCase):
         self.assertEqual(uuid, '987654321')
 
     @mock.patch('requests.post')
-    @log_capture('orm_common.utils.utils', level=logging.INFO)
+    @log_capture('orm.common.orm_common.utils.utils', level=logging.INFO)
     def test_make_uuid_offline(self, mock_post, l):
         mock_post.side_effect = Exception('boom')
         uuid = utils.make_uuid()
         self.assertEqual(uuid, None)
-        l.check(('orm_common.utils.utils', 'INFO', 'Failed in make_uuid:boom'))
+        l.check(('orm.common.orm_common.utils.utils', 'INFO', 'Failed in make_uuid:boom'))
 
     @mock.patch('requests.post')
     def test_make_transid(self, mock_post):
@@ -39,33 +39,34 @@ class TestUtil(TestCase):
         self.assertEqual(uuid, '987654321')
 
     @mock.patch('requests.post')
-    @log_capture('orm_common.utils.utils', level=logging.INFO)
+    @log_capture('orm.common.orm_common.utils.utils', level=logging.INFO)
     def test_make_transid_offline(self, mock_post, l):
         mock_post.side_effect = Exception('boom')
         uuid = utils.make_transid()
         self.assertEqual(uuid, None)
         l.check(
-            ('orm_common.utils.utils', 'INFO', 'Failed in make_transid:boom'))
+            ('orm.common.orm_common.utils.utils', 'INFO', 'Failed in make_transid:boom'))
 
-    @mock.patch('audit_client.api.audit.init')
-    @mock.patch('audit_client.api.audit.audit')
+    @mock.patch('orm.common.client.audit.audit_client.api.audit.init')
+    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
     def test_audit_trail(self, mock_init, mock_audit):
         resp = utils.audit_trail('create customer', '1234',
                                  {'X-RANGER-Client': 'Fred'}, '5678')
         self.assertEqual(resp, 200)
 
-    @mock.patch('audit_client.api.audit.audit')
+    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
     def test_audit_trail_offline(self, mock_audit):
         mock_audit.side_effect = Exception('boom')
         resp = utils.audit_trail('create customer', '1234',
                                  {'X-RANGER-Client': 'Fred'}, '5678')
         self.assertEqual(resp, None)
 
-    @mock.patch('audit_client.api.audit.init')
-    @mock.patch('audit_client.api.audit.audit')
+    @mock.patch('orm.common.client.audit.audit_client.api.audit.init')
+    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
     def test_audit_service_args_least(self, mock_audit, mock_init):
         resp = utils.audit_trail('create customer', '1234',
-                                 {'X-RANGER-Client': 'Fred'}, '5678')
+                                 {'X-RANGER-Client': 'Fred'}, '5678',
+                                 event_details='CMS')
         self.assertEqual(mock_audit.call_args[0][1], 'Fred')  # application_id
         self.assertEqual(mock_audit.call_args[0][2], '1234')  # tracking_id
         self.assertEqual(mock_audit.call_args[0][3], '1234')  # transaction_id
@@ -78,12 +79,13 @@ class TestUtil(TestCase):
         self.assertEqual(mock_audit.call_args[0][9], 'CMS')  # event_details
         # self.assertEqual(mock_audit.call_args[0][10], 'Saved to DB')  # status
 
-    @mock.patch('audit_client.api.audit.init')
-    @mock.patch('audit_client.api.audit.audit')
+    @mock.patch('orm.common.client.audit.audit_client.api.audit.init')
+    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
     def test_audit_service_with_tracking(self, mock_audit, mock_init):
         utils.audit_trail('create customer', '1234',
                           {'X-RANGER-Client': 'Fred',
-                           'X-RANGER-Tracking-Id': 'Track12'}, '5678')
+                           'X-RANGER-Tracking-Id': 'Track12'}, '5678',
+                          event_details='CMS')
         self.assertEqual(mock_audit.call_args[0][1], 'Fred')  # application_id
         self.assertEqual(mock_audit.call_args[0][2], 'Track12')  # tracking_id
         self.assertEqual(mock_audit.call_args[0][3], '1234')  # transaction_id
@@ -96,12 +98,13 @@ class TestUtil(TestCase):
         self.assertEqual(mock_audit.call_args[0][9], 'CMS')  # event_details
         # self.assertEqual(mock_audit.call_args[0][10], 'Saved to DB')  # status
 
-    @mock.patch('audit_client.api.audit.init')
-    @mock.patch('audit_client.api.audit.audit')
+    @mock.patch('orm.common.client.audit.audit_client.api.audit.init')
+    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
     def test_audit_service_with_requester(self, mock_audit, mock_init):
         resp = utils.audit_trail('create customer', '1234',
                                  {'X-RANGER-Client': 'Fred',
-                                  'X-RANGER-Requester': 'Req04'}, '5678')
+                                  'X-RANGER-Requester': 'Req04'}, '5678',
+                                 event_details='CMS')
         self.assertEqual(mock_audit.call_args[0][1], 'Fred')  # application_id
         self.assertEqual(mock_audit.call_args[0][2], '1234')  # tracking_id
         self.assertEqual(mock_audit.call_args[0][3], '1234')  # transaction_id

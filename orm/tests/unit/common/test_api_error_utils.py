@@ -2,7 +2,7 @@ import json
 from unittest import TestCase
 
 import mock
-from orm_common.utils import api_error_utils
+from orm.common.orm_common.utils import api_error_utils
 
 
 class TestCrossApiUtil(TestCase):

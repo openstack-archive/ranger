@@ -1,6 +1,6 @@
 import json
 
-from orm_common.utils import utils
+from orm.common.orm_common.utils import utils
 from wsme.exc import ClientSideError
 
 
