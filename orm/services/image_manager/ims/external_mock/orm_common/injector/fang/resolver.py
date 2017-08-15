@@ -1,4 +1,5 @@
-from .errors import ProviderNotFoundError
+import logging
+from orm.services.image_manager.ims.externel_mock.orm_common.injector.fang.errors import ProviderNotFoundError
 
 
 # This is effectively what is sometimes termed a "dependency injection
@@ -38,7 +39,7 @@ class DependencyResolver:
             try:
                 self.resolve(resource_name)
             except ProviderNotFoundError as e:
-                # TODO: Add error logging here
+                logging.error("Provider not found! Make sure the provider is available.\n %s", e)
                 return False
         else:
             return True
