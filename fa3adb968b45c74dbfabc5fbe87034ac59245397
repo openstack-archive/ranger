@@ -1,0 +1,10 @@
+Code-Review+1: Nishad Shah <nishad.shah@att.com>
+Code-Review+1: Michael Glaser <michael.glaser@att.com>
+Code-Review+2: Hari <hosingh000@gmail.com>
+Workflow+1: Hari <hosingh000@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 15 Aug 2017 18:11:32 +0000
+Reviewed-on: https://review.openstack.org/493961
+Project: openstack/ranger
+Branch: refs/heads/master
