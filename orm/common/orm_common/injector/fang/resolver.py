@@ -1,5 +1,5 @@
 import logging
-from orm.common.orm_common.injector.errors import ProviderNotFoundError
+from orm.common.orm_common.injector.fang.errors import ProviderNotFoundError
 
 
 # This is effectively what is sometimes termed a "dependency injection

@@ -3,7 +3,7 @@ import os
 from unittest import TestCase
 
 import mock
-from orm_common.injector import injector
+from orm.common.orm_common.injector import injector
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 import unittest
 
 import mock
-from orm_common.policy import policy
+from orm.common.orm_common.policy import policy
 
 
 class TestException(Exception):
