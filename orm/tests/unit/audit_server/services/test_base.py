@@ -3,7 +3,7 @@
 
 import unittest
 
-from audit_server.services.base import Error
+from orm.services.audit_trail_manager.audit_server.services.base import Error
 
 
 class Test(unittest.TestCase):

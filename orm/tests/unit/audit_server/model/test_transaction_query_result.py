@@ -3,7 +3,7 @@
 
 import unittest
 
-from audit_server.model.transaction_query_result import \
+from orm.services.audit_trail_manager.audit_server.model.transaction_query_result import \
     Model as TransactionQueryResultModel
 
 

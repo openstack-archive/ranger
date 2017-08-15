@@ -3,7 +3,7 @@
 
 import unittest
 
-from audit_server.storage.transaction import Base
+from orm.services.audit_trail_manager.audit_server.storage.transaction import Base
 
 
 class Test(unittest.TestCase):

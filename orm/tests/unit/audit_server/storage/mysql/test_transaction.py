@@ -2,9 +2,9 @@
 
 import unittest
 
-from audit_server.model.transaction import Model as TransactionModel
-from audit_server.model.transaction_query import Model as TransactionQueryModel
-from audit_server.storage.mysql.transaction import Connection, Record
+from orm.services.audit_trail_manager.audit_server.model.transaction import Model as TransactionModel
+from orm.services.audit_trail_manager.audit_server.model.transaction_query import Model as TransactionQueryModel
+from orm.services.audit_trail_manager.audit_server.storage.mysql.transaction import Connection, Record
 from mock import patch
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError

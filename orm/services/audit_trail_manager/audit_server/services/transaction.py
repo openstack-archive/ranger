@@ -2,9 +2,9 @@
 
 import logging
 
-from audit_server.model.transaction_query_result import \
+from orm.services.audit_trail_manager.audit_server.model.transaction_query_result import \
     Model as QueryResultModel
-from audit_server.storage import factory
+from orm.services.audit_trail_manager.audit_server.storage import factory
 
 logger = logging.getLogger(__name__)
 
