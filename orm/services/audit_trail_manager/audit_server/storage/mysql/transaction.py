@@ -2,8 +2,8 @@
 
 import logging
 
-from audit_server.model.transaction import Model
-from audit_server.storage import transaction
+from orm.services.audit_trail_manager.audit_server.model.transaction import Model
+from orm.services.audit_trail_manager.audit_server.storage import transaction
 from sqlalchemy import BigInteger, Column, Integer, Text, asc, create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative.api import declarative_base

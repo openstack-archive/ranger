@@ -1,12 +1,12 @@
 """test_transaction module."""
 
+from mock import patch
 import unittest
 
-from audit_server.model.transaction import Model as TransactionModel
-from audit_server.model.transaction_query import Model as TransactionQuery
-from audit_server.services import transaction as TransactionService
-from audit_server.storage import factory
-from mock import patch
+from orm.services.audit_trail_manager.audit_server.model.transaction import Model as TransactionModel
+from orm.services.audit_trail_manager.audit_server.model.transaction_query import Model as TransactionQuery
+from orm.services.audit_trail_manager.audit_server.services import transaction as TransactionService
+from orm.services.audit_trail_manager.audit_server.storage import factory
 
 
 class Test(unittest.TestCase):

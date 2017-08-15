@@ -4,9 +4,9 @@ import base
 import logging
 import wsme
 
-from audit_server.model.transaction import Model as TransactionModel
-from audit_server.model.transaction_query import Model as QueryModel
-from audit_server.services import transaction as transaction_service
+from orm.services.audit_trail_manager.audit_server.model.transaction import Model as TransactionModel
+from orm.services.audit_trail_manager.audit_server.model.transaction_query import Model as QueryModel
+from orm.services.audit_trail_manager.audit_server.services import transaction as transaction_service
 from pecan import rest
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose

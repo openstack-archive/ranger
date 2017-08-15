@@ -1,7 +1,7 @@
 """factory module."""
 
 
-from audit_server.storage.mysql.transaction import Connection as Transaction
+from orm.services.audit_trail_manager.audit_server.storage.mysql.transaction import Connection as Transaction
 
 database_url = 'NA'
 echo_statements = False

@@ -1,11 +1,11 @@
 """test_factory module."""
 
-import unittest
-
-from audit_server.storage import factory
-from audit_server.storage.mysql.transaction import Connection
 from mock import patch
 from sqlalchemy import create_engine
+import unittest
+
+from orm.services.audit_trail_manager.audit_server.storage import factory
+from orm.services.audit_trail_manager.audit_server.storage.mysql.transaction import Connection
 
 
 class Test(unittest.TestCase):

@@ -3,9 +3,9 @@
 
 import unittest
 
-from audit_server.controllers.v1.base import (ClientSideError,
-                                              EntityNotFoundError,
-                                              InputValueError)
+from orm.services.audit_trail_manager.audit_server.controllers.v1.base import (ClientSideError,
+                                                                               EntityNotFoundError,
+                                                                               InputValueError)
 
 
 class Test(unittest.TestCase):
