@@ -20,8 +20,8 @@ import logging
 
 import six
 
-from orm_common.utils import api_error_utils as err_utils
-from orm_common.utils import dictator
+from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.utils import dictator
 
 logger = logging.getLogger(__name__)
 

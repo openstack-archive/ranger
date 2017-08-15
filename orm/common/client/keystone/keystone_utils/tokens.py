@@ -3,9 +3,9 @@ import logging
 
 import requests
 
-from keystoneclient.v2_0 import client as v2_client
-from keystoneclient.v3 import client as v3_client
-from orm_common.utils import dictator
+from orm.common.client.keystone.mock_keystone.keystoneclient.v2_0 import client as v2_client
+from orm.common.client.keystone.mock_keystone.keystoneclient.v3 import client as v3_client
+from orm.common.orm_common.utils import dictator
 
 _verify = False
 

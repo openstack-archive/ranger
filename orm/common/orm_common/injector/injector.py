@@ -1,10 +1,10 @@
 import imp
 import os
 
-from orm_common.injector import fang
-from orm_common.utils.sanitize import sanitize_symbol_name
+from orm.common.orm_common.injector.fang import di
+from orm.common.orm_common.utils.sanitize import sanitize_symbol_name
 
-_di = fang.Di()
+_di = di.Di()
 logger = None
 
 

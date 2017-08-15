@@ -1,7 +1,7 @@
 import json
 import logging
 
-from orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.utils import api_error_utils as err_utils
 from pecan.hooks import PecanHook
 
 logger = logging.getLogger(__name__)

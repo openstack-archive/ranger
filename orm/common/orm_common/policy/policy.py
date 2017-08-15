@@ -2,9 +2,9 @@
 
 import logging
 
-from keystone_utils import tokens
-from orm_common.utils import api_error_utils as err_utils
-from orm_common.utils import dictator
+from orm.common.client.keystone.keystone_utils import tokens
+from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.utils import dictator
 import qolicy
 from wsme.exc import ClientSideError
 

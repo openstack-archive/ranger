@@ -2,7 +2,7 @@ import logging
 from unittest import TestCase
 
 import mock
-from orm_common.hooks import transaction_id_hook
+from orm.common.orm_common.hooks import transaction_id_hook
 
 logger = logging.getLogger(__name__)
 
