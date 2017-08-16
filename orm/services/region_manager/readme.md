@@ -15,7 +15,7 @@ _TBD_
 ## Code style guide
 First of all please read two of the following documents:
 1. [Pythons PEP8](https://www.python.org/dev/peps/pep-0008/)
-1. [Openstack hacking](http://docs.openstack.org/developer/hacking/)
+1. [Openstack hacking](https://docs.openstack.org/hacking/latest/)
 
 __After reading this please read it 3 more times__
 
