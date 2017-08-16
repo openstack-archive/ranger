@@ -63,7 +63,7 @@ class TestCreateResource(FunctionalTest):
     @patch.object(root.ResourceService, 'main',
                   side_effect=root.ConflictValue("region"))
     def test_delete_resource_flavor_con(self, input):
-        """test delete flavor while previous proccess still in progress."""
+        """test delete flavor while previous process still in progress."""
         try:
             response = self.app.delete_json('/v1/rds/resources', flavor_data)
         except Exception as e:

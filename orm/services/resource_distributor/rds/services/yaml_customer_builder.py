@@ -29,7 +29,7 @@ def get_users_quotas(data, region):
 def creat_final_yaml(title, description, resources, outputs):
     """put all yaml strings together.
 
-    :param title: ther version of yaml
+    :param title: the version of yaml
     :param description: file description
     :param resources: body of the yaml file
     :param outputs: the output of the yaml
