@@ -1,4 +1,4 @@
-from cms_rest.controllers.v1.orm.root import OrmController
+from orm.root import OrmController
 from pecan.rest import RestController
 
 

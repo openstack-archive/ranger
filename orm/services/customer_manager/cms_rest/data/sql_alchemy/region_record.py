@@ -1,5 +1,5 @@
-from cms_rest.data.sql_alchemy.models import Region
-from cms_rest.logger import get_logger
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import Region
+from orm.services.customer_manager.cms_rest.logger import get_logger
 
 LOG = get_logger(__name__)
 

@@ -1,6 +1,7 @@
-from cms_rest.model import Models as models
-from cms_rest.tests import FunctionalTest
 import mock
+
+from orm.services.customer_manager.cms_rest.model import Models as models
+from orm.tests.unit.cms import FunctionalTest
 
 GROUP_REGIONS = [
     "DPK",

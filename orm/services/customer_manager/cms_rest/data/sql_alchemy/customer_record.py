@@ -1,10 +1,11 @@
 from __builtin__ import int
 
-from cms_rest.data.sql_alchemy.models import (CmsUser, Customer,
-                                              CustomerMetadata, CustomerRegion,
-                                              Region, UserRole)
-from cms_rest.logger import get_logger
 from sqlalchemy import func
+
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import (CmsUser, Customer,
+                                                                            CustomerMetadata, CustomerRegion,
+                                                                            Region, UserRole)
+from orm.services.customer_manager.cms_rest.logger import get_logger
 
 LOG = get_logger(__name__)
 

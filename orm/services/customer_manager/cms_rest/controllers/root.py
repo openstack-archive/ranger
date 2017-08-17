@@ -1,4 +1,4 @@
-from cms_rest.controllers.v1 import root as v1
+from orm.services.customer_manager.cms_rest.controllers.v1 import root as v1
 from pecan import expose
 
 

@@ -1,7 +1,7 @@
-from cms_rest.logic.error_base import ErrorStatus
-from cms_rest.model.Model import Model
-from orm_common.utils.cross_api_utils import (get_regions_of_group,
-                                              set_utils_conf)
+from orm.services.customer_manager.cms_rest.logic.error_base import ErrorStatus
+from orm.services.customer_manager.cms_rest.model.Model import Model
+from orm.common.orm_common.utils.cross_api_utils import (get_regions_of_group,
+                                                         set_utils_conf)
 from pecan import conf
 import wsme
 from wsme import types as wtypes

@@ -1,9 +1,9 @@
-from cms_rest.data.sql_alchemy.cms_user_record import CmsUserRecord
-from cms_rest.data.sql_alchemy.customer_record import CustomerRecord
-from cms_rest.data.sql_alchemy.models import *
-from cms_rest.data.sql_alchemy.region_record import RegionRecord
-from cms_rest.logger import get_logger
-from cms_rest.logic.error_base import NotFound
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.cms_user_record import CmsUserRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.customer_record import CustomerRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import *
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.region_record import RegionRecord
+from orm.services.customer_manager.cms_rest.logger import get_logger
+from orm.services.customer_manager.cms_rest.logic.error_base import NotFound
 
 LOG = get_logger(__name__)
 

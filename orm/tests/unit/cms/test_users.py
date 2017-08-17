@@ -1,11 +1,11 @@
-import requests
-
-from cms_rest.controllers.v1.orm.customer import users
-from cms_rest.logic.error_base import ErrorStatus
-from cms_rest.model import Models
-from cms_rest.tests import FunctionalTest
 import mock
+import requests
 from wsme.exc import ClientSideError
+
+from orm.services.customer_manager.cms_rest.controllers.v1.orm.customer import users
+from orm.services.customer_manager.cms_rest.logic.error_base import ErrorStatus
+from orm.services.customer_manager.cms_rest.model import Models
+from orm.tests.unit.cms import FunctionalTest
 
 customer_logic_mock = None
 

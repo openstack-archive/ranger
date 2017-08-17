@@ -3,8 +3,8 @@ import pprint
 
 import requests
 
-from cms_rest.logger import get_logger
-from cms_rest.logic.error_base import ErrorStatus
+from orm.services.customer_manager.cms_rest.logger import get_logger
+from orm.services.customer_manager.cms_rest.logic.error_base import ErrorStatus
 from pecan import conf, request
 
 LOG = get_logger(__name__)

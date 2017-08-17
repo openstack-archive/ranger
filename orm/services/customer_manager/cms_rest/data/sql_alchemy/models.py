@@ -1,5 +1,5 @@
-from cms_rest.data.sql_alchemy.base import Base
-import cms_rest.model.Models as WsmeModels
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.base import Base
+import orm.services.customer_manager.cms_rest.model.Models as WsmeModels
 from oslo_db.sqlalchemy import models
 
 from sqlalchemy import Column, ForeignKey, Integer, SmallInteger, String

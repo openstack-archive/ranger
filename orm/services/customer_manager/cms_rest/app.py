@@ -1,12 +1,12 @@
 import os
-
-from cms_rest.logger import get_logger
-from cms_rest import model
-from cms_rest.utils import authentication
-from orm_common.policy import policy
-from orm_common.utils import utils
 from pecan.commands import CommandRunner
 from pecan import make_app
+
+from orm.common.orm_common.policy import policy
+from orm.common.orm_common.utils import utils
+from orm.services.customer_manager.cms_rest.logger import get_logger
+from orm.services.customer_manager.cms_rest import model
+from orm.services.customer_manager.cms_rest.utils import authentication
 
 logger = get_logger(__name__)
 
