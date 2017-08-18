@@ -496,7 +496,7 @@ definitions:
         example: /v1/images/b2173dd3-7ad6-4362-baa6-a68bce3565cb/file
       visibility:
         type: string
-        description: if image visable
+        description: if image visible
         example: private
       disk-format:
         type: string
