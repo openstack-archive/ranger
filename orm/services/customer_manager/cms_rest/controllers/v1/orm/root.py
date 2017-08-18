@@ -1,6 +1,8 @@
-from cms_rest.controllers.v1.orm.configuration import ConfigurationController
-from cms_rest.controllers.v1.orm.customer.root import CustomerController
-from cms_rest.controllers.v1.orm.logs import LogsController
+from __future__ import absolute_import
+
+from ..orm.configuration import ConfigurationController
+from ..orm.customer.root import CustomerController
+from ..orm.logs import LogsController
 from pecan.rest import RestController
 
 

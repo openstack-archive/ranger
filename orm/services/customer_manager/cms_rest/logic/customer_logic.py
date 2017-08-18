@@ -1,19 +1,19 @@
-import requests
-
-from cms_rest.data.data_manager import DataManager
-from cms_rest.data.sql_alchemy.models import CustomerMetadata, UserRole
-from cms_rest.logger import get_logger
-from cms_rest.logic.error_base import (DuplicateEntryError, ErrorStatus,
-                                       NotFound)
-from cms_rest.model.Models import (CustomerResultWrapper, CustomerSummary,
-                                   CustomerSummaryResponse,
-                                   RegionResultWrapper, UserResultWrapper)
-from cms_rest.rds_proxy import RdsProxy
-from orm_common.utils import utils
-from orm_common.utils.cross_api_utils import (get_regions_of_group,
-                                              set_utils_conf)
 import pecan
 from pecan import conf, request
+import requests
+
+from orm.common.orm_common.utils import utils
+from orm.common.orm_common.utils.cross_api_utils import (get_regions_of_group,
+                                                         set_utils_conf)
+from orm.services.customer_manager.cms_rest.data.data_manager import DataManager
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import CustomerMetadata, UserRole
+from orm.services.customer_manager.cms_rest.logger import get_logger
+from orm.services.customer_manager.cms_rest.logic.error_base import (DuplicateEntryError, ErrorStatus,
+                                                                     NotFound)
+from orm.services.customer_manager.cms_rest.model.Models import (CustomerResultWrapper, CustomerSummary,
+                                                                 CustomerSummaryResponse,
+                                                                 RegionResultWrapper, UserResultWrapper)
+from orm.services.customer_manager.cms_rest.rds_proxy import RdsProxy
 
 LOG = get_logger(__name__)
 

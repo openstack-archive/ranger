@@ -1,6 +1,6 @@
 import os
 
-from cms_rest.tests.simple_hook_mock import SimpleHookMock
+from orm.tests.unit.cms.simple_hook_mock import SimpleHookMock
 
 global SimpleHookMock
 
@@ -14,8 +14,8 @@ server = {
 
 # Pecan Application Configurations
 app = {
-    'root': 'cms_rest.controllers.root.RootController',
-    'modules': ['cms_rest'],
+    'root': 'orm.services.customer_manager.cms_rest.controllers.root.RootController',
+    'modules': ['orm.services.customer_manager.cms_rest'],
     'static_root': '%(confdir)s/../../public',
     'template_path': '%(confdir)s/../templates',
     'debug': True,
@@ -127,5 +127,5 @@ authentication = {
     "token_role": "admin",
     "role_location": {"tenant": "admin"},
     "keystone_version": "2.0",
-    "policy_file": "cms_rest/etc/policy.json"
+    "policy_file": "orm/services/customer_manager/cms_rest/etc/policy.json"
 }

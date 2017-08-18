@@ -1,9 +1,10 @@
-from cms_rest.data.sql_alchemy import models
-from cms_rest.logic.error_base import ErrorStatus
-from cms_rest import rds_proxy
-from cms_rest.tests import FunctionalTest
 import mock
 from testfixtures import log_capture
+
+from orm.services.customer_manager.cms_rest.data.sql_alchemy import models
+from orm.services.customer_manager.cms_rest.logic.error_base import ErrorStatus
+from orm.services.customer_manager.cms_rest import rds_proxy
+from orm.tests.unit.cms import FunctionalTest
 
 
 class Response:
@@ -22,7 +23,7 @@ class TestUtil(FunctionalTest):
 
     @mock.patch.object(rds_proxy, 'request')
     @mock.patch('requests.post')
-    @log_capture('cms_rest.rds_proxy')
+    @log_capture('orm.services.customer_manager.cms_rest.rds_proxy')
     def test_send_good(self, mock_post, mock_request, l):
         resp = Response(200, 'my content')
         mock_post.return_value = resp
@@ -33,7 +34,7 @@ class TestUtil(FunctionalTest):
 
     @mock.patch.object(rds_proxy, 'request')
     @mock.patch('requests.post')
-    @log_capture('cms_rest.rds_proxy')
+    @log_capture('orm.services.customer_manager.cms_rest.rds_proxy')
     def test_bad_status(self, mock_post, mock_request, l):
         resp = Response(400, 'my content')
         mock_post.return_value = resp
@@ -43,7 +44,7 @@ class TestUtil(FunctionalTest):
 
     @mock.patch.object(rds_proxy, 'request')
     @mock.patch('requests.post')
-    @log_capture('cms_rest.rds_proxy')
+    @log_capture('orm.services.customer_manager.cms_rest.rds_proxy')
     def test_no_content(self, mock_post, mock_request, l):
         resp = Response(200, None)
         mock_post.return_value = resp
