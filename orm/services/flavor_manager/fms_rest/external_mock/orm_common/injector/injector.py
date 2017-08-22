@@ -11,7 +11,6 @@ def register_providers(env_variable, providers_dir_path, _logger):
     global logger
     logger = _logger
 
-    # TODO: change all prints to logger
     logger.info('Initializing dependency injector')
     logger.info('Checking {0} variable'.format(env_variable))
 
