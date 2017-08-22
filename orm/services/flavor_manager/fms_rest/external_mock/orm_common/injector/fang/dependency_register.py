@@ -1,7 +1,8 @@
 from functools import partial
 import inspect
 
-from .errors import DependentNotFoundError
+from orm.services.flavor_manager.fms_rest.external_mock.orm_common.injector.fang.errors
+import DependentNotFoundError
 
 try:
     import click
