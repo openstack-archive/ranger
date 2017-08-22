@@ -1,11 +1,13 @@
-from fms_rest.data.sql_alchemy import db_models
-from fms_rest.data.wsme import models
-from fms_rest.data.wsme.models import *
-from fms_rest.logic.error_base import NotFoundError
-import fms_rest.logic.flavor_logic as flavor_logic
-from fms_rest.tests import FunctionalTest
+from orm.common.orm_common.injector import injector
+from orm.services.flavor_manager.fms_rest.data.sql_alchemy import db_models
+from orm.services.flavor_manager.fms_rest.data.wsme import models
+from orm.services.flavor_manager.fms_rest.data.wsme.models import *
+from orm.services.flavor_manager.fms_rest.logic.error_base import NotFoundError
+from orm.services.flavor_manager.fms_rest.logic import flavor_logic
+from orm.tests.unit.fms import FunctionalTest
+
+from sqlalchemy.orm import exc
 from mock import MagicMock, patch
-from orm_common.injector import injector
 
 
 class OES():
@@ -440,11 +442,11 @@ class TestFlavorLogic(FunctionalTest):
         injector.override_injected_dependency(
             ('data_manager', get_datamanager_mock))
 
-        mock_strin.side_effect = flavor_logic.FlushError()
-        self.assertRaises(flavor_logic.FlushError, flavor_logic.add_regions,
+        mock_strin.side_effect = exc.FlushError()
+        self.assertRaises(exc.FlushError, flavor_logic.add_regions,
                           'uuid', RegionWrapper([Region(name='test_region')]),
                           'transaction')
-        mock_strin.side_effect = flavor_logic.FlushError(
+        mock_strin.side_effect = exc.FlushError(
             'conflicts with persistent instance')
         self.assertRaises(flavor_logic.ErrorStatus, flavor_logic.add_regions,
                           'uuid', RegionWrapper([Region(name='test_region')]),
@@ -549,15 +551,15 @@ class TestFlavorLogic(FunctionalTest):
                           moq,
                           'transaction')
 
-        mock_strin.side_effect = flavor_logic.FlushError(
+        mock_strin.side_effect = exc.FlushError(
             'conflicts with persistent instance')
         self.assertRaises(flavor_logic.ConflictError,
                           flavor_logic.add_tenants, 'uuid',
                           TenantWrapper(tenants),
                           'transaction')
 
-        mock_strin.side_effect = flavor_logic.FlushError('')
-        self.assertRaises(flavor_logic.FlushError,
+        mock_strin.side_effect = exc.FlushError('')
+        self.assertRaises(exc.FlushError,
                           flavor_logic.add_tenants, 'uuid',
                           TenantWrapper(tenants),
                           'transaction')

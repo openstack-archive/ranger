@@ -1,8 +1,9 @@
 """Configuration rest API input module."""
-
+from __future__ import absolute_import
 import logging
 
-from orm_common.utils import utils
+from orm.common.orm_common.utils import utils
+
 from pecan import conf, rest
 from wsmeext.pecan import wsexpose
 

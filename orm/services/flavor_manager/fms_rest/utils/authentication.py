@@ -1,7 +1,8 @@
 import logging
 
-from keystone_utils import tokens
-from orm_common.policy import policy
+from orm.common.client.keystone.keystone_utils import tokens
+from orm.common.orm_common.policy import policy
+
 from pecan import conf
 
 logger = logging.getLogger(__name__)

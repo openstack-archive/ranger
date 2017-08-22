@@ -1,8 +1,8 @@
 import os
 
-import fms_rest.di_providers as di_providers
-from fms_rest.logger import get_logger
-from orm_common.injector import injector
+from orm.common.orm_common.injector import injector
+from orm.services.flavor_manager.fms_rest import di_providers
+from orm.services.flavor_manager.fms_rest.logger import get_logger
 
 logger = get_logger(__name__)
 

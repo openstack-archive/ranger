@@ -1,9 +1,10 @@
 import json
 import pprint
 
-from fms_rest.logger import get_logger
-from fms_rest.logic.error_base import ErrorStatus
-from orm_common.injector import injector
+from orm.common.orm_common.injector import injector
+from orm.services.flavor_manager.fms_rest.logger import get_logger
+from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
+
 from pecan import conf, request
 
 di = injector.get_di()

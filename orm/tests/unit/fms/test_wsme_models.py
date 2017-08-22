@@ -1,6 +1,6 @@
-from fms_rest.data.sql_alchemy import db_models
-import fms_rest.data.wsme.models as wsme_models
-from fms_rest.tests import FunctionalTest
+from orm.services.flavor_manager.fms_rest.data.sql_alchemy import db_models
+from orm.services.flavor_manager.fms_rest.data.wsme import models
+from orm.tests.unit.fms import FunctionalTest
 
 
 class TestWsmeModels(FunctionalTest):
@@ -29,7 +29,7 @@ class TestWsmeModels(FunctionalTest):
         sql_flavor.disk = 1
         sql_flavor.name = 'name'
 
-        wsme_flavors = wsme_models.FlavorWrapper.from_db_model(sql_flavor)
+        wsme_flavors = models.FlavorWrapper.from_db_model(sql_flavor)
 
         self.assertEqual(len(wsme_flavors.flavor.regions), 2)
         self.assertEqual(len(wsme_flavors.flavor.tenants), 2)
@@ -37,8 +37,8 @@ class TestWsmeModels(FunctionalTest):
         self.assertEqual(wsme_flavors.flavor.extra_specs['key2'], 'val2')
 
     def test_flavor_wrapper_to_db_model(self):
-        flavor_wrapper = wsme_models.FlavorWrapper()
-        flavor_wrapper.flavor = wsme_models.Flavor()
+        flavor_wrapper = models.FlavorWrapper()
+        flavor_wrapper.flavor = models.Flavor()
 
         flavor_wrapper.flavor.description = 'desc'
         flavor_wrapper.flavor.disk = '1'
@@ -46,8 +46,8 @@ class TestWsmeModels(FunctionalTest):
         flavor_wrapper.flavor.extra_specs = {'key1': 'val1', 'key2': 'val2'}
         flavor_wrapper.flavor.tag = {'key1': 'val1', 'key2': 'val2'}
         flavor_wrapper.flavor.options = {'key1': 'val1', 'key2': 'val2'}
-        flavor_wrapper.flavor.regions = [wsme_models.Region('region1'),
-                                         wsme_models.Region('region2')]
+        flavor_wrapper.flavor.regions = [models.Region('region1'),
+                                         models.Region('region2')]
         flavor_wrapper.flavor.tenants = ['tenant1', 'tenant2']
         flavor_wrapper.flavor.id = 'id'
         flavor_wrapper.flavor.ram = '1'
@@ -72,7 +72,7 @@ class TestWsmeModels(FunctionalTest):
         sql_flavor.name = 'some name'
         sql_flavor.description = 'some_decription'
 
-        flavor_summary = wsme_models.FlavorSummary.from_db_model(sql_flavor)
+        flavor_summary = models.FlavorSummary.from_db_model(sql_flavor)
 
         self.assertEqual(flavor_summary.id, sql_flavor.id)
         self.assertEqual(flavor_summary.name, sql_flavor.name)

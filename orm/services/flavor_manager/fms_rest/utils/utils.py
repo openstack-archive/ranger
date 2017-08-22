@@ -1,7 +1,8 @@
 import time
 
-from fms_rest.logger import get_logger
-from orm_common.injector import injector
+from orm.common.orm_common.injector import injector
+from orm.services.flavor_manager.fms_rest.logger import get_logger
+
 from pecan import conf
 
 logger = get_logger(__name__)

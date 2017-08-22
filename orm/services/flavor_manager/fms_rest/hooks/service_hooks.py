@@ -1,5 +1,6 @@
-from fms_rest.utils import utils
-from orm_common.hooks.transaction_id_hook import TransactionIdHook
+from orm.common.orm_common.hooks.transaction_id_hook import TransactionIdHook
+from orm.services.flavor_manager.fms_rest.utils import utils
+
 from pecan import abort
 
 

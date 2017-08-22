@@ -1,7 +1,8 @@
 
-from fms_rest.data.sql_alchemy.db_models import (Flavor, FlavorRegion,
-                                                 FlavorTenant)
-from fms_rest.logger import get_logger
+from orm.services.flavor_manager.fms_rest.data.sql_alchemy.db_models import (Flavor, FlavorRegion,
+                                                                             FlavorTenant)
+from orm.services.flavor_manager.fms_rest.logger import get_logger
+
 from sqlalchemy.sql import or_
 
 LOG = get_logger(__name__)

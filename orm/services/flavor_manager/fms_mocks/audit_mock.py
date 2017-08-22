@@ -1,4 +1,4 @@
-from fms_rest.logger import get_logger
+from orm.services.flavor_manager.fms_rest.logger import get_logger
 
 logger = get_logger(__name__)
 
