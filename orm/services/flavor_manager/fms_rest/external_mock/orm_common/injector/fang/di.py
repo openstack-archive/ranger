@@ -1,6 +1,6 @@
-from .dependency_register import DependencyRegister
-from .resolver import DependencyResolver
-from .resource_provider_register import ResourceProviderRegister
+from orm.services.flavor_manager.fms_rest.external_mock.orm_common.injector.fang.dependency_register import DependencyRegister
+from orm.services.flavor_manager.fms_rest.external_mock.orm_common.injector.fang.resolver import DependencyResolver
+from orm.services.flavor_manager.fms_rest.external_mock.orm_common.injector.fang.resource_provider_register import ResourceProviderRegister
 
 
 class Di:

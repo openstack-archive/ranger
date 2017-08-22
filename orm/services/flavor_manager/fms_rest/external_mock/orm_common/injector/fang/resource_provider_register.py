@@ -1,6 +1,6 @@
 from functools import partial
 
-from .errors import (FangError, ProviderAlreadyRegisteredError,
+from orm.services.flavor_manager.fms_rest.external_mock.orm_common.injector.fang.errors import (FangError, ProviderAlreadyRegisteredError,
                      ProviderNotFoundError)
 
 
