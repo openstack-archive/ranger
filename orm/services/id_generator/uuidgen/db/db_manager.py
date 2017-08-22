@@ -1,8 +1,8 @@
 import logging
 
+from orm.services.id_generator.uuidgen.db.uuid_db import UUID
 from oslo_db.sqlalchemy import session as db_session
 from pecan import conf
-from uuid_db import UUID
 
 logger = logging.getLogger(__name__)
 
