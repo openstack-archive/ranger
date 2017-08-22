@@ -1,9 +1,9 @@
 import logging
 import os
 
+from orm.services.id_generator.uuidgen import model
 from pecan.commands import CommandRunner
 from pecan import make_app
-from uuidgen import model
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,8 @@
 import logging
 
+import orm.services.id_generator.uuidgen.controllers.v1.root as root
 from pecan import expose
 from pecan.rest import RestController
-import uuidgen.controllers.v1.root as root
 
 LOG = logging.getLogger(__name__)
 
