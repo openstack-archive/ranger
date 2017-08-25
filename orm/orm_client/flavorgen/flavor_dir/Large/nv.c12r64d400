@@ -1,0 +1,10 @@
+{
+    "description":"A standard NV flavor with 12 VCPUs, 64 GB RAM, 400 GB Disk, 0 GB Swap and 0 GB Ephemeral",
+    "series": "nv",
+    "ram": "65536",
+    "ephemeral": "0",
+    "visibility": "public",
+    "vcpus": "12",
+    "swap": "0",
+    "disk": "400"
+}

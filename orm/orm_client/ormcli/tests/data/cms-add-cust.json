@@ -1,0 +1,119 @@
+{
+    "description": "Customer description",
+    "enabled": true,
+    "name": "myDomain",
+    "metadata": {
+      "my_server_name": "Apache1",
+      "ocx_cust": "123456889"
+    },
+    "regions": [
+      {
+        "name": "SAN1",
+        "type": "single",
+        "quotas": [
+          {
+            "compute": [
+              {
+                "instances": "10",
+                "injected-files": "10",
+                "keypairs": "10",
+                "ram": "10"
+              }
+            ],
+            "storage": [
+              {
+                "gigabytes": "10",
+                "snapshots": "10",
+                "volumes": "10"
+              }
+            ],
+            "network": [
+              {
+                "floatingip": "10",
+                "network": "10",
+                "port": "10",
+                "router": "10",
+                "subnet": "10"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "AIC_MEDIUM",
+        "type": "group",
+        "quotas": [
+          {
+            "compute": [
+              {
+                "instances": "10",
+                "injected-files": "10",
+                "keypairs": "10",
+                "ram": "10"
+              }
+            ],
+            "storage": [
+              {
+                "gigabytes": "10",
+                "snapshots": "10",
+                "volumes": "10"
+              }
+            ],
+            "network": [
+              {
+                "floatingip": "10",
+                "network": "10",
+                "port": "10",
+                "router": "10",
+                "subnet": "10"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "users": [
+      {
+        "id": "userId1",
+        "role": [
+          "admin",
+          "other"
+        ]
+      },
+      {
+        "id": "userId2",
+        "role": [
+          "storage"
+        ]
+      }
+    ],
+    "defaultQuotas": [
+      {
+        "compute": [
+          {
+            "instances": "10",
+            "injected-files": "10",
+            "keypairs": "10",
+            "ram": "10"
+          }
+        ],
+        "storage": [
+          {
+            "gigabytes": "10",
+            "snapshots": "10",
+            "volumes": "10"
+          }
+        ],
+        "network": [
+          {
+            "floatingip": "10",
+            "network": "10",
+            "port": "10",
+            "router": "10",
+            "subnet": "10"
+          }
+        ]
+      }
+    ]
+  }
+

@@ -1,0 +1,69 @@
+How to install orm cli
+======================
+
+Ensure you have python and pip installed
+
+> tar xvzf ormcli.tgz
+> cd ormcli
+> pip install -r requirements.txt
+
+
+How to run orm cli
+==================
+
+cms, fms, and rms are all services that should be installed somewhere.
+To access these services, you'll need their IP addresses and port numbers,
+which should be supplied with the --host and --port arguments
+
+For general help
+================
+
+> orm -h
+usage: orm [-h] <service> ...
+
+ORM REST CLI
+
+positional arguments:
+  <service>
+    rms       Endpoint Discovery Service
+    cms       Customer Management Service
+    fms       Flavor Management Service
+
+optional arguments:
+  -h, --help  show this help message and exit
+
+To get help on the cms subsystem
+================================
+
+> orm cms -h
+usage: orm cms [-h] [--version] [--requester REQUESTER]
+               [--tracking_id TRACKING_ID] [--host HOST] [--port PORT]
+               [--timeout TIMEOUT]
+               auth_token auth_region client <subcommand> [-h] <args> ...
+
+positional arguments:
+  auth_token            keystone user authorization token
+  auth_region           keystone region authorization id
+  client                client (application_id)
+  <subcommand> [-h] <args>
+    create_customer     datafile
+    update_customer     custid datafile
+    add_region          custid datafile
+    delete_region       custid regionid
+    add_user            custid regionid datafile
+    delete_default_user
+                        custid userid
+    delete_user_from_region
+                        custid regionid userid
+    get_customer        custid
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --requester REQUESTER
+                        requester (user_id)
+  --tracking_id TRACKING_ID
+                        tracking id
+  --host HOST           hostname or ip of CMS server
+  --port PORT           port number of CMS server
+  --timeout TIMEOUT     request timeout in ms (default: 10000)
