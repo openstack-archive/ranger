@@ -1,0 +1,10 @@
+{
+    "description":"A standard GV flavor with 2 VCPUs, 4 GB RAM, 12 GB Disk, 0 GB Swap and 40 GB Ephemeral",
+    "series": "gv",
+    "ram": "4096",
+    "ephemeral": "40",
+    "visibility": "public",
+    "vcpus": "2",
+    "swap": "0",
+    "disk": "12"
+}
