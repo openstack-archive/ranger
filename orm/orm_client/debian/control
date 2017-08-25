@@ -1,0 +1,13 @@
+Source: aic-orm-ormclient
+Section: unknown
+Priority: optional
+Maintainer: orm <orm@intl.att.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+XS-Python-Version: >= 2.7
+Homepage: <insert the upstream URL, if relevant>
+
+Package: aic-orm-ormclient
+Architecture: any
+Depends: python-argparse, python-requests, python-setuptools
+Description: aic-orm-ormclient application for ORM
