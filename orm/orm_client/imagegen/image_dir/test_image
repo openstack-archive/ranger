@@ -1,0 +1,11 @@
+{
+    "name": "test_image",
+    "url": "https://mirrors.it.att.com/images/image-name",
+    "visibility": "public",
+    "disk-format": "raw",
+    "container-format": "bare",
+    "min-disk": 0,
+    "owner": "ME",
+    "enabled": true,
+    "protected": false
+}
