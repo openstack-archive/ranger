@@ -2,9 +2,9 @@ import datetime
 import logging
 import uuid
 
+from orm.services.id_generator.uuidgen.db.db_manager import DBManager
 from pecan import expose, response
 from pecan.rest import RestController
-from uuidgen.db.db_manager import DBManager
 
 LOG = logging.getLogger(__name__)
 
