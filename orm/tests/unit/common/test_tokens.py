@@ -1,7 +1,9 @@
 """keystone_utils token validator unittests."""
 import unittest
 
-from keystone_utils import tokens
+from orm.common.client.keystone.keystone_utils import tokens
+from orm.common.client.keystone.mock_keystone.keystoneclient import exceptions
+
 import mock
 
 
@@ -16,10 +18,10 @@ class MyResponse(object):
 
 class MyKeystone(object):
     def validate(self, a):
-        raise tokens.v3_client.exceptions.NotFound('test')
+        raise exceptions.NotFound('test')
 
     def find(self, **kwargs):
-        raise tokens.v3_client.exceptions.NotFound('test')
+        raise exceptions.NotFound('test')
 
 
 class MyClient(object):
@@ -151,7 +153,7 @@ class TokensTest(unittest.TestCase):
     def test_does_user_have_role_sanity_false(self, mock_client):
         user = {'user': {'id': 'test_id', 'domain': {'id': 'test'}}}
         mock_client.roles.check = mock.MagicMock(
-            side_effect=tokens.v3_client.exceptions.NotFound('test'))
+            side_effect=exceptions.NotFound('test'))
         self.assertFalse(tokens._does_user_have_role(mock_client, '3', user,
                                                      'admin',
                                                      {'domain': 'test'}))
@@ -167,8 +169,8 @@ class TokensTest(unittest.TestCase):
     def test_does_user_have_role_role_does_not_exist(self, mock_client):
         user = {'user': {'id': 'test_id', 'domain': {'id': 'test'}}}
         mock_client.roles.find = mock.MagicMock(
-            side_effect=tokens.v3_client.exceptions.NotFound('test'))
-        self.assertRaises(tokens.v3_client.exceptions.NotFound,
+            side_effect=exceptions.NotFound('test'))
+        self.assertRaises(exceptions.NotFound,
                           tokens._does_user_have_role, mock_client, '3',
                           user, 'test', {'domain': 'default'})
 
@@ -198,7 +200,7 @@ class TokensTest(unittest.TestCase):
     @mock.patch.object(tokens, '_get_keystone_client')
     def test_get_token_user_token_not_found(self, mock_get_keystone_client):
         ks = mock.MagicMock()
-        ks.tokens.validate.side_effect = tokens.v3_client.exceptions.NotFound()
+        ks.tokens.validate.side_effect = exceptions.NotFound()
         mock_get_keystone_client.return_value = ks
         conf = tokens.TokenConf(*('3',) * 5)
         self.assertIsNone(tokens.get_token_user('a', conf, 'c', 'd'))
