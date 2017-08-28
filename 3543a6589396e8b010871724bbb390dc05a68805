@@ -1,0 +1,9 @@
+Code-Review+1: Nicholas Jones <nj762h@att.com>
+Code-Review+2: Hari <hosingh000@gmail.com>
+Workflow+1: Hari <hosingh000@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 28 Aug 2017 14:28:05 +0000
+Reviewed-on: https://review.openstack.org/496387
+Project: openstack/ranger
+Branch: refs/heads/master
