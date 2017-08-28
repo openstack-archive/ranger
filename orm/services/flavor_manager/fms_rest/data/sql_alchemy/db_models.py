@@ -1,7 +1,8 @@
 from __builtin__ import reversed
 
-from fms_rest.logger import get_logger
-from fms_rest.logic.error_base import ErrorStatus
+from orm.services.flavor_manager.fms_rest.logger import get_logger
+from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
+
 from oslo_db.sqlalchemy import models
 from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base

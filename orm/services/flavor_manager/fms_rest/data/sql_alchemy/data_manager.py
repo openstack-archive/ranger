@@ -12,9 +12,10 @@
 
 import logging
 
-# from fms_rest.logic.error_base import DuplicateEntityError
-from fms_rest.data.sql_alchemy.flavor.flavor_record import FlavorRecord
+# from orm.services.flavor_manager.fms_rest.logic.error_base import DuplicateEntityError
+from orm.services.flavor_manager.fms_rest.data.sql_alchemy.flavor.flavor_record import FlavorRecord
 from oslo_db.sqlalchemy import session as db_session
+
 from pecan import conf
 from sqlalchemy.event import listen
 

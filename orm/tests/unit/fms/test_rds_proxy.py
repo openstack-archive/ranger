@@ -1,6 +1,7 @@
-from fms_rest.data.sql_alchemy import db_models
-from fms_rest import proxies
-from fms_rest.tests import FunctionalTest
+from orm.services.flavor_manager.fms_rest.data.sql_alchemy import db_models
+from orm.services.flavor_manager.fms_rest import proxies
+from orm.tests.unit.fms import FunctionalTest
+
 import mock
 from testfixtures import log_capture
 
@@ -18,7 +19,7 @@ class TestUtil(FunctionalTest):
 
     @mock.patch.object(proxies.rds_proxy, 'request')
     @mock.patch('requests.post')
-    @log_capture('fms_rest.proxies.rds_proxy')
+    @log_capture('orm.services.flavor_manager.fms_rest.proxies.rds_proxy')
     def test_send_good(self, mock_post, mock_request, l):
         resp = Response(200, 'my content')
         mock_post.return_value = resp
@@ -27,7 +28,7 @@ class TestUtil(FunctionalTest):
         # self.assertRegexpMatches(l.records[-1].getMessage(), 'return from rds server status code')
 
     @mock.patch('requests.post')
-    @log_capture('fms_rest.proxies.rds_proxy')
+    @log_capture('orm.services.flavor_manager.fms_rest.proxies.rds_proxy')
     def test_bad_status(self, mock_post, l):
         resp = Response(400, 'my content')
         mock_post.return_value = resp
@@ -35,7 +36,7 @@ class TestUtil(FunctionalTest):
         # self.assertRegexpMatches(l.records[-1].getMessage(), 'return from rds server status code')
 
     @mock.patch('requests.post')
-    @log_capture('fms_rest.proxies.rds_proxy')
+    @log_capture('orm.services.flavor_manager.fms_rest.proxies.rds_proxy')
     def test_no_content(self, mock_post, l):
         resp = Response(200, None)
         mock_post.return_value = resp

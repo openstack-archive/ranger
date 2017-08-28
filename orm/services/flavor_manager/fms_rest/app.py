@@ -1,9 +1,10 @@
 import os
 
-from fms_rest.data import wsme
-from fms_rest.logger import get_logger
-from fms_rest.utils import authentication
-from orm_common.policy import policy
+from orm.common.orm_common.policy import policy
+from orm.services.flavor_manager.fms_rest.data import wsme
+from orm.services.flavor_manager.fms_rest.logger import get_logger
+from orm.services.flavor_manager.fms_rest.utils import authentication
+
 from pecan.commands import CommandRunner
 from pecan import make_app
 

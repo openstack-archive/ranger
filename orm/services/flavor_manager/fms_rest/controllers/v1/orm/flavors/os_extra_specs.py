@@ -1,9 +1,12 @@
-from fms_rest.data.wsme.models import ExtraSpecsWrapper
-from fms_rest.logger import get_logger
-from fms_rest.logic.error_base import ErrorStatus
-from fms_rest.utils import authentication
-from orm_common.injector import injector
-from orm_common.utils import api_error_utils as err_utils
+from __future__ import absolute_import
+
+from orm.common.orm_common.injector import injector
+from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.services.flavor_manager.fms_rest.data.wsme.models import ExtraSpecsWrapper
+from orm.services.flavor_manager.fms_rest.logger import get_logger
+from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
+from orm.services.flavor_manager.fms_rest.utils import authentication
+
 from pecan import request, rest
 from wsmeext.pecan import wsexpose
 

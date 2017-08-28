@@ -1,8 +1,9 @@
 import copy
 import uuid
 
-from fms_rest.data.sql_alchemy.data_manager import DataManager
-from fms_rest.logger import get_logger
+from orm.services.flavor_manager.fms_rest.data.sql_alchemy.data_manager import DataManager
+from orm.services.flavor_manager.fms_rest.logger import get_logger
+
 from mock import MagicMock
 
 logger = get_logger(__name__)

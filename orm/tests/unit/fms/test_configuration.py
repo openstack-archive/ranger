@@ -1,12 +1,13 @@
 """Get configuration module unittests."""
-from fms_rest.tests import FunctionalTest
+from orm.tests.unit.fms import FunctionalTest
+
 from mock import patch
 
 
 class TestGetConfiguration(FunctionalTest):
     """Main get configuration test case."""
 
-    @patch('orm_common.utils.utils.report_config')
+    @patch('orm.common.orm_common.utils.utils.report_config')
     def test_get_configuration_success(self, mock_report):
         """Test get_configuration returns the expected value on success."""
         mock_report.return_value = '12345'

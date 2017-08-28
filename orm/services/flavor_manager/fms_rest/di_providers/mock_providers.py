@@ -1,8 +1,8 @@
 from fms_mocks import audit_mock, requests_mock
-from fms_rest.data.sql_alchemy.data_manager import DataManager
-from fms_rest.logic import flavor_logic
-from fms_rest.proxies import rds_proxy
-from fms_rest.utils import utils
+from orm.services.flavor_manager.fms_rest.data.sql_alchemy.data_manager import DataManager
+from orm.services.flavor_manager.fms_rest.logic import flavor_logic
+from orm.services.flavor_manager.fms_rest.proxies import rds_proxy
+from orm.services.flavor_manager.fms_rest.utils import utils
 
 providers = [
     ('rds_proxy', rds_proxy),

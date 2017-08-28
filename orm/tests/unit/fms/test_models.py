@@ -1,5 +1,6 @@
-from fms_rest.data.wsme import models
-from fms_rest.tests import FunctionalTest
+from orm.services.flavor_manager.fms_rest.data.wsme import models
+from orm.tests.unit.fms import FunctionalTest
+
 import mock
 
 GROUP_REGIONS = [

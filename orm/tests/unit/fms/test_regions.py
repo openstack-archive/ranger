@@ -1,11 +1,13 @@
 import requests
 
-from fms_rest.controllers.v1.orm.flavors import regions
-from fms_rest.data.wsme import models
-from fms_rest.logic.error_base import ErrorStatus
-from fms_rest.tests import FunctionalTest, test_utils
+from orm.common.orm_common.injector import injector
+from orm.services.flavor_manager.fms_rest.controllers.v1.orm.flavors import regions
+from orm.services.flavor_manager.fms_rest.data.wsme import models
+from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
+from orm.tests.unit.fms import FunctionalTest
+from orm.tests.unit.fms import test_utils
+
 from mock import MagicMock, patch
-from orm_common.injector import injector
 
 utils_mock = None
 region_logic_mock = None

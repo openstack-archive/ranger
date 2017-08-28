@@ -1,7 +1,8 @@
-from fms_rest.controllers.v1.orm.flavors import os_extra_specs as es
-from fms_rest.data.wsme import models
-from fms_rest.logic.error_base import NotFoundError
-from fms_rest.tests import FunctionalTest
+from orm.services.flavor_manager.fms_rest.controllers.v1.orm.flavors import os_extra_specs as es
+from orm.services.flavor_manager.fms_rest.data.wsme import models
+from orm.services.flavor_manager.fms_rest.logic.error_base import NotFoundError
+from orm.tests.unit.fms import FunctionalTest
+
 from mock import MagicMock, patch
 
 

@@ -1,4 +1,4 @@
-from fms_rest.tests.simple_hook_mock import SimpleHookMock
+from orm.tests.unit.fms.simple_hook_mock import SimpleHookMock
 
 global SimpleHookMock
 
@@ -11,8 +11,8 @@ server = {
 
 # Pecan Application Configurations
 app = {
-    'root': 'fms_rest.controllers.root.RootController',
-    'modules': ['fms_rest'],
+    'root': 'orm.services.flavor_manager.fms_rest.controllers.root.RootController',
+    'modules': ['orm.services.flavor_manager.fms_rest'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/fms_rest/templates',
     'debug': True,
@@ -132,5 +132,5 @@ authentication = {
     "rms_url": "http://127.0.0.1:8080",
     "tenant_name": "admin",
     "keystone_version": "2.0",
-    "policy_file": "fms_rest/etc/policy.json"
+    "policy_file": "orm/services/flavor_manager/fms_rest/etc/policy.json"
 }

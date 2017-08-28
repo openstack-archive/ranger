@@ -1,5 +1,5 @@
 """Logs module unittests."""
-from fms_rest.tests import FunctionalTest
+from orm.tests.unit.fms import FunctionalTest
 
 
 class TestLogs(FunctionalTest):

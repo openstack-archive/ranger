@@ -1,6 +1,6 @@
-from fms_rest.hooks.service_hooks import TransIdHook
-from orm_common.hooks.api_error_hook import APIErrorHook
-from orm_common.hooks.security_headers_hook import SecurityHeadersHook
+from orm.common.orm_common.hooks.api_error_hook import APIErrorHook
+from orm.common.orm_common.hooks.security_headers_hook import SecurityHeadersHook
+from orm.services.flavor_manager.fms_rest.hooks.service_hooks import TransIdHook
 
 global TransIdHook
 global APIErrorHook
