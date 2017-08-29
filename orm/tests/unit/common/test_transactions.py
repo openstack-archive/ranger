@@ -2,7 +2,7 @@
 
 import unittest
 
-from audit_client.api.model.transaction import Transaction
+from orm.common.client.audit.audit_client.api.model.transaction import Transaction
 
 
 class Test(unittest.TestCase):

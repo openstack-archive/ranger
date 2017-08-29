@@ -2,7 +2,7 @@
 
 import unittest
 
-from audit_client.api.model.get_audits_result import AuditsResult
+from orm.common.client.audit.audit_client.api.model.get_audits_result import AuditsResult
 
 
 class Test(unittest.TestCase):

@@ -3,6 +3,7 @@ import logging
 
 import requests
 
+from orm.common.client.keystone.mock_keystone.keystoneclient import exceptions
 from orm.common.client.keystone.mock_keystone.keystoneclient.v2_0 import client as v2_client
 from orm.common.client.keystone.mock_keystone.keystoneclient.v3 import client as v3_client
 from orm.common.orm_common.utils import dictator
@@ -98,7 +99,7 @@ def get_token_user(token, conf, lcp_id=None, keystone_ep=None):
         return TokenUser(token_info)
     # Other exceptions raised by validate() are critical errors,
     # so instead of returning False, we'll just let them propagate
-    except client.exceptions.NotFound:
+    except exceptions.NotFound:
         logger.debug('User token not found in Keystone! Make sure that it is '
                      'correct and that it has not expired yet')
         return None
@@ -161,7 +162,7 @@ def _does_user_have_role(keystone, version, user, role, location):
         try:
             return keystone.roles.check(role, user=user['user']['id'],
                                         **location)
-        except v3_client.exceptions.NotFound:
+        except exceptions.NotFound:
             return False
         except KeyError:
             # Shouldn't be raised when using Keystone's v3/v2.0 API, but let's
@@ -254,7 +255,7 @@ def is_token_valid(token_to_validate, lcp_id, conf, required_role=None,
         logger.debug('User token found in Keystone')
     # Other exceptions raised by validate() are critical errors,
     # so instead of returning False, we'll just let them propagate
-    except client.exceptions.NotFound:
+    except exceptions.NotFound:
         logger.debug('User token not found in Keystone! Make sure that it is'
                      'correct and that it has not expired yet')
         return False
@@ -268,7 +269,7 @@ def is_token_valid(token_to_validate, lcp_id, conf, required_role=None,
             logger.debug('Checking role...')
             return _does_user_have_role(keystone, conf.version, user,
                                         required_role, role_location)
-        except client.exceptions.NotFound:
+        except exceptions.NotFound:
             raise ValueError('Role %s or tenant %s not found!' % (
                 required_role, role_location,))
     else:

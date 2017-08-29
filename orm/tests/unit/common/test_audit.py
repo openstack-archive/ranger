@@ -5,8 +5,9 @@ import threading
 import unittest
 import urllib2
 
-from audit_client.api import audit
-from audit_client.api.exceptions.audit_exception import AuditException
+from orm.common.client.audit.audit_client.api import audit
+from orm.common.client.audit.audit_client.api.exceptions.audit_exception import AuditException
+
 from mock import patch
 
 
