@@ -1,4 +1,4 @@
-from ims.tests.simple_hook_mock import SimpleHookMock
+from orm.tests.unit.ims.simple_hook_mock import SimpleHookMock
 
 global SimpleHookMock
 
@@ -11,8 +11,8 @@ server = {
 
 # Pecan Application Configurations
 app = {
-    'root': 'ims.controllers.root.RootController',
-    'modules': ['ims'],
+    'root': 'orm.services.image_manager.ims.controllers.root.RootController',
+    'modules': ['orm.services.image_manager.ims'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/ims/templates',
     'debug': True,
@@ -101,5 +101,5 @@ authentication = {
     "tenant_name": "admin",
     "keystone_version": "2.0",
     "token_role": "admin",
-    "policy_file": "ims/etc/policy.json"
+    "policy_file": "orm/services/image_manager/ims/etc/policy.json"
 }

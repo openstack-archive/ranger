@@ -1,7 +1,7 @@
-from ims.logger import get_logger
-from ims.persistency.sql_alchemy.db_models import (Image, ImageCustomer,
-                                                   ImageRegion)
-from ims.persistency.sql_alchemy.infra.record import Record
+from orm.services.image_manager.ims.logger import get_logger
+from orm.services.image_manager.ims.persistency.sql_alchemy.db_models import (Image, ImageCustomer,
+                                                                              ImageRegion)
+from orm.services.image_manager.ims.persistency.sql_alchemy.infra.record import Record
 
 LOG = get_logger(__name__)
 

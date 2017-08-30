@@ -1,9 +1,9 @@
 """Image model module."""
-from ims.logic.error_base import ErrorStatus
-from ims.persistency.sql_alchemy import db_models
-from ims.persistency.wsme.base import Model
-from orm_common.utils.cross_api_utils import (get_regions_of_group,
-                                              set_utils_conf)
+from orm.services.image_manager.ims.logic.error_base import ErrorStatus
+from orm.services.image_manager.ims.persistency.sql_alchemy import db_models
+from orm.services.image_manager.ims.persistency.wsme.base import Model
+from orm.common.orm_common.utils.cross_api_utils import (get_regions_of_group,
+                                                         set_utils_conf)
 from pecan import conf, request
 import wsme
 

@@ -1,9 +1,9 @@
 """Init package."""
 import os
 
-import ims.di_providers as di_providers
-from ims.logger import get_logger
-from orm_common.injector import injector
+from orm.common.orm_common.injector import injector
+import orm.services.image_manager.ims.di_providers as di_providers
+from orm.services.image_manager.ims.logger import get_logger
 
 logger = get_logger(__name__)
 

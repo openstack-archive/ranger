@@ -1,9 +1,10 @@
-from ims.logger import get_logger
-from ims.logic.error_base import ErrorStatus
-from ims.persistency.wsme.models import MetadataWrapper
-from ims.utils import authentication as auth
-from orm_common.injector import injector
-from orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.injector import injector
+from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.services.image_manager.ims.logger import get_logger
+from orm.services.image_manager.ims.logic.error_base import ErrorStatus
+from orm.services.image_manager.ims.persistency.wsme.models import MetadataWrapper
+from orm.services.image_manager.ims.utils import authentication as auth
+
 from pecan import request, rest
 from wsmeext.pecan import wsexpose
 

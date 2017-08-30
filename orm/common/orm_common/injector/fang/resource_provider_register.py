@@ -1,7 +1,7 @@
 from functools import partial
 
-from .errors import (FangError, ProviderAlreadyRegisteredError,
-                     ProviderNotFoundError)
+from orm.common.orm_common.injector.fang.errors import (FangError, ProviderAlreadyRegisteredError,
+                                                        ProviderNotFoundError)
 
 
 class ResourceProviderRegister:
@@ -10,7 +10,7 @@ class ResourceProviderRegister:
         # Maps resource names to a provider
         self.resource_providers = {}
 
-    def register(self, resource_name, provider=None, allow_override=False):
+    def register(self, resource_name, provider=None, allow_override=True):
         if provider is None:
             # Give a partial usable as a decorator
             return partial(

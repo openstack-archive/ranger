@@ -1,7 +1,8 @@
-from ims.logic import image_logic
-from ims.persistency.sql_alchemy.db_models import Image
-from ims.persistency.wsme import models
-from ims.tests import FunctionalTest
+from orm.services.image_manager.ims.logic import image_logic
+from orm.services.image_manager.ims.persistency.sql_alchemy.db_models import Image
+from orm.services.image_manager.ims.persistency.wsme import models
+from orm.tests.unit.ims import FunctionalTest
+
 import mock
 
 
@@ -92,10 +93,9 @@ class TestImageLogic(FunctionalTest):
     @mock.patch.object(image_logic.ImsUtils, 'get_server_links',
                        return_value=["ip", "path"])
     @mock.patch.object(image_logic, 'di')
-    @mock.patch.object(image_logic, 'utils')
     @mock.patch.object(image_logic, 'ImageWrapper')
     def test_get_image_by_uuid_image_no_status(self, mock_image,
-                                               mock_utils, mock_di, mock_links):
+                                               mock_di, mock_links):
         mock_rds_proxy = mock.MagicMock()
         mock_rds_proxy.get_status.return_value = RDSGetStatus(status_code=404)
         mock_image.from_db_model.return_value = ImageWrapperTest()
@@ -111,13 +111,11 @@ class TestImageLogic(FunctionalTest):
     @mock.patch.object(image_logic.ImsUtils, 'get_server_links',
                        return_value=["ip", "path"])
     @mock.patch.object(image_logic, 'di')
-    @mock.patch.object(image_logic, 'utils')
     @mock.patch.object(image_logic, 'ImageWrapper')
     def test_get_image_by_uuid_image_sanity(self, mock_image,
-                                            mock_utils, mock_di, mock_links):
+                                            mock_di, mock_links):
         mock_rds_proxy = mock.MagicMock()
         mock_rds_proxy.get_status.return_value = RDSGetStatus()
-        mock_utils.get_resource_status.return_value = {'status': 'Success'}
         my_get_image = mock.MagicMock()
         my_get_record = mock.MagicMock()
         my_get_record.get_record.return_value = my_get_image
@@ -183,14 +181,12 @@ class TestDeleteImageLogic(FunctionalTest):
 class TestUpdateImage(FunctionalTest):
     """tests for update image."""
 
-    @mock.patch.object(image_logic, 'request')
     @mock.patch.object(image_logic, 'get_image_by_uuid',
                        return_value=ImageTest(id="image_id"))
     @mock.patch.object(image_logic, 'send_to_rds_if_needed', return_value=True)
     @mock.patch.object(image_logic, 'di')
     def test_update_image_success(self, mock_di, mock_send_to_rds_if_needed,
-                                  mock_get_image_by_uuid, request):
-        request.headers = {'X-RANGER-Requester': "orm_orm"}
+                                  mock_get_image_by_uuid):
         rds_proxy, mock_data_manager = get_data_manager_mock()
         mock_di.resolver.unpack.return_value = mock_data_manager
         result = image_logic.update_image(ImageTest(), "imgae_id",
@@ -198,13 +194,12 @@ class TestUpdateImage(FunctionalTest):
 
         self.assertEqual("image_id", result.id)
 
-    @mock.patch.object(image_logic, 'request')
     @mock.patch.object(image_logic, 'get_image_by_uuid',
                        return_value=ImageTest(id="image_id"))
     @mock.patch.object(image_logic, 'send_to_rds_if_needed', return_value=True)
     @mock.patch.object(image_logic, 'di')
     def test_update_image_notfound(self, mock_di, mock_send_to_rds_if_needed,
-                                   mock_get_image_by_uuid, request):
+                                   mock_get_image_by_uuid):
         rds_proxy, mock_data_manager = get_data_manager_mock(
             mock_sql_image=None)
         mock_di.resolver.unpack.return_value = mock_data_manager
@@ -214,14 +209,13 @@ class TestUpdateImage(FunctionalTest):
         except Exception as e:
             self.assertEqual(404, e.status_code)
 
-    @mock.patch.object(image_logic, 'request')
     @mock.patch.object(image_logic, 'get_image_by_uuid',
                        return_value=ImageTest(id="image_id"))
     @mock.patch.object(image_logic, 'send_to_rds_if_needed',
                        side_effect=Exception("rds not found"))
     @mock.patch.object(image_logic, 'di')
     def test_update_image_anyerror(self, mock_di, mock_send_to_rds_if_needed,
-                                   mock_get_image_by_uuid, request):
+                                   mock_get_image_by_uuid):
         rds_proxy, mock_data_manager = get_data_manager_mock()
         mock_di.resolver.unpack.return_value = mock_data_manager
 
@@ -235,14 +229,11 @@ class TestActivateImageLogic(FunctionalTest):
     @mock.patch.object(image_logic, 'get_image_by_uuid',
                        return_value=ImageTest(**{'status': 'Success'}))
     @mock.patch.object(image_logic, 'di')
-    @mock.patch.object(image_logic, 'utils')
     @mock.patch.object(image_logic, 'ImageWrapper')
     def test_activate_image_activate_no_activated_image(self,
                                                         mock_image,
-                                                        mock_utils,
                                                         mock_di,
                                                         mock_by_uuid):
-        mock_utils.get_resource_status.return_value = {'status': 'Success'}
 
         my_enabled = mock.MagicMock()
         my_enabled.enabled = 0
@@ -261,13 +252,11 @@ class TestActivateImageLogic(FunctionalTest):
     @mock.patch.object(image_logic, 'get_image_by_uuid',
                        return_value=ImageTest(**{'status': 'Success'}))
     @mock.patch.object(image_logic, 'di')
-    @mock.patch.object(image_logic, 'utils')
     @mock.patch.object(image_logic, 'ImageWrapper')
-    def test_activate_image_already_activated(self, mock_image, mock_utils,
+    def test_activate_image_already_activated(self, mock_image,
                                               mock_di,
                                               mock_get_image_by_uuid):
 
-        mock_utils.get_resource_status.return_value = {'status': 'Success'}
         my_enabled = mock.MagicMock()
         my_enabled.enabled = 1
 
@@ -283,12 +272,9 @@ class TestActivateImageLogic(FunctionalTest):
         self.assertEqual(result.status, 'Success')
 
     @mock.patch.object(image_logic, 'di')
-    @mock.patch.object(image_logic, 'utils')
     @mock.patch.object(image_logic, 'ImageWrapper')
     def test_activate_image_image_not_found(self, mock_image,
-                                            mock_utils,
                                             mock_di):
-        mock_utils.get_resource_status.return_value = {'status': 'Success'}
         my_get_image = mock.MagicMock()
         my_get_image.get_image.return_value = None
         my_get_record = mock.MagicMock()
@@ -303,11 +289,9 @@ class TestActivateImageLogic(FunctionalTest):
 
     @mock.patch.object(image_logic, 'LOG')
     @mock.patch.object(image_logic, 'di')
-    @mock.patch.object(image_logic, 'utils')
     @mock.patch.object(image_logic, 'ImageWrapper')
     def test_activate_image_image_other_exception(self,
                                                   mock_image,
-                                                  mock_utils,
                                                   mock_di,
                                                   log_moc):
         my_get_image = mock.MagicMock()
@@ -377,11 +361,10 @@ class TestCreateImage(FunctionalTest):
     def tearDown(self):
         FunctionalTest.tearDown(self)
 
-    @mock.patch.object(image_logic, 'request')
     @mock.patch.object(image_logic, 'di')
     @mock.patch.object(image_logic, 'ImageWrapper')
     @mock.patch.object(image_logic, 'get_image_by_uuid', return_value='test')
-    def test_create_image_sanity(self, mock_image, mock_di, mock_req, mock_get):
+    def test_create_image_sanity(self, mock_image, mock_di, mock_req):
         my_image = mock.MagicMock()
         my_dm = mock.MagicMock()
         my_dm.get_record.return_value = my_image
@@ -391,11 +374,9 @@ class TestCreateImage(FunctionalTest):
         result = image_logic.create_image(mock.MagicMock(), 'test1', 'test2')
         self.assertEqual('test', result)
 
-    @mock.patch.object(image_logic, 'request')
     @mock.patch.object(image_logic, 'di')
     @mock.patch.object(image_logic, 'ImageWrapper')
-    def test_create_image_validate_model_failure(self, mock_image, mock_di,
-                                                 mock_request):
+    def test_create_image_validate_model_failure(self, mock_image, mock_di):
         image = mock.MagicMock()
         image.validate_model.side_effect = ValueError('test')
 

@@ -1,7 +1,8 @@
 import json
 
-from ims.controllers.v1.orm.images import metadata
-from ims.tests import FunctionalTest
+from orm.services.image_manager.ims.controllers.v1.orm.images import metadata
+from orm.tests.unit.ims import FunctionalTest
+
 import mock
 from wsme.exc import ClientSideError
 

@@ -1,11 +1,12 @@
 import json
 
-from ims.controllers.v1.orm.images import enabled
-from ims.logic.error_base import ErrorStatus
-from ims.persistency.wsme.models import ImageWrapper
-from ims.tests import FunctionalTest
+from orm.common.orm_common.injector import injector
+from orm.services.image_manager.ims.controllers.v1.orm.images import enabled
+from orm.services.image_manager.ims.logic.error_base import ErrorStatus
+from orm.services.image_manager.ims.persistency.wsme.models import ImageWrapper
+from orm.tests.unit.ims import FunctionalTest
+
 import mock
-from orm_common.injector import injector
 from wsme.exc import ClientSideError
 
 return_error = 0

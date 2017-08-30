@@ -1,5 +1,6 @@
-from ims.persistency.wsme import models
-from ims.tests import FunctionalTest
+from orm.services.image_manager.ims.persistency.wsme import models
+from orm.tests.unit.ims import FunctionalTest
+
 import mock
 
 GROUP_REGIONS = [

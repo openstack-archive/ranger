@@ -9,10 +9,10 @@
 # For more information visit http://www.igenxsoft.com
 ###
 
-from ims.logger import get_logger
-from ims.logic.error_base import ErrorStatus, NotFoundError
-from orm_common.utils.cross_api_utils import (get_regions_of_group,
-                                              set_utils_conf)
+from orm.services.image_manager.ims.logger import get_logger
+from orm.services.image_manager.ims.logic.error_base import ErrorStatus, NotFoundError
+from orm.common.orm_common.utils.cross_api_utils import (get_regions_of_group,
+                                                         set_utils_conf)
 from oslo_db.sqlalchemy import models
 from pecan import conf
 from sqlalchemy import (Column, ForeignKeyConstraint, Integer, SmallInteger,

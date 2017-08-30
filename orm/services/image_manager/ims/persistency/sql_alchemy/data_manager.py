@@ -1,5 +1,6 @@
-from ims.logger import get_logger
-from ims.persistency.sql_alchemy.image.image_record import ImageRecord
+from orm.services.image_manager.ims.logger import get_logger
+from orm.services.image_manager.ims.persistency.sql_alchemy.image.image_record import ImageRecord
+
 from oslo_db.sqlalchemy import session as db_session
 from pecan import conf
 from sqlalchemy.event import listen

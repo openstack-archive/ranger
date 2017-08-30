@@ -1,12 +1,12 @@
 import time
 
-from ims.logger import get_logger
-from ims.logic.error_base import ErrorStatus, NotFoundError
-from ims.persistency.sql_alchemy.db_models import ImageCustomer, ImageRegion
-from ims.persistency.wsme.models import (ImageSummary, ImageSummaryResponse,
-                                         ImageWrapper, RegionWrapper)
-from ims.utils import utils as ImsUtils
-from orm_common.injector import injector
+from orm.common.orm_common.injector import injector
+from orm.services.image_manager.ims.logger import get_logger
+from orm.services.image_manager.ims.logic.error_base import ErrorStatus, NotFoundError
+from orm.services.image_manager.ims.persistency.sql_alchemy.db_models import ImageCustomer, ImageRegion
+from orm.services.image_manager.ims.persistency.wsme.models import (ImageSummary, ImageSummaryResponse,
+                                                                    ImageWrapper, RegionWrapper)
+from orm.services.image_manager.ims.utils import utils as ImsUtils
 
 LOG = get_logger(__name__)
 

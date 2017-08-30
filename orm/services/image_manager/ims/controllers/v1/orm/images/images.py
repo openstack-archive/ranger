@@ -1,14 +1,15 @@
 import oslo_db
 
-from ims.controllers.v1.orm.images.customers import CustomerController
-from ims.controllers.v1.orm.images.enabled import EnabledController
-from ims.controllers.v1.orm.images.regions import RegionController
-from ims.logger import get_logger
-from ims.logic.error_base import ErrorStatus
-from ims.persistency.wsme.models import ImageSummaryResponse, ImageWrapper
-from ims.utils import authentication as auth
-from orm_common.injector import injector
-from orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.injector import injector
+from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.services.image_manager.ims.controllers.v1.orm.images.customers import CustomerController
+from orm.services.image_manager.ims.controllers.v1.orm.images.enabled import EnabledController
+from orm.services.image_manager.ims.controllers.v1.orm.images.regions import RegionController
+from orm.services.image_manager.ims.logger import get_logger
+from orm.services.image_manager.ims.logic.error_base import ErrorStatus
+from orm.services.image_manager.ims.persistency.wsme.models import ImageSummaryResponse, ImageWrapper
+from orm.services.image_manager.ims.utils import authentication as auth
+
 from pecan import request, rest
 from wsmeext.pecan import wsexpose
 

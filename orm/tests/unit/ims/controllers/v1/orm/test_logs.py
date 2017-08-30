@@ -1,4 +1,4 @@
-from ims.tests import FunctionalTest
+from orm.tests.unit.ims import FunctionalTest
 
 
 class TestLogsController(FunctionalTest):

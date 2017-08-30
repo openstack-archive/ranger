@@ -1,4 +1,4 @@
-from ims.logger import get_logger
+from orm.services.image_manager.ims.logger import get_logger
 
 LOG = get_logger(__name__)
 

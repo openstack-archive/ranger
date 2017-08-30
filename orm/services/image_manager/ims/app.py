@@ -1,9 +1,10 @@
 import os
 
-from ims.logger import get_logger
-from ims.utils import authentication as auth
-from orm_common.policy import policy
-from orm_common.utils.utils import set_utils_conf
+from orm.common.orm_common.policy import policy
+from orm.common.orm_common.utils.utils import set_utils_conf
+from orm.services.image_manager.ims.logger import get_logger
+from orm.services.image_manager.ims.utils import authentication as auth
+
 from pecan import conf, make_app
 from pecan.commands import CommandRunner
 

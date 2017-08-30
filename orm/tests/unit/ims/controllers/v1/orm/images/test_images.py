@@ -1,12 +1,13 @@
 """Images unittests module."""
 import json
 
-from ims.controllers.v1.orm.images import images
-from ims.logic.error_base import ErrorStatus
-from ims.persistency.wsme.models import ImageSummaryResponse, ImageWrapper
-from ims.tests import FunctionalTest
+from orm.common.orm_common.injector import injector
+from orm.services.image_manager.ims.controllers.v1.orm.images import images
+from orm.services.image_manager.ims.logic.error_base import ErrorStatus
+from orm.services.image_manager.ims.persistency.wsme.models import ImageSummaryResponse, ImageWrapper
+from orm.tests.unit.ims import FunctionalTest
+
 import mock
-from orm_common.injector import injector
 from wsme.exc import ClientSideError
 
 utils_mock = None
