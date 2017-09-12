@@ -1,9 +1,9 @@
 """DB actions wrapper module."""
 import logging
 
-from rms.model.model import Groups, Regions
-from rms.services import error_base
-from rms.storage import base_data_manager, data_manager_factory
+from orm.services.region_manager.rms.model.model import Groups, Regions
+from orm.services.region_manager.rms.services import error_base
+from orm.services.region_manager.rms.storage import base_data_manager, data_manager_factory
 
 LOG = logging.getLogger(__name__)
 
