@@ -1,9 +1,10 @@
 import logging
 
-from keystone_utils import tokens
-from orm_common.policy import policy
+from orm.common.client.keystone.keystone_utils import tokens
+from orm.common.orm_common.policy import policy
+from orm.services.region_manager.rms.services import services as RegionService
+
 from pecan import conf
-from rms.services import services as RegionService
 
 logger = logging.getLogger(__name__)
 

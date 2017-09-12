@@ -1,13 +1,15 @@
 import logging
 
+from orm.services.region_manager.rms.model import model as PythonModels
+from orm.services.region_manager.rms.services import error_base
+from orm.services.region_manager.rms.storage.base_data_manager import (BaseDataManager,
+                                                                       DuplicateEntryError,
+                                                                       EntityNotFound)
+
 import oslo_db
 from data_models import (Group, GroupRegion, Region, RegionEndPoint,
                          RegionMetaData)
 from oslo_db.sqlalchemy import session as db_session
-from rms.model import model as PythonModels
-from rms.services import error_base as ServiceBase
-from rms.storage.base_data_manager import (BaseDataManager,
-                                           DuplicateEntryError, EntityNotFound)
 from sqlalchemy.ext.declarative.api import declarative_base
 from sqlalchemy.sql import or_
 
@@ -164,7 +166,7 @@ class DataManager(BaseDataManager):
             logger.exception(
                 "fail to update entity with id {} not found".format(
                     region_to_update))
-            raise ServiceBase.NotFoundError(message=exp.message)
+            raise error_base.NotFoundError(message=exp.message)
         except Exception as exp:
             logger.exception("fail to update region {}".format(str(exp)))
             raise

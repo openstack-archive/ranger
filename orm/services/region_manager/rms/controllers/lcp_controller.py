@@ -1,11 +1,12 @@
 import logging
 
-from orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.services.region_manager.rms.model import url_parm
+from orm.services.region_manager.rms.services.error_base import ErrorStatus
+from orm.services.region_manager.rms.services import services
+from orm.services.region_manager.rms.utils import authentication
+
 from pecan import request, rest
-from rms.model import url_parm
-from rms.services.error_base import ErrorStatus
-from rms.services import services
-from rms.utils import authentication
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose
 
