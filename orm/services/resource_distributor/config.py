@@ -1,3 +1,4 @@
+import orm.base_config as config
 # Pecan Application configurations
 app = {
     'root': 'rds.controllers.root.RootController',
@@ -6,8 +7,8 @@ app = {
 }
 
 server = {
-    'port': '8777',
-    'host': '0.0.0.0'
+    'port': config.rds['port'],
+    'host': config.orm_host
 }
 
 # DB configurations
@@ -148,7 +149,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/tmp/rds.log',
+            'filename': config.rds['log'],
             'formatter': 'simple'
         }
     },
