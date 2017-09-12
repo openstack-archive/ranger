@@ -47,7 +47,7 @@ logging = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'color',
-            'filename': '/opt/app/orm/audit_server/audit_server.log'
+            'filename': '/var/logs/%APACHE_NAME%/audit_server.log'
         }
     },
     'formatters': {

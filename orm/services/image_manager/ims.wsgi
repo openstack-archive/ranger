@@ -1,2 +1,2 @@
 from pecan.deploy import deploy
-application = deploy('/opt/app/orm/ims/config.py')
+application = deploy('/opt/stack/ranger/orm/services/image_manager/config.py')

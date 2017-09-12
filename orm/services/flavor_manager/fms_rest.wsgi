@@ -1,2 +1,2 @@
 from pecan.deploy import deploy
-application = deploy('/opt/app/orm/fms_rest/config.py')
+application = deploy('/opt/stack/ranger/orm/services/flavor_manager/config.py')

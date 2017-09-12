@@ -49,7 +49,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/opt/app/orm/cms_rest/cms_rest.log',
+            'filename': '/var/logs/%APACHE_NAME%/cms_rest.log',
             'formatter': 'simple'
         }
     },
@@ -120,5 +120,5 @@ authentication = {
     "role_location": {"tenant": "admin"},
     # The Keystone version currently in use. Can be either "2.0" or "3".
     "keystone_version": "2.0",
-    "policy_file": "/opt/app/orm/cms_rest/cms_rest/etc/policy.json"
+    "policy_file": "/opt/stack/ranger/orm/services/customer_manager/cms_rest/etc/policy.json"
 }

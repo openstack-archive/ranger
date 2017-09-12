@@ -1,2 +1,2 @@
 from pecan.deploy import deploy
-application = deploy('/opt/app/orm/audit_server/config.py')
+application = deploy('/opt/stack/ranger/orm/services/audit_trail_manager/config.py')
