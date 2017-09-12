@@ -38,7 +38,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/opt/app/orm/uuidgen/uuidgen.log',
+            'filename': '/var/logs/%APACHE_NAME%/uuidgen.log',
             'formatter': 'simple'
         }
     },
