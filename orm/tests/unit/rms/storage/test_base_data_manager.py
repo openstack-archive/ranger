@@ -1,6 +1,6 @@
 import unittest
 
-from rms.storage.base_data_manager import BaseDataManager
+from orm.services.region_manager.rms.storage.base_data_manager import BaseDataManager
 
 
 class BaseDataManagerTests(unittest.TestCase):

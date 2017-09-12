@@ -1,7 +1,8 @@
 """Authentication utilities module unittests."""
+from orm.services.region_manager.rms.utils import authentication
+from orm.tests.unit.rms import FunctionalTest
+
 import mock
-from rms.tests import FunctionalTest
-from rms.utils import authentication
 
 
 class TestGetConfiguration(FunctionalTest):

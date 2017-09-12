@@ -1,7 +1,7 @@
 """url parms unittests module."""
 import unittest
 
-from rms.model import url_parm
+from orm.services.region_manager.rms.model import url_parm
 
 parms = {'status': 'functional', 'city': 'Los Angeles', 'clli': 'clli_0',
          'zip': '012345', 'country': 'US', 'metadata': ['key_1:value_1',
