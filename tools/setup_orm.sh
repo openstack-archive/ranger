@@ -1,6 +1,6 @@
 root_dir=/opt/stack/upstream_ranger/ranger
 
-audit_dir=$root_dir/orm/services/audit_trail_manager
+audit_dir=$root_dir/orm/services/audit_manager
 customer_dir=$root_dir/orm/services/customer_manager
 flavor_dir=$root_dir/orm/services/flavor_manager
 id_dir=$root_dir/orm/services/id_generator
