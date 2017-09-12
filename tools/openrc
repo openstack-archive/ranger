@@ -1,0 +1,13 @@
+# export OS_AIC_TENANT_NAME='admin'
+export tenant_name='admin'
+export AIC_ORM_TENANT_NAME='admin'
+export AIC_ORM_USERNAME='admin'
+export AIC_ORM_PASSWORD=$ADMIN_PASSWORD
+export AIC_ORM_ORM_BASE_URL='http://127.0.0.1'
+export AIC_ORM_AUTH_REGION='local'
+# Openstack environment variables
+export OS_USERNAME='admin'
+export OS_PASSWORD=$ADMIN_PASSWORD
+export OS_REGION_NAME='RegionOne'
+export OS_AUTH_URL=http://127.0.0.1:5000/v2.0
+export OS_TENANT_NAME='admin'
