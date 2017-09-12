@@ -1,10 +1,9 @@
 """config module."""
-
-
+import orm.base_config as config
 # Server Specific Configurations
 server = {
-    'port': '8776',
-    'host': '0.0.0.0'
+    'port': config.audit_server['port'],
+    'host': config.orm_host
 }
 
 # DB configurations
@@ -47,7 +46,7 @@ logging = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'color',
-            'filename': '/opt/app/orm/audit_server/audit_server.log'
+            'filename': config.audit_server['log']
         }
     },
     'formatters': {
