@@ -3,13 +3,14 @@ import logging
 import time
 import wsme
 
-from orm_common.utils import api_error_utils as err_utils
-from orm_common.utils import utils
+from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.utils import utils
+from orm.services.region_manager.rms.model import model as PythonModel
+from orm.services.region_manager.rms.services import error_base
+from orm.services.region_manager.rms.services import services as GroupService
+from orm.services.region_manager.rms.utils import authentication
+
 from pecan import request, rest
-from rms.model import model as PythonModel
-from rms.services import error_base
-from rms.services import services as GroupService
-from rms.utils import authentication
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose
 

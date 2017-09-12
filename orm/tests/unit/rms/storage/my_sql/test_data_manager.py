@@ -1,9 +1,10 @@
 import unittest
 
+from orm.services.region_manager.rms.services import error_base
+from orm.services.region_manager.rms.storage.base_data_manager import DuplicateEntryError
+from orm.services.region_manager.rms.storage.my_sql import data_manager, data_models
+
 import mock
-from rms.services import error_base
-from rms.storage.base_data_manager import DuplicateEntryError
-from rms.storage.my_sql import data_manager, data_models
 
 end_point_list = [{"type": "ord",
                    "url": "http://ord.com"}]
@@ -178,7 +179,7 @@ class TestDataManager(unittest.TestCase):
     def test_update_region_region_not_found(self, mock_engine_facade):
         """Test that NotFoundError is raised when calling update_region."""
         my_data_manager = data_manager.DataManager("url", "", "")
-        self.assertRaises(data_manager.ServiceBase.NotFoundError,
+        self.assertRaises(error_base.NotFoundError,
                           my_data_manager.update_region, "reg1", "region1",
                           "region_name",
                           "a_state", "a_country",
@@ -249,7 +250,7 @@ class TestDataManager(unittest.TestCase):
                            query=QueryObject(ret=None)))
     def test_update_region_meta_data_region_not_found(self, mock_db_session):
         my_data_manager = data_manager.DataManager("url", "", "")
-        self.assertRaises(data_manager.error_base.NotFoundError,
+        self.assertRaises(error_base.NotFoundError,
                           my_data_manager.update_region_meta_data,
                           'region', {'meta': 'data'})
 
@@ -263,7 +264,7 @@ class TestDataManager(unittest.TestCase):
                            query=QueryObject(ret=None)))
     def test_delete_region_metadata_region_not_found(self, mock_db_session):
         my_data_manager = data_manager.DataManager("url", "", "")
-        self.assertRaises(data_manager.error_base.NotFoundError,
+        self.assertRaises(error_base.NotFoundError,
                           my_data_manager.delete_region_metadata,
                           'region', {'meta': 'data'})
 
@@ -277,7 +278,7 @@ class TestDataManager(unittest.TestCase):
                            query=QueryObject(ret=None)))
     def test_update_region_status_region_not_found(self, mock_db_session):
         my_data_manager = data_manager.DataManager("url", "", "")
-        self.assertRaises(data_manager.error_base.NotFoundError,
+        self.assertRaises(error_base.NotFoundError,
                           my_data_manager.update_region_status,
                           'region', 'status')
 

@@ -1,10 +1,11 @@
 import json
 import logging
 
-import rms.controllers.logs as logs
+import orm.services.region_manager.rms.controllers.logs as logs
+from orm.services.region_manager.rms.controllers.logs import LogsController as logs_controller
+from orm.tests.unit.rms import FunctionalTest
+
 from mock import MagicMock, patch
-from rms.controllers.logs import LogsController as logs_controller
-from rms.tests import FunctionalTest
 from wsme.exc import ClientSideError
 
 

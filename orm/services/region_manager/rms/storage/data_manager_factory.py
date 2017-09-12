@@ -1,7 +1,9 @@
 import logging
 
+from orm.services.region_manager.rms.storage.my_sql.data_manager import DataManager
+
 from pecan import conf
-from rms.storage.my_sql.data_manager import DataManager
+
 
 LOG = logging.getLogger(__name__)
 
