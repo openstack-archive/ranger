@@ -1,2 +1,2 @@
 from pecan.deploy import deploy
-application = deploy('/opt/app/orm/uuidgen/config.py')
+application = deploy('ranger/orm/services/id_generator/config.py')

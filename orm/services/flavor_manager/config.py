@@ -1,15 +1,15 @@
 from orm.common.orm_common.hooks.api_error_hook import APIErrorHook
 from orm.common.orm_common.hooks.security_headers_hook import SecurityHeadersHook
 from orm.services.flavor_manager.fms_rest.hooks.service_hooks import TransIdHook
-
+import orm.base_config as config
 global TransIdHook
 global APIErrorHook
 global SecurityHeadersHook
 
 # Server Specific Configurations
 server = {
-    'port': '8082',
-    'host': '0.0.0.0',
+    'port': config.fms['port'],
+    'host': config.orm_host,
     'name': 'fms'
 }
 
@@ -50,7 +50,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/opt/app/orm/fms_rest/fms_rest.log',
+            'filename': config.fms['log'],
             'formatter': 'simple'
         }
     },

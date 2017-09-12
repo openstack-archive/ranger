@@ -1,2 +1,2 @@
 from pecan.deploy import deploy
-application = deploy('/opt/app/orm/rds/config.py')
+application = deploy('ranger/orm/services/resource_distributor/config.py')
