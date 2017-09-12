@@ -1,6 +1,6 @@
-from orm_common.hooks.api_error_hook import APIErrorHook
-from orm_common.hooks.security_headers_hook import SecurityHeadersHook
-from orm_common.hooks.transaction_id_hook import TransactionIdHook
+from orm.common.orm_common.hooks.api_error_hook import APIErrorHook
+from orm.common.orm_common.hooks.security_headers_hook import SecurityHeadersHook
+from orm.common.orm_common.hooks.transaction_id_hook import TransactionIdHook
 
 global TransactionIdHook
 global APIErrorHook
@@ -51,7 +51,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/opt/app/orm/rms/rms.log',
+            'filename': '/var/logs/ranger/rms.log',
             'formatter': 'simple'
         }
     },
@@ -115,5 +115,5 @@ authentication = {
     "tenant_name": "admin",
     # The Keystone version currently in use. Can be either "2.0" or "3"
     "keystone_version": "2.0",
-    "policy_file": "/opt/app/orm/rms/rms/etc/policy.json"
+    "policy_file": "/stack/orm/services/region_manager/rms/etc/policy.json"
 }

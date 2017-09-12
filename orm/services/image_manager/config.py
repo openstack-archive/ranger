@@ -51,7 +51,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/opt/app/orm/ims/ims.log',
+            'filename': '/var/logs/ranger/ims.log',
             'formatter': 'simple'
         }
     },
