@@ -1,4 +1,4 @@
 region_id,region_name,address_state,address_country,address_city,address_street,address_zip,region_status,ranger_agent_version,open_stack_version,design_type,location_type,vlcp_name,clli,description,keystone_url,horizon_url,ord_url
 SNA1,SNA 1,CAL,US,LA,n/a,1111,functional,ranger_agent1.0,kilo,n/a,n/a,n/a,n/a,SNA1 lcp in CAL,http://identity1.com,http://horizon1.com,http://ord1.com
 SNA2,SNA 2,NY,US,NY City,n/a,2222,functional,ranger_agent1.5,kilo,n/a,n/a,n/a,n/a,SNA2 lcp in NYC,http://identity2.com,http://horizon2.com,http://ord2.com
-DPK,DPK,NY,US,FIL,n/a,3333,functional,ranger_agent1.0,kilo,n/a,n/a,n/a,n/a,DPK lcp in FIL,http://identity3.com,http://horizon3.com,http://ord3.com
+LOCAL,LOCAL,NY,US,FIL,n/a,3333,functional,ranger_agent1.0,kilo,n/a,n/a,n/a,n/a,DPK lcp in FIL,http://127.0.0.1:5000/v2.0,http://horizon3.com,http://127.0.0.1:9090
