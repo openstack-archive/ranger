@@ -1,15 +1,15 @@
+import orm.base_config as config
 from orm_common.hooks.api_error_hook import APIErrorHook
 from orm_common.hooks.security_headers_hook import SecurityHeadersHook
 from orm_common.hooks.transaction_id_hook import TransactionIdHook
-
 global TransactionIdHook
 global APIErrorHook
 global SecurityHeadersHook
 
 # Server Specific Configurations
 server = {
-    'port': '7080',
-    'host': '0.0.0.0',
+    'port': config.cms['port'],
+    'host': config.orm_host,
     'name': 'cms',
     'host_ip': '0.0.0.0'
 }
@@ -49,7 +49,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/opt/app/orm/cms_rest/cms_rest.log',
+            'filename': config.cms['log'],
             'formatter': 'simple'
         }
     },
@@ -120,5 +120,5 @@ authentication = {
     "role_location": {"tenant": "admin"},
     # The Keystone version currently in use. Can be either "2.0" or "3".
     "keystone_version": "2.0",
-    "policy_file": "/opt/app/orm/cms_rest/cms_rest/etc/policy.json"
+    "policy_file": "/opt/stack/ranger/orm/services/customer_manager/cms_rest/etc/policy.json"
 }
