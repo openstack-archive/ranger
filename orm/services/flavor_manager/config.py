@@ -50,7 +50,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/opt/app/orm/fms_rest/fms_rest.log',
+            'filename': '/opt/app/orm/logs/fms_rest.log',
             'formatter': 'simple'
         }
     },
