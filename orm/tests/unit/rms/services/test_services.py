@@ -1,12 +1,12 @@
 """Services module unittests."""
+from orm.services.region_manager.rms.controllers.v2.orm.resources import regions
+from orm.services.region_manager.rms.services import services
+from orm.tests.unit.rms.controllers.v1.orm.resources.test_region import full_region
+from orm.tests.unit.rms import FunctionalTest
+
 import mock
 from mock import patch
 from pecan import conf
-from rms.controllers.v2.orm.resources import regions
-from rms.services import services
-from rms.tests.controllers.v1.orm.resources.test_region import full_region
-from rms.tests import FunctionalTest
-
 # from rms.model import url_parm as parms
 
 
