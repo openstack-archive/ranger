@@ -1,6 +1,7 @@
 """model module."""
+from orm.services.region_manager.rms.services import error_base
+
 from pecan import conf
-from rms.services import error_base
 
 
 class Address(object):

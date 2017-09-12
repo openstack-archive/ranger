@@ -1,11 +1,12 @@
 import json
 
+from orm.services.region_manager.rms.controllers import lcp_controller
+from orm.services.region_manager.rms.model.model import EndPoint, RegionData, Regions
+from orm.services.region_manager.rms.services.error_base import NotFoundError
+from orm.services.region_manager.rms.services import services
+from orm.tests.unit.rms import FunctionalTest
+
 from mock import MagicMock, patch
-from rms.controllers import lcp_controller as lcps
-from rms.model.model import EndPoint, RegionData, Regions
-from rms.services.error_base import NotFoundError
-from rms.services import services
-from rms.tests import FunctionalTest
 from wsme.exc import ClientSideError
 
 TEST_REGIONS_DATA = [
@@ -72,13 +73,13 @@ class TestLcpController(FunctionalTest):
 
     @patch.object(services, 'get_regions_data', return_value=regions_mock)
     def test_get_zones_success(self, regions_data):
-        zones = lcps.get_zones()
+        zones = lcp_controller.get_zones()
         self.assertEqual(zones, TEST_REGIONS_DATA)
 
     @patch.object(services, 'get_regions_data',
                   side_effect=NotFoundError(message="No regions found!"))
     def test_get_zones_get_regions_data_error(self, regions_data):
-        zones = lcps.get_zones()
+        zones = lcp_controller.get_zones()
         self.assertEqual(zones, [])
 
     # Test get_all in lcp_controller
@@ -183,7 +184,7 @@ class TestLcpController(FunctionalTest):
 
     # Test get_one in lcp_controller
     def test_build_zone_response_with_missing_endpoints(self,):
-        result = lcps.build_zone_response(region_data_no_endpoints)
+        result = lcp_controller.build_zone_response(region_data_no_endpoints)
         self.assertEqual("", result['keystone_EP'])
         self.assertEqual("", result['horizon_EP'])
         self.assertEqual("", result['ORD_EP'])
