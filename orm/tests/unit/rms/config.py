@@ -6,8 +6,8 @@ server = {
 
 # Pecan Application Configurations
 app = {
-    'root': 'rms.controllers.root.RootController',
-    'modules': ['rms'],
+    'root': 'orm.services.region_manager.rms.controllers.root.RootController',
+    'modules': ['orm.services.region_manager.rms'],
     'static_root': '%(confdir)s/../../public',
     'template_path': '%(confdir)s/../templates',
     'debug': True,

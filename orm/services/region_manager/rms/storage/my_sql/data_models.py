@@ -1,5 +1,6 @@
 # coding: utf-8
-from rms.model.model import Address, EndPoint, RegionData
+from orm.services.region_manager.rms.model.model import Address, EndPoint, RegionData
+
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship

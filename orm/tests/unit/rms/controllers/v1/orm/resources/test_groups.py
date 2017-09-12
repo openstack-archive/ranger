@@ -1,9 +1,10 @@
 """get_groups unittests module."""
 import json
 
+from orm.services.region_manager.rms.controllers.v2.orm.resources import groups
+from orm.tests.unit.rms import FunctionalTest
+
 from mock import MagicMock, patch
-from rms.controllers.v2.orm.resources import groups
-from rms.tests import FunctionalTest
 from wsme.exc import ClientSideError
 
 res = {"regions": ["aaaa", "bbbb", "ccccc"],

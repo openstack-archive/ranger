@@ -1,9 +1,10 @@
 import json
 
+from orm.services.region_manager.rms.controllers.v2.orm.resources import regions
+from orm.services.region_manager.rms.model import model as PyModels
+from orm.tests.unit.rms import FunctionalTest
+
 from mock import MagicMock, patch
-from rms.controllers.v2.orm.resources import regions
-from rms.model import model as PyModels
-from rms.tests import FunctionalTest
 from wsme.exc import ClientSideError
 
 result_inst = PyModels.Regions([PyModels.RegionData("2", "3", "4", "5", "6",

@@ -1,12 +1,13 @@
 import logging
 import os
 
-from orm_common.policy import policy
-from orm_common.utils import utils
+from orm.common.orm_common.policy import policy
+from orm.common.orm_common.utils import utils
+from orm.services.region_manager.rms import model
+from orm.services.region_manager.rms.utils import authentication
+
 from pecan.commands import CommandRunner
 from pecan import make_app
-from rms import model
-from rms.utils import authentication
 
 logger = logging.getLogger(__name__)
 
