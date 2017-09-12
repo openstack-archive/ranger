@@ -1,15 +1,15 @@
 from ims.hooks.service_hooks import TransIdHook
 from orm_common.hooks.api_error_hook import APIErrorHook
 from orm_common.hooks.security_headers_hook import SecurityHeadersHook
-
+import orm.base_config as config
 global TransIdHook
 global APIErrorHook
 global SecurityHeadersHook
 
 # Server Specific Configurations
 server = {
-    'port': '8084',
-    'host': '0.0.0.0',
+    'port': config.ims['port'],
+    'host': config.orm_host,
     'name': 'ims'
 }
 
@@ -51,7 +51,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/opt/app/orm/ims/ims.log',
+            'filename': config.ims['log'],
             'formatter': 'simple'
         }
     },
