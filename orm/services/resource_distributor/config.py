@@ -148,7 +148,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/tmp/rds.log',
+            'filename': '/var/logs/%LOG_LOCATION%/rds.log',
             'formatter': 'simple'
         }
     },
