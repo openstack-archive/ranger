@@ -6,9 +6,9 @@ import time
 
 import requests
 
-from audit_client.api import audit
+from orm.common.client.audit.audit_client.api import audit
 from pecan import conf
-from rds.services import region_resource_id_status as regionResourceIdStatus
+from orm.services.resource_distributor.rds.services import region_resource_id_status as regionResourceIdStatus
 
 # REST API constants
 OK_CODE = 200

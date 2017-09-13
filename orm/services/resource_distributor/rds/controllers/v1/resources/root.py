@@ -6,10 +6,10 @@ import time
 
 import pecan
 from pecan import rest
-from rds.controllers.v1.base import (ClientSideError, LockedEntity,
+from orm.services.resource_distributor.rds.controllers.v1.base import (ClientSideError, LockedEntity,
                                      NotAllowedError)
-from rds.services.base import ConflictValue
-from rds.services import resource as ResourceService
+from orm.services.resource_distributor.rds.services.base import ConflictValue
+from orm.services.resource_distributor.rds.services import resource as ResourceService
 import wsme
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose

@@ -3,11 +3,11 @@ import logging
 import time
 
 from pecan import rest
-from rds.controllers.v1.base import InputValueError
-from rds.controllers.v1.status import get_resource
-from rds.services.base import ErrorMesage, InputError
-from rds.services import region_resource_id_status as regionResourceIdStatus
-from rds.utils import utils
+from orm.services.resource_distributor.rds.controllers.v1.base import InputValueError
+from orm.services.resource_distributor.rds.controllers.v1.status import get_resource
+from orm.services.resource_distributor.rds.services.base import ErrorMesage, InputError
+from orm.services.resource_distributor.rds.services import region_resource_id_status as regionResourceIdStatus
+from orm.services.resource_distributor.rds.utils import utils
 import wsme
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose

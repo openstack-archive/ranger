@@ -2,8 +2,8 @@
 import logging
 
 from pecan import rest
-from rds.controllers.v1.base import EntityNotFoundError
-from rds.services import region_resource_id_status as regionResourceIdStatus
+from orm.services.resource_distributor.rds.controllers.v1.base import EntityNotFoundError
+from orm.services.resource_distributor.rds.services import region_resource_id_status as regionResourceIdStatus
 import wsme
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose

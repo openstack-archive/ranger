@@ -1,4 +1,4 @@
-from rds.sot.git_sot import git_sot
+from orm.services.resource_distributor.rds.sot.git_sot import git_sot
 
 sot_type = ""
 local_repository_path = ""

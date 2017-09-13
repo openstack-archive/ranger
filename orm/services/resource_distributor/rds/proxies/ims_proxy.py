@@ -4,8 +4,8 @@ import logging
 import requests
 
 from pecan import conf
-from rds.services.base import ErrorMesage
-from rds.utils import authentication as AuthService
+from orm.services.resource_distributor.rds.services.base import ErrorMesage
+from orm.services.resource_distributor.rds.utils import authentication as AuthService
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,6 @@ def send_image_metadata(meta_data, region, resource_id, action='post'):
 
     if response.status_code != 200:
         raise ErrorMesage(
-            "Got error from rds server, code: {0} message: {1}".format(
+            "Got error from orm.services.resource_distributor.rds server, code: {0} message: {1}".format(
                 response.status_code, response.content))
     return

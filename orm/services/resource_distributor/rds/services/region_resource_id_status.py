@@ -1,8 +1,8 @@
 import logging
 import sys
 
-from rds.services.base import Error, InputError
-from rds.storage import factory
+from orm.services.resource_distributor.rds.services.base import Error, InputError
+from orm.services.resource_distributor.rds.storage import factory
 
 logger = logging.getLogger(__name__)
 config = {

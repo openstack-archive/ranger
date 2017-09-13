@@ -4,8 +4,8 @@ import logging
 import requests
 
 from pecan import conf
-from rds.proxies import ims_proxy
-from rds.services.base import ErrorMesage
+from orm.services.resource_distributor.rds.proxies import ims_proxy
+from orm.services.resource_distributor.rds.services.base import ErrorMesage
 
 logger = logging.getLogger(__name__)
 
