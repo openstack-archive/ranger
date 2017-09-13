@@ -2,14 +2,15 @@
 import logging
 import time
 
+from orm.services.resource_distributor.rds.services import region_resource_id_status as regionResourceIdStatus
+from orm.services.resource_distributor.rds.services import (yaml_customer_builder, yaml_flavor_bulder,
+                                                            yaml_image_builder)
+from orm.services.resource_distributor.rds.services.base import ConflictValue, ErrorMesage
+from orm.services.resource_distributor.rds.services.model.resource_input import ResourceData as InputData
+from orm.services.resource_distributor.rds.sot import sot_factory
+from orm.services.resource_distributor.rds.utils import utils, uuid_utils
+
 from pecan import conf, request
-from rds.services import region_resource_id_status as regionResourceIdStatus
-from rds.services import (yaml_customer_builder, yaml_flavor_bulder,
-                          yaml_image_builder)
-from rds.services.base import ConflictValue, ErrorMesage
-from rds.services.model.resource_input import ResourceData as InputData
-from rds.sot import sot_factory
-from rds.utils import utils, uuid_utils
 
 my_logger = logging.getLogger(__name__)
 

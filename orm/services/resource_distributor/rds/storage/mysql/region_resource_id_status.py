@@ -4,8 +4,8 @@ import time
 import oslo_db
 from oslo_db.sqlalchemy import session as db_session
 from pecan import conf
-from rds.services.model.region_resource_id_status import Model, StatusModel
-from rds.storage import region_resource_id_status
+from orm.services.resource_distributor.rds.services.model.region_resource_id_status import Model, StatusModel
+from orm.services.resource_distributor.rds.storage import region_resource_id_status
 from sqlalchemy import BigInteger, Column, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative.api import declarative_base
 from sqlalchemy.orm import relationship

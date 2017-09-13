@@ -1,11 +1,11 @@
 import json
 import logging
-
 import requests
 
-from keystone_utils import tokens
+from orm.common.client.keystone.keystone_utils import tokens
+from orm.services.resource_distributor.rds.proxies import rms_proxy as RmsService
+
 from pecan import conf
-from rds.proxies import rms_proxy as RmsService
 
 enabled = False
 mech_id = ""

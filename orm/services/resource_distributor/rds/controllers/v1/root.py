@@ -1,8 +1,8 @@
 """v1 controller."""
-from rds.controllers.v1.configuration import root as config_root
-from rds.controllers.v1 import logs
-from rds.controllers.v1.resources import root as Rds
-from rds.controllers.v1.status import resource_status
+from orm.services.resource_distributor.rds.controllers.v1.configuration import root as config_root
+from orm.services.resource_distributor.rds.controllers.v1 import logs
+from orm.services.resource_distributor.rds.controllers.v1.resources import root as Rds
+from orm.services.resource_distributor.rds.controllers.v1.status import resource_status
 
 
 class RDS(object):

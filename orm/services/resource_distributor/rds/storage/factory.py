@@ -1,4 +1,4 @@
-from rds.storage.mysql.region_resource_id_status import \
+from orm.services.resource_distributor.rds.storage.mysql.region_resource_id_status import \
     Connection as RegionResourceIdStatusConnection
 
 database = {

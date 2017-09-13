@@ -5,9 +5,9 @@ import threading
 import git_factory
 from git_base import (GitInitError, GitResetError, GitUploadError,
                       GitValidateError)
-from rds.ordupdate.ord_notifier import notify_ord
-from rds.sot import base_sot
-from rds.sot.base_sot import SoTError
+from orm.services.resource_distributor.rds.ordupdate.ord_notifier import notify_ord
+from orm.services.resource_distributor.rds.sot import base_sot
+from orm.services.resource_distributor.rds.sot.base_sot import SoTError
 
 logger = logging.getLogger(__name__)
 lock = threading.Lock()
