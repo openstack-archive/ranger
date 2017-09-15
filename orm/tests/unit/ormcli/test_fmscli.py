@@ -1,8 +1,8 @@
 from cStringIO import StringIO
 import json
 import mock
-from ormcli import fmscli
-from ormcli import ormcli
+from orm.orm_client.ormcli import fmscli
+from orm.orm_client.ormcli import ormcli
 import requests
 import sys
 from unittest import TestCase

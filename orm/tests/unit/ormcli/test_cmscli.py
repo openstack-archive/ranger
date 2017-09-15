@@ -1,8 +1,8 @@
 from cStringIO import StringIO
 import json
 import mock
-from ormcli import cmscli
-from ormcli import ormcli
+from orm.orm_client.ormcli import cmscli
+from orm.orm_client.ormcli import ormcli
 import requests
 import sys
 from unittest import TestCase
@@ -161,7 +161,7 @@ class CmsTests(TestCase):
             'orm cms --orm-base-url 12.11.10.9 --port 8832 --timeout 150 '
             'add_user '
             'client1 customer1 region1 '
-            'ormcli/tests/data/cms-add-cust.json'.split())
+            'orm/tests/unit/ormcli/data/cms-add-cust.json'.split())
         args = cli.args
         self.assertEqual(args.orm_base_url, '12.11.10.9')
         self.assertEqual(args.port, 8832)
@@ -174,7 +174,7 @@ class CmsTests(TestCase):
         cli.create_parser()
         cli.parse(
             'orm cms --faceless add_user client1 customer1 region1 '
-            'ormcli/tests/data/cms-add-cust.json'.split())
+            'orm/tests/unit/ormcli/data/cms-add-cust.json'.split())
         with self.assertRaises(SystemExit) as cm:
             cli.logic()
         self.assertEqual(cm.exception.code, 1)
@@ -190,7 +190,7 @@ class CmsTests(TestCase):
         cli.create_parser()
         cli.parse(
             'orm cms add_user client1 customer1 region1 '
-            'ormcli/tests/data/cms-add-cust.json'.split())
+            'orm/tests/unit/ormcli/data/cms-add-cust.json'.split())
         with self.assertRaises(SystemExit) as cm:
             cli.logic()
 
@@ -201,7 +201,7 @@ class CmsTests(TestCase):
         cli.create_parser()
         cli.parse(
             'orm cms create_customer client1 '
-            'ormcli/tests/data/cms-add-cust.json'.split())
+            'orm/tests/unit/ormcli/data/cms-add-cust.json'.split())
         resp = self.respond({"access": {"token": {"id": 989}}}, 400)
         mock_post.return_value = resp
         with self.assertRaises(SystemExit) as cm:
@@ -213,7 +213,7 @@ class CmsTests(TestCase):
         cli.create_parser()
         cli.parse(
             'orm cms create_customer client1 '
-            'ormcli/tests/data/cms-add-cust.json'.split())
+            'orm/tests/unit/ormcli/data/cms-add-cust.json'.split())
         mock_post.return_value = self.respond(
             {"access": {"token": {"id": 989}}}, 200)
 

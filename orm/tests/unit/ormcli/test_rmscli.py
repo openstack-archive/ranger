@@ -1,7 +1,7 @@
 from cStringIO import StringIO
 import mock
-from ormcli import ormcli
-from ormcli import rmscli
+from orm.orm_client.ormcli import ormcli
+from orm.orm_client.ormcli import rmscli
 import requests
 import sys
 from unittest import TestCase

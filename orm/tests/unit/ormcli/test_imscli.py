@@ -1,8 +1,8 @@
 from cStringIO import StringIO
 import mock
-from ormcli import imscli
-from ormcli.imscli import cmd_data
-from ormcli import ormcli
+from orm.orm_client.ormcli import imscli
+from orm.orm_client.ormcli.imscli import cmd_data
+from orm.orm_client.ormcli import ormcli
 import sys
 from unittest import TestCase
 
@@ -61,7 +61,7 @@ class ImsTests(TestCase):
         cli.create_parser()
         cli.parse(
             'orm ims create_image client1 '
-            'ormcli/tests/data/ims-create-image.json'.split())
+            'orm/tests/unit/ormcli/data/ims-create-image.json'.split())
         with self.assertRaises(SystemExit) as cm:
             cli.logic()
         self.assertEqual(cm.exception.code, 1)
@@ -79,7 +79,7 @@ class ImsTests(TestCase):
         globals()['auth_region'] = 'test'
         cli.parse(
             'orm ims create_image client1 '
-            'ormcli/tests/data/ims-create-image.json'.split())
+            'orm/tests/unit/ormcli/data/ims-create-image.json'.split())
         with self.assertRaises(SystemExit) as cm:
             cli.logic()
 
