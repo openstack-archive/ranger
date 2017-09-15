@@ -1,5 +1,5 @@
 import mock
-from ormcli import cli_common
+from orm.orm_client.ormcli import cli_common
 from unittest import TestCase
 
 
