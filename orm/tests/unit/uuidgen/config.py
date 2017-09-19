@@ -36,8 +36,8 @@ logging = {
 }
 # Pecan Application Configurations
 app = {
-    'root': 'uuidgen.controllers.root.RootController',
-    'modules': ['uuidgen'],
+    'root': 'orm.services.id_generator.uuidgen.controllers.root.RootController',
+    'modules': ['orm.services.id_generator.uuidgen'],
     'static_root': '%(confdir)s/../../public',
     'template_path': '%(confdir)s/../templates',
     'debug': True,

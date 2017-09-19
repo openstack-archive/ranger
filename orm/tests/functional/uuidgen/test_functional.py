@@ -1,9 +1,11 @@
 import json
 import re
 
+import orm.services.id_generator.uuidgen as uuidgen
+import orm.services.id_generator.uuidgen.controllers.v1.uuid_controller as uuid_controller
+from orm.tests.unit.uuidgen import FunctionalTest
+
 import mock
-import uuidgen.controllers.v1.uuid_controller as uuid_controller
-from uuidgen.tests import FunctionalTest
 
 
 class MyException(Exception):

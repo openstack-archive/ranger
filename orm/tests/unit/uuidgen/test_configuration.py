@@ -1,7 +1,7 @@
 """Get configuration module unittests."""
 from mock import patch
-from uuidgen.controllers.v1 import configuration as root
-from uuidgen.tests import FunctionalTest
+from orm.services.id_generator.uuidgen.controllers.v1 import configuration as root
+from orm.tests.unit.uuidgen import FunctionalTest
 
 
 class TestGetConfiguration(FunctionalTest):
