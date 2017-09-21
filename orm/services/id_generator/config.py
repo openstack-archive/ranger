@@ -1,9 +1,9 @@
+import orm.base_config as config
 # Server Specific Configurations
 server = {
-    'port': '8090',
-    'host': '0.0.0.0'
+    'port': config.uuid['port'],
+    'host': config.orm_host 
 }
-
 # Pecan Application Configurations
 app = {
     'root': 'uuidgen.controllers.root.RootController',
@@ -38,7 +38,7 @@ logging = {
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
-            'filename': '/opt/app/orm/uuidgen/uuidgen.log',
+            'filename': config.uuid['log'],
             'formatter': 'simple'
         }
     },
