@@ -48,14 +48,14 @@ def add_to_parser(service_sub):
                                        metavar='<subcommand> [-h] <args>')
 
     # image
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<data file with new image JSON>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<data file with new image JSON>'
     parser_create_image = subparsers.add_parser('create_image',
                                                 help='%s %s' % (h1, h2))
     parser_create_image.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_create_image.add_argument('datafile', type=argparse.FileType('r'),
                                      help=h2)
 
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<image id>', \
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', \
                  '<data file with updated image JSON>'
     parser_update_image = subparsers.add_parser('update_image',
                                                 help='%s %s %s' % (h1,
@@ -66,20 +66,20 @@ def add_to_parser(service_sub):
     parser_update_image.add_argument('datafile', type=argparse.FileType('r'),
                                      help=h3)
 
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<image id>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<image id>'
     parser_delete_image = subparsers.add_parser('delete_image',
                                                 help='%s %s' % (h1, h2))
     parser_delete_image.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_image.add_argument('imageid', type=str, help=h2)
 
     # get images
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<image id>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<image id>'
     parser_get_image = subparsers.add_parser('get_image',
                                              help='%s %s' % (h1, h2))
     parser_get_image.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_get_image.add_argument('imageid', type=str, help=h2)
 
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', \
+    h1, h2 = '[<"X-RANGER-Client" header>]', \
              '[--visibility <public|private>] ' \
              '[--region <name>] [--customer <id>]'
     parser_list_images = subparsers.add_parser('list_images',
@@ -91,7 +91,7 @@ def add_to_parser(service_sub):
     parser_list_images.add_argument('--customer', type=str, help='customer id')
 
     # activate/deactivate image
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<image id>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<image id>'
     parser_enable = subparsers.add_parser('enable',
                                           help='%s %s' % (h1, h2))
     parser_enable.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
@@ -104,7 +104,7 @@ def add_to_parser(service_sub):
     parser_disable.add_argument('imageid', type=str, help=h2)
 
     # region for image
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<image id>', \
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', \
                  '<data file with region(s) JSON>'
     parser_add_regions = subparsers.add_parser('add_regions',
                                                help='%s %s %s' % (h1, h2, h3))
@@ -114,7 +114,7 @@ def add_to_parser(service_sub):
                                     type=argparse.FileType('r'),
                                     help=h3)
 
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<image id>', \
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', \
                  '<data file with region(s) JSON>'
     parser_update_regions = subparsers.add_parser('update_regions',
                                                   help='%s %s %s' % (h1,
@@ -127,7 +127,7 @@ def add_to_parser(service_sub):
                                        type=argparse.FileType('r'),
                                        help=h3)
 
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<image id>', '<region id>'
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', '<region id>'
     parser_delete_region = subparsers.add_parser('delete_region',
                                                  help='%s %s %s' % (h1,
                                                                     h2,
@@ -137,7 +137,7 @@ def add_to_parser(service_sub):
     parser_delete_region.add_argument('regionid', type=str, help=h3)
 
     # customer for image
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<image id>', \
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', \
                  '<data file with customer(s) JSON>'
     parser_add_customers = subparsers.add_parser('add_customers',
                                                  help='%s %s %s' % (h1,
@@ -149,7 +149,7 @@ def add_to_parser(service_sub):
                                       type=argparse.FileType('r'),
                                       help=h3)
 
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<image id>', \
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', \
                  '<data file with customer(s) JSON>'
     parser_update_customer = subparsers.add_parser('update_customers',
                                                    help='%s %s %s' % (h1,
@@ -162,7 +162,7 @@ def add_to_parser(service_sub):
                                         type=argparse.FileType('r'),
                                         help=h3)
 
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<image id>', \
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', \
                  '<customer id>'
     parser_delete_customer = subparsers.add_parser('delete_customer',
                                                    help='%s %s %s' % (h1,
@@ -299,7 +299,7 @@ def cmd_data(args):
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
-    environment_variable = 'AIC_ORM_{}'.format(
+    environment_variable = 'RANGER_{}'.format(
         argument.replace('-', '_').upper())
 
     return os.environ.get(environment_variable)
@@ -328,9 +328,9 @@ def run(args):
         'content-type': 'application/json',
         'X-Auth-Token': auth_token,
         'X-Auth-Region': auth_region,
-        'X-AIC-ORM-Requester': requester,
-        'X-AIC-ORM-Client': client,
-        'X-AIC-ORM-Tracking-Id': tracking_id
+        'X-RANGER-Requester': requester,
+        'X-RANGER-Client': client,
+        'X-RANGER-Tracking-Id': tracking_id
     }
 
     if args.verbose:

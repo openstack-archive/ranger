@@ -36,7 +36,7 @@ def add_to_parser(service_sub):
     parser.add_argument('--orm-base-url', type=str, help='ORM base URL',
                         default=get_environment_variable('orm-base-url'))
     parser.add_argument('--tracking_id', type=str,
-                        help='"X-AIC-ORM-Tracking-Id" header')
+                        help='"X-RANGER-Tracking-Id" header')
     parser.add_argument('--port', type=int, help='port number of CMS server')
     parser.add_argument('--timeout', type=int,
                         help='request timeout in seconds (default: 10)')
@@ -51,7 +51,7 @@ def add_to_parser(service_sub):
 
     # customer
     parser_create_customer = subparsers.add_parser('create_customer',
-                                                   help='[<"X-AIC-ORM-Client" '
+                                                   help='[<"X-RANGER-Client" '
                                                         'header>] <data file '
                                                         'with new customer '
                                                         'JSON>')
@@ -63,7 +63,7 @@ def add_to_parser(service_sub):
                                              'JSON>')
 
     parser_delete_customer = subparsers.add_parser('delete_customer',
-                                                   help='[<"X-AIC-ORM-Client" '
+                                                   help='[<"X-RANGER-Client" '
                                                         'header>] <customer '
                                                         'id>')
     parser_delete_customer.add_argument('client',
@@ -72,7 +72,7 @@ def add_to_parser(service_sub):
                                         help='<customer id>')
 
     parser_update_customer = subparsers.add_parser('update_customer',
-                                                   help='[<"X-AIC-ORM-Client" '
+                                                   help='[<"X-RANGER-Client" '
                                                         'header>] <customer '
                                                         'id> <data file with '
                                                         'updated customer '
@@ -88,7 +88,7 @@ def add_to_parser(service_sub):
 
     # region
     parser_add_region = subparsers.add_parser('add_region',
-                                              help='[<"X-AIC-ORM-Client" '
+                                              help='[<"X-RANGER-Client" '
                                                    'header>] <customer id> '
                                                    '<data file with region('
                                                    's) JSON>')
@@ -98,7 +98,7 @@ def add_to_parser(service_sub):
                                    help='<data file with region(s) JSON>')
 
     parser_replace_region = subparsers.add_parser('replace_region',
-                                                  help='[<"X-AIC-ORM-Client" '
+                                                  help='[<"X-RANGER-Client" '
                                                        'header>] <customer '
                                                        'id> <data file with '
                                                        'region(s) JSON>')
@@ -110,7 +110,7 @@ def add_to_parser(service_sub):
                                        help='<data file with region(s) JSON>')
 
     parser_delete_region = subparsers.add_parser('delete_region',
-                                                 help='[<"X-AIC-ORM-Client" '
+                                                 help='[<"X-RANGER-Client" '
                                                       'header>] <customer id> '
                                                       '<region id>')
     parser_delete_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
@@ -119,7 +119,7 @@ def add_to_parser(service_sub):
 
     # add user
     parser_add_user = subparsers.add_parser('add_user',
-                                            help='[<"X-AIC-ORM-Client" '
+                                            help='[<"X-RANGER-Client" '
                                                  'header>] <customer id> '
                                                  '<region id> <data file '
                                                  'with user(s) JSON>')
@@ -131,7 +131,7 @@ def add_to_parser(service_sub):
 
     # replace user
     parser_replace_user = subparsers.add_parser('replace_user',
-                                                help='[<"X-AIC-ORM-Client" '
+                                                help='[<"X-RANGER-Client" '
                                                      'header>] <customer id> '
                                                      '<region id> <data file '
                                                      'with user(s) JSON>')
@@ -144,7 +144,7 @@ def add_to_parser(service_sub):
     # delete user
     parser_delete_user = subparsers.add_parser(
         'delete_user',
-        help='[<"X-AIC-ORM-Client" header>] '
+        help='[<"X-RANGER-Client" header>] '
              '<customer id> <region id> <user id>')
     parser_delete_user.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_user.add_argument('custid', type=str,
@@ -157,7 +157,7 @@ def add_to_parser(service_sub):
     # add default user
     parser_add_default_user = \
         subparsers.add_parser('add_default_user',
-                              help='[<"X-AIC-ORM-Client" header>] '
+                              help='[<"X-RANGER-Client" header>] '
                                    '<customer id> '
                                    '<data file with '
                                    'region(s) JSON>')
@@ -172,7 +172,7 @@ def add_to_parser(service_sub):
     # replace default user
     parser_replace_default_user = \
         subparsers.add_parser('replace_default_user',
-                              help='[<"X-AIC-ORM-Client" header>] '
+                              help='[<"X-RANGER-Client" header>] '
                                    '<customer id> '
                                    '<data file '
                                    'with region(s) '
@@ -188,7 +188,7 @@ def add_to_parser(service_sub):
 
     # change enable
     parser_enable_customer = subparsers.add_parser('enabled',
-                                                   help='[<"X-AIC-ORM-Client" '
+                                                   help='[<"X-RANGER-Client" '
                                                         'header>] '
                                                         '<customer id> '
                                                         '<data file with '
@@ -205,7 +205,7 @@ def add_to_parser(service_sub):
     # delete default user
     parser_delete_default_user = \
         subparsers.add_parser('delete_default_user',
-                              help='[<"X-AIC-ORM-Client" header>] <customer '
+                              help='[<"X-RANGER-Client" header>] <customer '
                                    'id> <user id>')
     parser_delete_default_user.add_argument('client',
                                             **cli_common.ORM_CLIENT_KWARGS)
@@ -216,10 +216,10 @@ def add_to_parser(service_sub):
 
     # add metadata
     h1, h2, h3 = \
-        '[<"X-AIC-ORM-Client" header>]', '<customer id>', '<data file ' \
-                                                          'with ' \
-                                                          'metadata(' \
-                                                          's) JSON>'
+        '[<"X-RANGER-Client" header>]', '<customer id>', '<data file ' \
+                                                         'with ' \
+                                                         'metadata(' \
+                                                         's) JSON>'
     parser_add_metadata = subparsers.add_parser('add_metadata',
                                                 help='%s %s %s' % (h1, h2, h3))
     parser_add_metadata.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
@@ -230,10 +230,10 @@ def add_to_parser(service_sub):
 
     # replace metadata
     h1, h2, h3 = \
-        '[<"X-AIC-ORM-Client" header>]', '<customer id>', '<data file ' \
-                                                          'with ' \
-                                                          'metadata(' \
-                                                          's) JSON>'
+        '[<"X-RANGER-Client" header>]', '<customer id>', '<data file ' \
+                                                         'with ' \
+                                                         'metadata(' \
+                                                         's) JSON>'
     parser_replace_metadata = subparsers.add_parser('replace_metadata',
                                                     help='%s %s %s' % (
                                                         h1, h2, h3))
@@ -247,13 +247,13 @@ def add_to_parser(service_sub):
 
     # get customer
     parser_get_customer = subparsers.add_parser('get_customer',
-                                                help='[<"X-AIC-ORM-Client" '
+                                                help='[<"X-RANGER-Client" '
                                                      'header>] <customer id>')
     parser_get_customer.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_get_customer.add_argument('custid', type=str, help='<customer id>')
 
     # list customers
-    h1 = '[<"X-AIC-ORM-Client" header>]'
+    h1 = '[<"X-RANGER-Client" header>]'
     h2 = '[--region <name>] [--user <name>] [--metadata <key:value>]' \
          ' [starts_with <name>] [contains <name>]'
     parser_list_customer = subparsers.add_parser('list_customers',
@@ -385,7 +385,7 @@ def get_token(timeout, args, host):
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
-    environment_variable = 'AIC_ORM_{}'.format(
+    environment_variable = 'RANGER_{}'.format(
         argument.replace('-', '_').upper())
 
     return os.environ.get(environment_variable)
@@ -415,9 +415,9 @@ def run(args):
         'content-type': 'application/json',
         'X-Auth-Token': auth_token,
         'X-Auth-Region': auth_region,
-        'X-AIC-ORM-Requester': requester,
-        'X-AIC-ORM-Client': client,
-        'X-AIC-ORM-Tracking-Id': tracking_id
+        'X-RANGER-Requester': requester,
+        'X-RANGER-Client': client,
+        'X-RANGER-Tracking-Id': tracking_id
     }
 
     if args.verbose:

@@ -48,7 +48,7 @@ def add_to_parser(service_sub):
                                        metavar='<subcommand> [-h] <args>')
 
     # flavor
-    h1, h2 = ('[<"X-AIC-ORM-Client" header>]',
+    h1, h2 = ('[<"X-RANGER-Client" header>]',
               '<data file with new flavor JSON>')
     parser_create_flavor = subparsers.add_parser('create_flavor',
                                                  help='%s %s' % (h1, h2))
@@ -56,7 +56,7 @@ def add_to_parser(service_sub):
     parser_create_flavor.add_argument('datafile', type=argparse.FileType('r'),
                                       help=h2)
 
-    h1, h2, h3 = ('[<"X-AIC-ORM-Client" header>]', '<flavor id>',
+    h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
                   '<data file with tag(s) JSON>',)
     parser_add_tags = subparsers.add_parser('add_tags',
                                             help='%s %s %s' % (h1, h2, h3))
@@ -65,7 +65,7 @@ def add_to_parser(service_sub):
     parser_add_tags.add_argument('datafile', type=argparse.FileType('r'),
                                  help=h3)
 
-    h1, h2, h3 = ('[<"X-AIC-ORM-Client" header>]', '<flavor id>',
+    h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
                   '<data file with tag(s) JSON>',)
     parser_replace_tags = subparsers.add_parser('replace_tags',
                                                 help='%s %s %s' % (h1, h2, h3))
@@ -74,35 +74,35 @@ def add_to_parser(service_sub):
     parser_replace_tags.add_argument('datafile', type=argparse.FileType('r'),
                                      help=h3)
 
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<flavor id>', '<tag name>'
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<flavor id>', '<tag name>'
     parser_delete_tag = subparsers.add_parser('delete_tag',
                                               help='%s %s %s' % (h1, h2, h3))
     parser_delete_tag.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_tag.add_argument('flavorid', type=str, help=h2)
     parser_delete_tag.add_argument('tagname', type=str, help=h3)
 
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<flavor id>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<flavor id>'
     parser_delete_all_tags = subparsers.add_parser('delete_all_tags',
                                                    help='%s %s' % (h1, h2))
     parser_delete_all_tags.add_argument('client',
                                         **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_all_tags.add_argument('flavorid', type=str, help=h2)
 
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<flavor id>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<flavor id>'
     parser_get_tags = subparsers.add_parser('get_tags',
                                             help='%s %s' % (h1, h2))
     parser_get_tags.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_get_tags.add_argument('flavorid', type=str, help=h2)
 
     # extra specs
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<flavor id>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<flavor id>'
     parser_get_extra_specs = subparsers.add_parser('get_extra_specs',
                                                    help='%s %s' % (h1, h2))
     parser_get_extra_specs.add_argument('client',
                                         **cli_common.ORM_CLIENT_KWARGS)
     parser_get_extra_specs.add_argument('flavorid', type=str, help=h2)
 
-    h1, h2, h3 = ('[<"X-AIC-ORM-Client" header>]', '<flavor id>',
+    h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
                   '<datafile with extra_specs json>',)
     parser_replace_extra_specs = subparsers.add_parser('replace_extra_specs',
                                                        help='%s %s %s' % (h1,
@@ -115,14 +115,14 @@ def add_to_parser(service_sub):
                                             type=argparse.FileType('r'),
                                             help=h3)
 
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<flavor id>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<flavor id>'
     parser_delete_all_extra_specs = subparsers.add_parser(
         'delete_all_extra_specs', help='%s %s' % (h1, h2))
     parser_delete_all_extra_specs.add_argument('client',
                                                **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_all_extra_specs.add_argument('flavorid', type=str, help=h2)
 
-    h1, h2, h3 = ('[<"X-AIC-ORM-Client" header>]', '<flavor id>',
+    h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
                   '<extra_spec key name>',)
     parser_delete_extra_spec = subparsers.add_parser('delete_extra_spec',
                                                      help='%s%s%s' % (
@@ -132,7 +132,7 @@ def add_to_parser(service_sub):
     parser_delete_extra_spec.add_argument('flavorid', type=str, help=h2)
     parser_delete_extra_spec.add_argument('eskeyname', type=str, help=h3)
 
-    h1, h2, h3 = ('[<"X-AIC-ORM-Client" header>]', '<flavor id>',
+    h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
                   '<datafile with extra_specs json>',)
     parser_add_extra_specs = subparsers.add_parser('add_extra_specs',
                                                    help='%s%s%s' % (
@@ -144,19 +144,19 @@ def add_to_parser(service_sub):
                                         type=argparse.FileType('r'),
                                         help=h3)
 
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<flavor id>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<flavor id>'
     parser_delete_flavor = subparsers.add_parser('delete_flavor',
                                                  help='%s %s' % (h1, h2))
     parser_delete_flavor.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_flavor.add_argument('flavorid', type=str, help=h2)
 
-    h1, h2 = '[<"X-AIC-ORM-Client" header>]', '<flavor id or flavor_name>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<flavor id or flavor_name>'
     parser_get_flavor = subparsers.add_parser('get_flavor',
                                               help='%s %s' % (h1, h2))
     parser_get_flavor.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_get_flavor.add_argument('flavorid', type=str, help=h2)
 
-    h1, h2 = ('[<"X-AIC-ORM-Client" header>]',
+    h1, h2 = ('[<"X-RANGER-Client" header>]',
               '[--visibility <public|private>] [--region <name>] [--tenant '
               '<id>] [--series {gv,nv,ns,nd,ss}] [--alias <alias>]')
     parser_list_flavor = subparsers.add_parser('list_flavors',
@@ -175,7 +175,7 @@ def add_to_parser(service_sub):
     parser_list_flavor.add_argument('--alias', type=str, help='flavor alias')
 
     # region for flavor
-    h1, h2, h3 = ('[<"X-AIC-ORM-Client" header>]', '<flavor id>',
+    h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
                   '<data file with region(s) JSON>',)
     parser_add_region = subparsers.add_parser('add_region',
                                               help='%s %s %s' % (h1, h2, h3))
@@ -184,7 +184,7 @@ def add_to_parser(service_sub):
     parser_add_region.add_argument('datafile', type=argparse.FileType('r'),
                                    help=h3)
 
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<flavor id>', '<region id>'
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<flavor id>', '<region id>'
     parser_delete_region = subparsers.add_parser('delete_region',
                                                  help='%s %s %s' % (
                                                      h1, h2, h3))
@@ -193,7 +193,7 @@ def add_to_parser(service_sub):
     parser_delete_region.add_argument('regionid', type=str, help=h3)
 
     # tenant for flavor
-    h1, h2, h3 = ('[<"X-AIC-ORM-Client" header>]', '<flavor id>',
+    h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
                   '<data file with tenant(s) JSON>',)
     parser_add_tenant = subparsers.add_parser('add_tenant',
                                               help='%s %s %s' % (h1, h2, h3))
@@ -202,7 +202,7 @@ def add_to_parser(service_sub):
     parser_add_tenant.add_argument('datafile', type=argparse.FileType('r'),
                                    help=h3)
 
-    h1, h2, h3 = '[<"X-AIC-ORM-Client" header>]', '<flavor id>', '<tenant id>'
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<flavor id>', '<tenant id>'
     parser_delete_tenant = subparsers.add_parser('delete_tenant',
                                                  help='%s %s %s' % (
                                                      h1, h2, h3))
@@ -332,7 +332,7 @@ def get_token(timeout, args, host):
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
-    environment_variable = 'AIC_ORM_{}'.format(
+    environment_variable = 'RANGER_{}'.format(
         argument.replace('-', '_').upper())
 
     return os.environ.get(environment_variable)
@@ -362,9 +362,9 @@ def run(args):
         'content-type': 'application/json',
         'X-Auth-Token': auth_token,
         'X-Auth-Region': auth_region,
-        'X-AIC-ORM-Requester': requester,
-        'X-AIC-ORM-Client': client,
-        'X-AIC-ORM-Tracking-Id': tracking_id
+        'X-RANGER-Requester': requester,
+        'X-RANGER-Client': client,
+        'X-RANGER-Tracking-Id': tracking_id
     }
 
     if args.verbose:
