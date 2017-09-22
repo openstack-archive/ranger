@@ -9,7 +9,7 @@ netifaces==0.10.4
 SQLAlchemy==0.9.7
 WSME>=0.6
 MySQL-python==1.2.5
-requests==2.2.1
+requests==2.6.0
 oslo.db==1.7.2
 oslo.serialization
 oslo.config
