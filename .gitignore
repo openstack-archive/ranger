@@ -30,6 +30,8 @@ cover/
 nosetests.xml
 .testrepository
 .venv
+.idea/
+.stestr/
 
 # Translations
 *.mo

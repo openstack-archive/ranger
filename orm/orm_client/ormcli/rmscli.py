@@ -347,9 +347,9 @@ def run(args):
         'content-type': 'application/json',
         'X-Auth-Token': auth_token,
         'X-Auth-Region': auth_region,
-        'X-AIC-ORM-Requester': requester,
-        'X-AIC-ORM-Client': client,
-        'X-AIC-ORM-Tracking-Id': tracking_id
+        'X-RANGER-Requester': requester,
+        'X-RANGER-Client': client,
+        'X-RANGER-Tracking-Id': tracking_id
     }
     if args.verbose:
         print("Sending API:\ntimeout: %d\ndata: %s\n"
