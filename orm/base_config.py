@@ -1,33 +1,67 @@
-import os
-orm_host = '0.0.0.0'
+orm_protocal = 'http'
+orm_host = '127.0.0.1'
 log_location = '{}'
-ranger_base = os.path.dirname(os.path.abspath('orm'))
+ranger_base = '/opt/stack/upstream_ranger/ranger'
 log_location = ranger_base + '/logs/{}'
+db_user = 'root'
+db_pass = 'stack'
+db_host = '127.0.0.1'
+ssl_verify = False
+token_auth_enabled = True
+token_auth_user = 'admin'
+token_auth_pass = 'nova'
+token_auth_tenant = 'admin'
+token_auth_user_role = 'admin'
+uuid_port = '7001'
+audit_port = '7002'
+rms_port = '7003'
+rds_port = '8777'
+cms_port = '7080'
+fms_port = '8082'
+ims_port = '8084'
+
+db_url = 'mysql://' + db_user + ':' + db_pass + '@' + db_host + ':3306/'
+
 uuid = {
-    'port': '7001',
+    'port': uuid_port,
+    'base_url': '{}://{}:{}/'.format(orm_protocal, orm_host, uuid_port),
     'log': log_location.format('uuidgen.log')
 }
 cms = {
-    'port': '7080',
+    'port': cms_port,
+    'base_url': '{}://{}:{}/'.format(orm_protocal, orm_host, cms_port),
+    'policy_file': ranger_base + '/orm/services/customer_manager/cms_rest/etc/policy.json',
     'log': log_location.format('cms.log')
 }
 fms = {
-    'port': '8082',
+    'port': fms_port,
+    'base_url': '{}://{}:{}/'.format(orm_protocal, orm_host, fms_port),
+    'policy_file': ranger_base + '/orm/services/flavor_manager/fms_rest/etc/policy.json',
     'log': log_location.format('fms.log')
 }
 audit_server = {
-    'port': '8776',
+    'port': audit_port,
+    'base_url': '{}://{}:{}/'.format(orm_protocal, orm_host, audit_port),
     'log': log_location.format('audit_server.log')
 }
 ims = {
-    'port': '8084',
+    'port': ims_port,
+    'base_url': '{}://{}:{}/'.format(orm_protocal, orm_host, ims_port),
+    'policy_file': ranger_base + '/orm/services/image_manager/ims/etc/policy.json',
     'log': log_location.format('ims.log')
 }
 rms = {
-    'port': '8080',
+    'port': rms_port,
+    'base_url': '{}://{}:{}/'.format(orm_protocal, orm_host, rms_port),
+    'policy_file': ranger_base + '/orm/services/region_manager/rms/etc/policy.json',
     'log': log_location.format('rms.log')
 }
 rds = {
-    'port': '8778',
+    'port': rds_port,
+    'repo_local_location': '/opt/app/orm/ORM',
+    'repo_user': 'hs571j',
+    'repo_email': 'hs571j@att.com',
+    'repo_remote_location': 'git@127.0.0.1:/home/repo/ORM.git',
+    'base_url': '{}://{}:{}/'.format(orm_protocal, orm_host, rds_port),
     'log': log_location.format('rds.log')
 }

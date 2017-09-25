@@ -8,14 +8,14 @@ server = {
 
 # DB configurations
 database = {
-    'url': 'mysql://root:stack@127.0.0.1/orm_audit?charset=utf8',
+    'url': config.db_url + 'orm_audit?charset=utf8',
     # 'url': 'mysql://root:root@127.0.0.1/orm_audit?charset=utf8',
     'echo_statements': True
 }
 
 # Pecan Application Configurations
 app = {
-    'root': 'audit_server.controllers.root.RootController',
+    'root': 'orm.services.audit_trail_manager.audit_server.controllers.root.RootController',
     'modules': ['audit_server'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/audit_server/templates',
@@ -63,7 +63,7 @@ logging = {
     }
 }
 
-verify = False
+verify = config.ssl_verify
 
 # Custom Configurations must be in Python dictionary format::
 #
