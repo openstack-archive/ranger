@@ -8,7 +8,7 @@ server = {
 
 # DB configurations
 database = {
-    'url': 'mysql://root:stack@127.0.0.1/orm_audit?charset=utf8',
+    'url': 'mysql://{db_user}:{db_pass}@{db_host}/orm_audit?charset=utf8',
     # 'url': 'mysql://root:root@127.0.0.1/orm_audit?charset=utf8',
     'echo_statements': True
 }
@@ -63,7 +63,7 @@ logging = {
     }
 }
 
-verify = False
+verify_ssl_cert = False
 
 # Custom Configurations must be in Python dictionary format::
 #

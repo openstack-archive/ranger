@@ -13,7 +13,7 @@ server = {
 
 # DB configurations
 database = {
-    'url': 'mysql://root:stack@127.0.0.1/orm_rds?charset=utf8'
+    'url': 'mysql://{db_user}:{db_pass}@{db_host}/orm_rds?charset=utf8'
 }
 
 sot = {
@@ -23,13 +23,13 @@ sot = {
 git = {
     # possible values : 'native', 'gittle'
     'type': 'native',
-    'local_repository_path': '/opt/app/orm/ORM',
+    'local_repository_path': {local_git_repo_path},
     'file_name_format': 's_{}.yml',
     'relative_path_format': '/{}/hot/{}/{}',
     'commit_message_format': 'File was added to repository: {}',
-    'commit_user': 'orm_rds',
-    'commit_email': 'orm_rds@att.com',
-    'git_server_url': 'orm_rds@127.0.0.1:~/SoT/ORM.git',
+    'commit_user': {git_user},
+    'commit_email': {git_user_email},
+    'git_server_url': {git_remote_repo},
     'git_cmd_timeout': 45
 }
 
@@ -59,7 +59,7 @@ ordupdate = {
     'cert_path': '../resources/ord.crt'
 }
 
-verify = False
+verify_ssl_cert = False
 
 UUID_URL = 'http://127.0.0.1:8090/v1/uuids'
 
@@ -168,10 +168,10 @@ logging = {
 
 
 authentication = {
-    "enabled": True,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "tenant_name": "admin",
+    "enabled": {keystone_auth_enable},
+    "mech_id": {orm_keystone_user},
+    "mech_pass": {orm_keystone_pass},
+    "tenant_name": {orm_keystone_tenant},
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "2.0"
+    "keystone_version": {openstack_keystone_version}
 }

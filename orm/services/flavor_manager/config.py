@@ -69,9 +69,9 @@ logging = {
 }
 
 database = {
-    'host': 'localhost',
-    'username': 'root',
-    'password': 'stack',
+    'host': {db_host},
+    'username': {db_user},
+    'password': {db_user},
     'db_name': 'orm_fms_db',
 
 }
@@ -146,17 +146,16 @@ api = {
 
 }
 
-verify = False
+verify_ssl_cert = False
 
 authentication = {
-    "enabled": False,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "rms_url": "http://127.0.0.1:8080",
-    # "rms_url": "http://127.0.0.1:8080",
-    "tenant_name": "admin",
+    "enabled": {keystone_auth_enable},
+    "mech_id": {orm_keystone_user},
+    "mech_pass": {orm_keystone_pass},
+    "rms_url": config.base_url + ':' + config.rms['port'],
+    "tenant_name": {orm_keystone_tenant},
     "token_role": "admin",
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "2.0",
+    "keystone_version": {openstack_keystone_version},
     "policy_file": "fms_rest/etc/policy.json",
 }

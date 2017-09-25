@@ -56,10 +56,10 @@ logging = {
     }
 }
 
-verify = False
+verify_ssl_cert = False
 
 database = {
-    'connection_string': 'mysql://root:stack@localhost:3306/orm'
+    'connection_string': 'mysql://{db_user}:{db_pass}@{db_host}/orm'
 }
 # Custom Configurations must be in Python dictionary format::
 #

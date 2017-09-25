@@ -80,7 +80,7 @@ quotas_default_values = {
 }
 
 database = {
-    'connection_string': 'mysql://root:stack@localhost:3306/orm_cms_db'
+    'connection_string': 'mysql://{db_user}:{db_pass}@{db_host}/orm_cms_db'
 }
 
 api = {
@@ -105,20 +105,20 @@ api = {
     }
 }
 
-verify = False
+verify_ssl_cert = False
 
 authentication = {
-    "enabled": True,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "rms_url": "http://127.0.0.1:8080",
-    "tenant_name": "admin",
+    "enabled": {keystone_auth_enable},
+    "mech_id": {orm_keystone_user},
+    "mech_pass": {orm_keystone_pass},
+    "rms_url": config.base_url + ':' + config.rms['port'],
+    "tenant_name": {orm_keystone_tenant},
     "token_role": "admin",
     # The Keystone collection under which the role was granted.
     # The key can be either "tenant" (for Keystone v2.0) or "domain"
     # (for Keystone v3) and the value is the tenant/domain name.
     "role_location": {"tenant": "admin"},
     # The Keystone version currently in use. Can be either "2.0" or "3".
-    "keystone_version": "2.0",
+    "keystone_version": {openstack_keystone_version},
     "policy_file": "/opt/stack/ranger/orm/services/customer_manager/cms_rest/etc/policy.json"
 }

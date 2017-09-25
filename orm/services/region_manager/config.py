@@ -86,7 +86,7 @@ region_options = {
 
 # DB configurations
 database = {
-    'url': 'mysql://root:stack@127.0.0.1/orm_rms_db?charset=utf8',
+    'url': 'mysql://{db_user}:{db_pass}@{db_host}/orm_rms?charset=utf8',
     'max_retries': 3,
     'retries_interval': 10
 }
@@ -106,14 +106,14 @@ api = {
     }
 }
 
-verify = False
+verify_ssl_cert = False
 
 authentication = {
-    "enabled": True,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "tenant_name": "admin",
+    "enabled": {keystone_auth_enable},
+    "mech_id": {orm_keystone_user},
+    "mech_pass": {orm_keystone_pass},
+    "tenant_name": {orm_keystone_tenant},
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "2.0",
+    "keystone_version": {openstack_keystone_version},
     "policy_file": "/stack/orm/services/region_manager/rms/etc/policy.json"
 }

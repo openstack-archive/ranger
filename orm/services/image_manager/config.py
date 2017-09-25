@@ -70,14 +70,14 @@ logging = {
 }
 
 database = {
-    'host': 'localhost',
-    'username': 'root',
-    'password': 'stack',
+    'host': {db_host},
+    'username': {db_user},
+    'password': {db_pass},
     'db_name': 'orm_ims_db',
 
 }
 
-verify = False
+verify_ssl_cert = False
 
 database['connection_string'] = 'mysql://{0}:{1}@{2}:3306/{3}'.format(database['username'],
                                                                       database['password'],
@@ -110,12 +110,12 @@ api = {
 }
 
 authentication = {
-    "enabled": True,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "rms_url": "http://127.0.0.1:8080",
-    "tenant_name": "admin",
+    "enabled": {keystone_auth_enable},
+    "mech_id": {orm_keystone_user},
+    "mech_pass": {orm_keystone_pass},
+    "rms_url": config.base_url + ':' + config.rms['port'],
+    "tenant_name": {orm_keystone_tenant},
     "token_role": "admin",
-    "keystone_version": "2.0",
+    "keystone_version": {openstack_keystone_version},
     "policy_file": "ims/etc/policy.json"
 }
