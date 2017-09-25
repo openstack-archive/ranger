@@ -15,7 +15,7 @@ server = {
 
 # Pecan Application Configurations
 app = {
-    'root': 'rms.controllers.root.RootController',
+    'root': 'orm.services.region_manager.rms.controllers.root.RootController',
     'modules': ['rms'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/rms/templates',
@@ -86,34 +86,35 @@ region_options = {
 
 # DB configurations
 database = {
-    'url': 'mysql://root:stack@127.0.0.1/orm_rms_db?charset=utf8',
+    'url': config.db_url + 'orm_rms_db?charset=utf8',
     'max_retries': 3,
     'retries_interval': 10
 }
 
 endpoints = {
-    'lcp': 'http://127.0.0.1:8082/lcp'
+    'lcp': config.rms['base_url'] + 'lcp'
 }
 
 api = {
     'uuid_server': {
-        'base': 'http://127.0.0.1:8090/',
+        'base': config.uuid['base_url'],
         'uuids': 'v1/uuids'
     },
     'audit_server': {
-        'base': 'http://127.0.0.1:8776/',
+        'base': config.audit_server['base_url'],
         'trans': 'v1/audit/transaction'
     }
 }
 
-verify = False
+verify = config.ssl_verify
 
 authentication = {
-    "enabled": True,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "tenant_name": "admin",
+    "enabled": config.token_auth_enabled,
+    "mech_id": config.token_auth_user,
+    "mech_pass": config.token_auth_pass,
+    "tenant_name": config.token_auth_tenant,
+    "token_role": config.token_auth_user_role,
     # The Keystone version currently in use. Can be either "2.0" or "3"
     "keystone_version": "2.0",
-    "policy_file": "/stack/orm/services/region_manager/rms/etc/policy.json"
+    "policy_file": config.rms['policy_file']
 }
