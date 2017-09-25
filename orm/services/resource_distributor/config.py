@@ -1,8 +1,8 @@
 import orm.base_config as config
 # Pecan Application configurations
 app = {
-    'root': 'rds.controllers.root.RootController',
-    'modules': ['rds'],
+    'root': 'orm.services.resource_distributor.rds.controllers.root.RootController',
+    'modules': ['orm.services.resource_distributor.rds'],
     'service_name': 'RDS'
 }
 
@@ -13,7 +13,7 @@ server = {
 
 # DB configurations
 database = {
-    'url': 'mysql://root:stack@127.0.0.1/orm_rds?charset=utf8'
+    'url': config.db_url + 'orm_rds?charset=utf8'
 }
 
 sot = {
@@ -23,35 +23,35 @@ sot = {
 git = {
     # possible values : 'native', 'gittle'
     'type': 'native',
-    'local_repository_path': '/opt/app/orm/ORM',
+    'local_repository_path': config.rds['repo_local_location'],
     'file_name_format': 's_{}.yml',
     'relative_path_format': '/{}/hot/{}/{}',
     'commit_message_format': 'File was added to repository: {}',
-    'commit_user': 'orm_rds',
-    'commit_email': 'orm_rds@att.com',
-    'git_server_url': 'orm_rds@127.0.0.1:~/SoT/ORM.git',
+    'commit_user': config.rds['repo_user'],
+    'commit_email': config.rds['repo_email'],
+    'git_server_url': config.rds['repo_remote_location'],
     'git_cmd_timeout': 45
 }
 
 audit = {
-    'audit_server_url': 'http://127.0.0.1:8776/v1/audit/transaction',
+    'audit_server_url': config.audit_server['base_url'] + 'v1/audit/transaction',
     'num_of_send_retries': 3,
     'time_wait_between_retries': 1
 }
 
 ims = {
-    'base_url': 'http://127.0.0.1:8084/',
+    'base_url': config.ims['base_url'],
     'metadata_path': 'v1/orm/images/{0}/regions/{1}/metadata'
 }
 
 rms = {
-    'base_url': 'http://127.0.0.1:8080/',
+    'base_url': config.rms['base_url'],
     'all_regions_path': 'v2/orm/regions'
 }
 
 ordupdate = {
     'discovery_url': 'http://127.0.0.1',
-    'discovery_port': 8080,
+    'discovery_port': config.rms['port'],
     'template_type': 'hot',
     # This flag should be false only in case the ord does not support https.
     'https_enabled': True,
@@ -59,9 +59,7 @@ ordupdate = {
     'cert_path': '../resources/ord.crt'
 }
 
-verify = False
-
-UUID_URL = 'http://127.0.0.1:8090/v1/uuids'
+UUID_URL = config.uuid['base_url'] + 'uuids'
 
 # yaml configurations
 yaml_configs = {
@@ -167,11 +165,14 @@ logging = {
 }
 
 
+verify = config.ssl_verify
+
 authentication = {
-    "enabled": True,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "tenant_name": "admin",
+    "enabled": config.token_auth_enabled,
+    "mech_id": config.token_auth_user,
+    "mech_pass": config.token_auth_pass,
+    "tenant_name": config.token_auth_tenant,
+    "token_role": config.token_auth_user_role,
     # The Keystone version currently in use. Can be either "2.0" or "3"
     "keystone_version": "2.0"
 }

@@ -2,6 +2,7 @@
 import argparse
 import cli_common
 import config
+import orm.base_config as base_config
 import os
 import requests
 
@@ -304,7 +305,7 @@ def get_token(timeout, args, host):
                 print message
                 raise cli_common.MissingArgumentError(message)
 
-    keystone_ep = cli_common.get_keystone_ep('{}:8080'.format(host),
+    keystone_ep = cli_common.get_keystone_ep('{}:{}'.format(host, base_config.rms['port']),
                                              auth_region)
     if keystone_ep is None:
         raise ConnectionError(
@@ -340,7 +341,7 @@ def get_environment_variable(argument):
 
 def run(args):
     host = args.orm_base_url if args.orm_base_url else config.orm_base_url
-    port = args.port if args.port else 8082
+    port = args.port if args.port else base_config.fms['port']
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
 
@@ -374,7 +375,7 @@ def run(args):
                 timeout, data, headers, rest_cmd.__name__, url))
     try:
         resp = rest_cmd(url, timeout=timeout, data=data, headers=headers,
-                        verify=config.verify)
+                        verify=False)
     except Exception as e:
         print e
         exit(1)
