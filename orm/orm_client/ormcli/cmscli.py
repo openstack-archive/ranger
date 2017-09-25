@@ -2,6 +2,7 @@
 import argparse
 import cli_common
 import config
+import orm.base_config as config
 import os
 import requests
 
@@ -357,7 +358,7 @@ def get_token(timeout, args, host):
                 print message
                 raise cli_common.MissingArgumentError(message)
 
-    keystone_ep = cli_common.get_keystone_ep('{}:8080'.format(host),
+    keystone_ep = cli_common.get_keystone_ep('{}:{}'.format(host, config.rms['port']),
                                              auth_region)
     if keystone_ep is None:
         raise ConnectionError(

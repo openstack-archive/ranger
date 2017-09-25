@@ -6,8 +6,8 @@ server = {
 }
 # Pecan Application Configurations
 app = {
-    'root': 'uuidgen.controllers.root.RootController',
-    'modules': ['uuidgen'],
+    'root': 'orm.services.id_generator.uuidgen.controllers.root.RootController',
+    'modules': ['orm.services.id_generator.uuidgen'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/uuidgen/templates',
     'debug': True,
@@ -56,10 +56,10 @@ logging = {
     }
 }
 
-verify = False
+verify = config.ssl_verify
 
 database = {
-    'connection_string': 'mysql://root:stack@localhost:3306/orm'
+    'connection_string': config.db_url + 'orm'
 }
 # Custom Configurations must be in Python dictionary format::
 #
