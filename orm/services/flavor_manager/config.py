@@ -17,8 +17,8 @@ cache_seconds = 0
 
 # Pecan Application Configurations
 app = {
-    'root': 'fms_rest.controllers.root.RootController',
-    'modules': ['fms_rest'],
+    'root': 'orm.services.flavor_manager.fms_rest.controllers.root.RootController',
+    'modules': ['orm.services.flavor_manager.fms_rest'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/fms_rest/templates',
     'debug': True,
@@ -69,9 +69,9 @@ logging = {
 }
 
 database = {
-    'host': 'localhost',
-    'username': 'root',
-    'password': 'stack',
+    'host': config.db_host,
+    'username': config.db_user,
+    'password': config.db_pass,
     'db_name': 'orm_fms_db',
 
 }
@@ -124,39 +124,37 @@ application_root = 'http://localhost:{0}'.format(server['port'])
 
 api = {
     'uuid_server': {
-        'base': 'http://127.0.0.1:8090/',
+        'base': config.uuid['base_url'],
         'uuids': 'v1/uuids'
     },
     'rds_server': {
-        'base': 'http://127.0.0.1:8777/',
-        # 'base': 'http://127.0.0.1:8777/',
+        'base': config.rds['base_url'],
         'resources': 'v1/rds/resources',
         'status': 'v1/rds/status/resource/'
     },
     'rms_server': {
-        'base': 'http://127.0.0.1:8080/',
+        'base': config.rms['base_url'],
         'groups': 'v2/orm/groups',
         'regions': 'v2/orm/regions',
         'cache_seconds': 60
     },
     'audit_server': {
-        'base': 'http://127.0.0.1:8776/',
+        'base': config.audit_server['base_url'],
         'trans': 'v1/audit/transaction'
     }
 
 }
 
-verify = False
+verify = config.ssl_verify
 
 authentication = {
-    "enabled": False,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "rms_url": "http://127.0.0.1:8080",
-    # "rms_url": "http://127.0.0.1:8080",
-    "tenant_name": "admin",
-    "token_role": "admin",
+    "enabled": config.token_auth_enabled,
+    "mech_id": config.token_auth_user,
+    "mech_pass": config.token_auth_pass,
+    "rms_url": config.rms['base_url'],
+    "tenant_name": config.token_auth_tenant,
+    "token_role": config.token_auth_user_role,
     # The Keystone version currently in use. Can be either "2.0" or "3"
     "keystone_version": "2.0",
-    "policy_file": "fms_rest/etc/policy.json",
+    "policy_file": config.fms['policy_file'],
 }
