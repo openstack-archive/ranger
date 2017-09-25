@@ -15,8 +15,8 @@ server = {
 
 # Pecan Application Configurations
 app = {
-    'root': 'ims.controllers.root.RootController',
-    'modules': ['ims'],
+    'root': 'orm.services.image_manager.ims.controllers.root.RootController',
+    'modules': ['orm.services.image_manager.ims'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/ims/templates',
     'debug': True,
@@ -70,52 +70,51 @@ logging = {
 }
 
 database = {
-    'host': 'localhost',
-    'username': 'root',
-    'password': 'stack',
+    'host': config.db_host,
+    'username': config.db_user,
+    'password': config.db_pass,
     'db_name': 'orm_ims_db',
 
 }
-
-verify = False
-
 database['connection_string'] = 'mysql://{0}:{1}@{2}:3306/{3}'.format(database['username'],
                                                                       database['password'],
                                                                       database['host'],
                                                                       database['db_name'])
 
-application_root = 'http://localhost:{0}'.format(server['port'])
+application_root = config.ims['base_url']
 
 api = {
     'uuid_server': {
-        'base': 'http://127.0.0.1:8090/',
+        'base': config.uuid['base_url'],
         'uuids': 'v1/uuids'
     },
     'rds_server': {
-        'base': 'http://127.0.0.1:8777/',
+        'base': config.rds['base_url'],
         'resources': 'v1/rds/resources',
         'status': 'v1/rds/status/resource/'
     },
     'rms_server': {
-        'base': 'http://127.0.0.1:8080/',
+        'base': config.rms['base_url'],
         'groups': 'v2/orm/groups',
         'regions': 'v2/orm/regions',
         'cache_seconds': 60
     },
     'audit_server': {
-        'base': 'http://127.0.0.1:8776/',
+        'base': config.audit_server['base_url'],
         'trans': 'v1/audit/transaction'
     }
 
 }
 
+verify = config.ssl_verify
+
 authentication = {
-    "enabled": True,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "rms_url": "http://127.0.0.1:8080",
-    "tenant_name": "admin",
-    "token_role": "admin",
+    "enabled": config.token_auth_enabled,
+    "mech_id": config.token_auth_user,
+    "mech_pass": config.token_auth_pass,
+    "rms_url": config.rms['base_url'],
+    "tenant_name": config.token_auth_tenant,
+    "token_role": config.token_auth_user_role,
     "keystone_version": "2.0",
-    "policy_file": "ims/etc/policy.json"
+    "policy_file": config.ims['policy_file']
 }

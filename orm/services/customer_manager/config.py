@@ -11,14 +11,14 @@ server = {
     'port': config.cms['port'],
     'host': config.orm_host,
     'name': 'cms',
-    'host_ip': '0.0.0.0'
+    'host_ip': config.orm_host
 }
 
 # Pecan Application Configurations
 
 app = {
-    'root': 'cms_rest.controllers.root.RootController',
-    'modules': ['cms_rest'],
+    'root': 'orm.services.customer_manager.cms_rest.controllers.root.RootController',
+    'modules': ['orm.services.customer_manager.cms_rest'],
     'static_root': '%(confdir)s/public',
     'template_path': '%(confdir)s/cms_rest/templates',
     'debug': True,
@@ -80,45 +80,45 @@ quotas_default_values = {
 }
 
 database = {
-    'connection_string': 'mysql://root:stack@localhost:3306/orm_cms_db'
+    'connection_string': config.db_url + 'orm_cms_db'
 }
 
 api = {
     'uuid_server': {
-        'base': 'http://127.0.0.1:8090/',
+        'base': config.uuid['base_url'],
         'uuids': 'v1/uuids'
     },
     'rds_server': {
-        'base': 'http://127.0.0.1:8777/',
+        'base': config.rds['base_url'],
         'resources': 'v1/rds/resources',
         'status': 'v1/rds/status/resource/'
     },
     'rms_server': {
-        'base': 'http://127.0.0.1:8080/',
+        'base': config.rms['base_url'],
         'regions': 'v2/orm/regions',
         'groups': 'v2/orm/groups',
         'cache_seconds': 30
     },
     'audit_server': {
-        'base': 'http://127.0.0.1:8776/',
+        'base': config.audit_server['base_url'],
         'trans': 'v1/audit/transaction'
     }
 }
 
-verify = False
+verify = config.ssl_verify
 
 authentication = {
-    "enabled": True,
-    "mech_id": "admin",
-    "mech_pass": "stack",
-    "rms_url": "http://127.0.0.1:8080",
-    "tenant_name": "admin",
-    "token_role": "admin",
+    "enabled": config.token_auth_enabled,
+    "mech_id": config.token_auth_user,
+    "mech_pass": config.token_auth_pass,
+    "rms_url": config.rms['base_url'],
+    "tenant_name": config.token_auth_tenant,
+    "token_role": config.token_auth_user_role,
     # The Keystone collection under which the role was granted.
     # The key can be either "tenant" (for Keystone v2.0) or "domain"
     # (for Keystone v3) and the value is the tenant/domain name.
     "role_location": {"tenant": "admin"},
     # The Keystone version currently in use. Can be either "2.0" or "3".
     "keystone_version": "2.0",
-    "policy_file": "/opt/stack/ranger/orm/services/customer_manager/cms_rest/etc/policy.json"
+    "policy_file": config.cms['policy_file']
 }

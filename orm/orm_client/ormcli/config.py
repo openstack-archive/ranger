@@ -5,4 +5,4 @@ username = ''
 password = False
 auth_region = ''
 orm_base_url = 'http://127.0.0.1'
-verify = False
+verify=False
