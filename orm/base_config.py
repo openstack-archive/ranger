@@ -1,7 +1,7 @@
 import os
-orm_host = '0.0.0.0'
+orm_host = '127.0.0.1'
 log_location = '{}'
-ranger_base = os.path.dirname(os.path.abspath('orm'))
+ranger_base = '/opt/stack/ranger'
 log_location = ranger_base + '/logs/{}'
 uuid = {
     'port': '7001',
@@ -16,7 +16,7 @@ fms = {
     'log': log_location.format('fms.log')
 }
 audit_server = {
-    'port': '8776',
+    'port': '7002',
     'log': log_location.format('audit_server.log')
 }
 ims = {
@@ -24,10 +24,10 @@ ims = {
     'log': log_location.format('ims.log')
 }
 rms = {
-    'port': '8080',
+    'port': '7003',
     'log': log_location.format('rms.log')
 }
 rds = {
-    'port': '8778',
+    'port': '8777'
     'log': log_location.format('rds.log')
 }
