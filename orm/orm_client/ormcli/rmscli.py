@@ -305,7 +305,7 @@ def get_path(args):
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
-    environment_variable = 'AIC_ORM_{}'.format(
+    environment_variable = 'RANGER_{}'.format(
         argument.replace('-', '_').upper())
 
     return os.environ.get(environment_variable)
@@ -347,9 +347,9 @@ def run(args):
         'content-type': 'application/json',
         'X-Auth-Token': auth_token,
         'X-Auth-Region': auth_region,
-        'X-AIC-ORM-Requester': requester,
-        'X-AIC-ORM-Client': client,
-        'X-AIC-ORM-Tracking-Id': tracking_id
+        'X-RANGER-Requester': requester,
+        'X-RANGER-Client': client,
+        'X-RANGER-Tracking-Id': tracking_id
     }
     if args.verbose:
         print("Sending API:\ntimeout: %d\ndata: %s\n"
