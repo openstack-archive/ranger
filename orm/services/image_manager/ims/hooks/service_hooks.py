@@ -1,5 +1,5 @@
-from orm_common.hooks.transaction_id_hook import TransactionIdHook
-from orm_common.utils import utils
+from orm.common.orm_common.hooks.transaction_id_hook import TransactionIdHook
+from orm.common.orm_common.utils import utils
 
 
 class TransIdHook(TransactionIdHook):

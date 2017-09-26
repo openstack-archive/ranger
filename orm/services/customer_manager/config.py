@@ -1,7 +1,7 @@
 import orm.base_config as config
-from orm_common.hooks.api_error_hook import APIErrorHook
-from orm_common.hooks.security_headers_hook import SecurityHeadersHook
-from orm_common.hooks.transaction_id_hook import TransactionIdHook
+from orm.common.orm_common.hooks.api_error_hook import APIErrorHook
+from orm.common.orm_common.hooks.security_headers_hook import SecurityHeadersHook
+from orm.common.orm_common.hooks.transaction_id_hook import TransactionIdHook
 global TransactionIdHook
 global APIErrorHook
 global SecurityHeadersHook

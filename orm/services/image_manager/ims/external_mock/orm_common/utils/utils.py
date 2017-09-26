@@ -4,7 +4,7 @@ import time
 import requests
 
 from audit_client.api import audit
-from orm_common.logger import get_logger
+from orm.common.orm_common.logger import get_logger
 from pecan import conf
 
 logger = get_logger(__name__)

@@ -7,7 +7,7 @@ db_user = 'root'
 db_pass = 'stack'
 db_host = '127.0.0.1'
 ssl_verify = False
-token_auth_enabled = True
+token_auth_enabled = False
 token_auth_user = 'admin'
 token_auth_pass = 'nova'
 token_auth_tenant = 'admin'
@@ -64,4 +64,7 @@ rds = {
     'repo_remote_location': 'git@127.0.0.1:/home/repo/ORM.git',
     'base_url': '{}://{}:{}/'.format(orm_protocal, orm_host, rds_port),
     'log': log_location.format('rds.log')
+}
+cli = {
+    'base_region': 'local'
 }

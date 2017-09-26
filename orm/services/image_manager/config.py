@@ -1,7 +1,7 @@
-from ims.hooks.service_hooks import TransIdHook
 import orm.base_config as config
-from orm_common.hooks.api_error_hook import APIErrorHook
-from orm_common.hooks.security_headers_hook import SecurityHeadersHook
+from orm.common.orm_common.hooks.api_error_hook import APIErrorHook
+from orm.common.orm_common.hooks.security_headers_hook import SecurityHeadersHook
+from orm.services.image_manager.ims.hooks.service_hooks import TransIdHook
 global TransIdHook
 global APIErrorHook
 global SecurityHeadersHook
