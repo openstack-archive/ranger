@@ -1,6 +1,6 @@
 """audit controller module."""
 
-from audit_server.controllers.v1 import configuration, logs, transaction
+from orm.services.audit_trail_manager.audit_server.controllers.v1 import configuration, logs, transaction
 
 
 class AuditController(object):

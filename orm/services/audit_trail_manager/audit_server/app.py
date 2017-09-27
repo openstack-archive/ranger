@@ -2,8 +2,9 @@
 import logging
 import os
 
-from audit_server import model
-from audit_server.storage import factory
+from orm.services.audit_trail_manager.audit_server import model
+from orm.services.audit_trail_manager.audit_server.storage import factory
+
 from pecan.commands import CommandRunner
 from pecan import make_app
 

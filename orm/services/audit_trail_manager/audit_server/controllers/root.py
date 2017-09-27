@@ -1,7 +1,7 @@
 """root controller module."""
 
 
-from audit_server.controllers.v1 import root as v1
+from orm.services.audit_trail_manager.audit_server.controllers.v1 import root as v1
 
 
 class RootController(object):
