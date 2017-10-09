@@ -59,7 +59,7 @@ ordupdate = {
     'cert_path': '../resources/ord.crt'
 }
 
-UUID_URL = config.uuid['base_url'] + 'uuids'
+UUID_URL = config.uuid['base_url'] + 'v1/uuids'
 
 # yaml configurations
 yaml_configs = {
