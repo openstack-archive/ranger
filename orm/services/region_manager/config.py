@@ -17,8 +17,6 @@ server = {
 app = {
     'root': 'orm.services.region_manager.rms.controllers.root.RootController',
     'modules': ['orm.services.region_manager.rms'],
-    'static_root': '%(confdir)s/public',
-    'template_path': '%(confdir)s/rms/templates',
     'debug': True,
     'hooks': lambda: [TransactionIdHook(), APIErrorHook(), SecurityHeadersHook()]
 }

@@ -1,7 +1,6 @@
 import logging
 import os
 
-from orm.services.id_generator.uuidgen import model
 from pecan.commands import CommandRunner
 from pecan import make_app
 
@@ -9,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 def setup_app(config):
-    model.init_model()
     app_conf = dict(config.app)
 
     app = make_app(app_conf.pop('root'),

@@ -19,12 +19,7 @@ cache_seconds = 0
 app = {
     'root': 'orm.services.flavor_manager.fms_rest.controllers.root.RootController',
     'modules': ['orm.services.flavor_manager.fms_rest'],
-    'static_root': '%(confdir)s/public',
-    'template_path': '%(confdir)s/fms_rest/templates',
     'debug': True,
-    'errors': {
-        '__force_dict__': True
-    },
     'hooks': lambda: [TransIdHook(), APIErrorHook(), SecurityHeadersHook()]
 }
 

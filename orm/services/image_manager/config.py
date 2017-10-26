@@ -17,12 +17,7 @@ server = {
 app = {
     'root': 'orm.services.image_manager.ims.controllers.root.RootController',
     'modules': ['orm.services.image_manager.ims'],
-    'static_root': '%(confdir)s/public',
-    'template_path': '%(confdir)s/ims/templates',
     'debug': True,
-    'errors': {
-        '__force_dict__': True
-    },
     'hooks': lambda: [TransIdHook(), APIErrorHook(), SecurityHeadersHook()]
 }
 

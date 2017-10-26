@@ -19,8 +19,6 @@ server = {
 app = {
     'root': 'orm.services.customer_manager.cms_rest.controllers.root.RootController',
     'modules': ['orm.services.customer_manager.cms_rest'],
-    'static_root': '%(confdir)s/public',
-    'template_path': '%(confdir)s/cms_rest/templates',
     'debug': True,
     'hooks': lambda: [TransactionIdHook(), APIErrorHook(), SecurityHeadersHook()]
 }

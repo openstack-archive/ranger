@@ -17,13 +17,7 @@ database = {
 app = {
     'root': 'orm.services.audit_trail_manager.audit_server.controllers.root.RootController',
     'modules': ['orm.services.audit_trail_manager.audit_server'],
-    'static_root': '%(confdir)s/public',
-    'template_path': '%(confdir)s/audit_server/templates',
     'debug': True,
-    'errors': {
-        404: '/error/404',
-        '__force_dict__': True
-    }
 }
 
 logging = {

@@ -8,13 +8,7 @@ server = {
 app = {
     'root': 'orm.services.id_generator.uuidgen.controllers.root.RootController',
     'modules': ['orm.services.id_generator.uuidgen'],
-    'static_root': '%(confdir)s/public',
-    'template_path': '%(confdir)s/uuidgen/templates',
     'debug': True,
-    'errors': {
-        404: '/error/404',
-        '__force_dict__': True
-    }
 }
 
 logging = {
