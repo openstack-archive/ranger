@@ -2,7 +2,7 @@
 
 import logging
 
-from orm.services.id_generator.uuidgen.external_mock.orm_common.utils import utils
+from orm.common.orm_common.utils import utils
 from pecan import conf, rest
 from wsmeext.pecan import wsexpose
 
