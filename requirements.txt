@@ -12,5 +12,6 @@ MySQL-python==1.2.5
 requests==2.6.0
 oslo.db==1.7.2
 oslo.serialization
-oslo.config
+oslo.config>=4.6.0 # Apache-2.0
 oslo.policy
+oslo.log>=3.30.0 # Apache-2.0
