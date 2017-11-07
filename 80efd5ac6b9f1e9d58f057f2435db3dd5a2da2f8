@@ -1,0 +1,10 @@
+Code-Review+1: Nicholas Jones <nj762h@att.com>
+Code-Review+1: Michael Glaser <michael.glaser@att.com>
+Code-Review+2: Hari <hosingh000@gmail.com>
+Workflow+1: Hari <hosingh000@gmail.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 07 Nov 2017 15:19:10 +0000
+Reviewed-on: https://review.openstack.org/517713
+Project: openstack/ranger
+Branch: refs/heads/master
