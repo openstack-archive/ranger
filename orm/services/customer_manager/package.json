@@ -1,5 +1,5 @@
 {
-  "name": "aic-orm-discovery",
+  "name": "orm-rms",
   "version": "1.0.0",
   "description": "This document includes the following topics 1. Dev environment installation process 1. Code style guide 1. Python tips and tricks",
   "main": "gulpfile.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://dv696w@gerrit.mtn5.cci.att.com:29418/aic-orm-discovery"
+    "url": ""
   },
   "author": "",
   "license": "ISC",

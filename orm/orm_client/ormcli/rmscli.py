@@ -108,7 +108,7 @@ def add_to_parser(service_sub):
     parser_list_region = subparsers.add_parser('list_regions',
                                                help='\
 [--use_version <api version>] [--type <type>] [--status <status>]\
-[--metadata <metadata>] [--aicversion <aicversion>][--clli <clli>]\
+[--metadata <metadata>] [--rangerversion <rangerversion>][--clli <clli>]\
 [--regionname <regionname>] [--osversion <osversion>] [--valet <valet>]\
 [--state <state>] [--country <country>] [--city <city>] [--street <street>]\
 [--zip <zip>] [--vlcp_name <vlcp_name>]')
@@ -118,8 +118,8 @@ def add_to_parser(service_sub):
     parser_list_region.add_argument('--status', type=str, help='<status>')
     parser_list_region.add_argument('--metadata', action='append', nargs="+",
                                     type=str, help='<metadata>')
-    parser_list_region.add_argument('--aicversion', type=str,
-                                    help='<aicversion>')
+    parser_list_region.add_argument('--rangerversion', type=str,
+                                    help='<rangerversion>')
     parser_list_region.add_argument('--clli', type=str, help='<clli>')
     parser_list_region.add_argument('--regionname', type=str,
                                     help='<regionname>')
@@ -251,8 +251,8 @@ def cmd_details(args):
         if args.metadata:
             for meta in args.metadata:
                 param += '%smetadata=%s' % (preparm(param), meta[0])
-        if args.aicversion:
-            param += '%saicversion=%s' % (preparm(param), args.aicversion)
+        if args.rangerversion:
+            param += '%srangerversion=%s' % (preparm(param), args.rangerversion)
         if args.clli:
             param += '%sclli=%s' % (preparm(param), args.clli)
         if args.regionname:

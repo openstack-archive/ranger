@@ -352,7 +352,7 @@ CUSTOMER_JSON = {
             ]
         },
         {
-            "name": "AIC_MEDIUM",
+            "name": "Ranger_MEDIUM",
             "type": "group",
             "quotas": [
                 {

@@ -542,7 +542,7 @@ definitions:
         description: deprecated, this field is ignored
       ranger_agent_version:
         type: string
-        example: "AIC3.5"
+        example: "Ranger3.5"
       open_stack_version:
         type: string
       clli:

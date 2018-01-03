@@ -109,7 +109,7 @@ def build_zone_response(zone):
         design_type=zone.design_type,
         location_type=zone.location_type,
         vLCP_name=zone.vlcp_name,
-        AIC_version=zone.ranger_agent_version,
+        Ranger_version=zone.ranger_agent_version,
         OS_version=zone.open_stack_version,
         keystone_EP=end_points_dict["identity"],
         horizon_EP=end_points_dict["dashboard"],

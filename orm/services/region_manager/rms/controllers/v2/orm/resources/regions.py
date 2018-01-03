@@ -248,7 +248,7 @@ class RegionsController(rest.RestController):
             result = RegionService.create_full_region(full_region_input)
             logger.debug("API: region created : {}".format(result))
 
-            event_details = 'Region {} {} created: AICversion {}, OSversion {}, CLLI {}'.format(
+            event_details = 'Region {} {} created: Rangerversion {}, OSversion {}, CLLI {}'.format(
                 full_region_input.name, full_region_input.design_type,
                 full_region_input.ranger_agent_version,
                 full_region_input.open_stack_version, full_region_input.clli)
@@ -312,7 +312,7 @@ class RegionsController(rest.RestController):
             result = RegionService.update_region(region_id, region)
             logger.debug("API: region {} updated".format(region_id))
 
-            event_details = 'Region {} {} modified: AICversion {}, OSversion {}, CLLI {}'.format(
+            event_details = 'Region {} {} modified: Rangerversion {}, OSversion {}, CLLI {}'.format(
                 region.name, region.design_type, region.ranger_agent_version,
                 region.open_stack_version, region.clli)
             utils.audit_trail('update region', request.transaction_id,

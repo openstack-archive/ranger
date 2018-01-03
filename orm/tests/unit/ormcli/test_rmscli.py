@@ -28,7 +28,7 @@ class RmsTests(TestCase):
         args.type = '1'
         args.status = '2'
         args.metadata = '3'
-        args.aicversion = '4'
+        args.rangerversion = '4'
         args.clli = '5'
         args.regionname = '6'
         args.osversion = '7'
@@ -40,12 +40,12 @@ class RmsTests(TestCase):
         args.zip = '13'
         args.vlcp_name = '14'
 
-        AAAAAAA = '/?type=%s&status=%s&metadata=%s&aicversion=%s&clli=%s'\
+        AAAAAAA = '/?type=%s&status=%s&metadata=%s&rangerversion=%s&clli=%s'\
             '&regionname=%s&osversion=%s&valet=%s&state=%s&country=%s'\
             '&city=%s&street=%s&zip=%s&vlcp_name=%s' % (args.type,
                                                         args.status,
                                                         args.metadata,
-                                                        args.aicversion,
+                                                        args.rangerversion,
                                                         args.clli,
                                                         args.regionname,
                                                         args.osversion,
@@ -112,7 +112,7 @@ class RmsTests(TestCase):
                 "name": "SNA 1",
                 "enabled": 1,
                 "state": "functional",
-                "aic_version": "aic3.0",
+                "ranger_version": "ranger3.0",
                 "endpoints": [
                     {
                         "type": "horizon",
@@ -135,7 +135,7 @@ class RmsTests(TestCase):
         cli.logic()
         sys.stdout.seek(0)
         output = sys.stdout.read()
-        self.assertIn('"aic_version": "aic3.0"', output)
+        self.assertIn('"ranger_version": "ranger3.0"', output)
 
         # def test_error_with_wrong_port(self):
         #     args = self.parser.parse_args('--port 1111'.split())
