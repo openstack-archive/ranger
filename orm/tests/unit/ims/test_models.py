@@ -30,6 +30,24 @@ class TestModels(FunctionalTest):
         self.assertRaises(models.ErrorStatus, image.handle_region_group,)
 
 
+class TestWsmeModels(FunctionalTest):
+    def test_create_image_visibility(self):
+        image_wrapper = models.ImageWrapper()
+        image_wrapper.image = models.Image()
+
+        image_wrapper.image.name = 'name'
+        image_wrapper.image.url = 'http://aic.att.com'
+        image_wrapper.image.visibility = 'private'
+        image_wrapper.image.disk_format = 'raw'
+        image_wrapper.image.container_format = 'bare'
+        image_wrapper.image.min_ram = 1024
+        image_wrapper.image.customers = ['a1', 'a2']
+
+        sql_image = image_wrapper.validate_model()
+
+        self.assertEqual(len(image_wrapper.image.customers), 2)
+
+
 def get_image_model():
     """this function create a customer model object for testing
     :return: new customer object

@@ -16,9 +16,9 @@ class Response:
 
 class TestUtil(FunctionalTest):
 
+    @log_capture('orm.services.flavor_manager.fms_rest.proxies.rds_proxy')
     @mock.patch.object(proxies.rds_proxy, 'request')
     @mock.patch('requests.post')
-    @log_capture('orm.services.flavor_manager.fms_rest.proxies.rds_proxy')
     def test_send_good(self, mock_post, mock_request, l):
         resp = Response(200, 'my content')
         mock_post.return_value = resp

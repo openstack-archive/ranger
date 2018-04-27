@@ -61,8 +61,19 @@ class UserRoleRecord:
             if user_id is None:
                 raise NotFound("user %s is not found" % user_query)
 
-        result = self.session.connection().execute("delete from user_role where customer_id = %d and region_id = %d and user_id = %d" % (customer_id, region_id, user_id))
-        print "num records deleted: " + str(result.rowcount)
+        if region_id == -1:
+            delete_query = "DELETE ur FROM user_role ur,user_role u " \
+                           "where ur.user_id=u.user_id and ur.role_id=u.role_id " \
+                           "and ur.customer_id = u.customer_id and u.region_id =-1 " \
+                           "and ur.customer_id = %d and ur.user_id=%d" % (customer_id, user_id)
+        else:
+            delete_query = "DELETE ur FROM user_role as ur LEFT JOIN user_role AS u " \
+                           "ON ur.customer_id = u.customer_id and u.user_id=ur.user_id " \
+                           "and u.region_id=-1 where ur.customer_id = %d and ur.region_id= %d " \
+                           "and ur.user_id =%d and ur.role_id !=IFNULL(u.role_id,'')" \
+                           % (customer_id, region_id, user_id)
+
+        result = self.session.connection().execute(delete_query)
         return result
 
     def delete_all_users_from_region(self, customer_id, region_id):
@@ -75,9 +86,19 @@ class UserRoleRecord:
         if isinstance(region_id, basestring):
             region_record = RegionRecord(self.session)
             region_id = region_record.get_region_id_from_name(region_id)
+        if region_id == -1:
+            delete_query = "DELETE ur FROM user_role ur,user_role u " \
+                           "where ur.user_id=u.user_id and ur.role_id=u.role_id " \
+                           "and ur.customer_id = u.customer_id and u.region_id =-1 " \
+                           "and ur.customer_id = %d" % (customer_id)
+        else:
+            delete_query = "DELETE ur FROM user_role as ur LEFT JOIN user_role AS u " \
+                           "ON ur.customer_id = u.customer_id and u.user_id=ur.user_id " \
+                           "and u.region_id=-1 where ur.customer_id = %d and ur.region_id= %d " \
+                           "and ur.role_id !=IFNULL(u.role_id,'')" \
+                           % (customer_id, region_id)
 
-        result = self.session.connection().execute(
-            "delete from user_role where customer_id = {} and region_id = {}".format(customer_id, region_id))
+        result = self.session.connection().execute(delete_query)
 
         print "num records deleted: " + str(result.rowcount)
         return result

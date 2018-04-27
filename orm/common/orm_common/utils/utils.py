@@ -34,44 +34,28 @@ def _check_conf_initialization():
             'pass pecan coniguration')
 
 
-def make_uuid():
-    """ function to request new uuid from uuid_generator rest service
+def create_or_validate_uuid(uuid, uuid_type):
+    """ function to:
+            1) request new uuid from uuid_generator rest service
+            2) validate a uuid if one is being set
         returns uuid string
     """
     _check_conf_initialization()
     url = conf.api.uuid_server.base + conf.api.uuid_server.uuids
 
-    try:
+    if not uuid:
         logger.debug('Requesting new UUID from URL: {}'.format(url))
-        resp = requests.post(url, verify=conf.verify)
-    except requests.exceptions.ConnectionError as exp:
-        nagios = 'CON{}UUIDGEN001'.format(conf.server.name.upper())
-        logger.critical('CRITICAL|{}|Failed in make_uuid: connection error: {}'.format(nagios, str(exp)))
-        exp.message = 'connection error: Failed to get uuid: unable to connect to server'
-        raise
-    except Exception as e:
-        logger.info('Failed in make_uuid:' + str(e))
-        return None
-
-    resp = resp.json()
-    return resp['uuid']
-
-
-def create_existing_uuid(uuid):
-    """ function to request new uuid from uuid_generator rest service
-        returns uuid string
-    :param uuid:
-    :return:
-    """
-    _check_conf_initialization()
-    url = conf.api.uuid_server.base + conf.api.uuid_server.uuids
+    else:
+        logger.debug('Creating UUID: {}, using URL: {}'.format(uuid, url))
 
     try:
-        logger.debug('Creating UUID: {}, using URL: {}'.format(uuid, url))
-        resp = requests.post(url, data={'uuid': uuid}, verify=conf.verify)
+        resp = requests.post(url, data={'uuid': uuid, 'uuid_type': uuid_type},
+                             verify=conf.verify)
     except requests.exceptions.ConnectionError as exp:
         nagios = 'CON{}UUIDGEN001'.format(conf.server.name.upper())
-        logger.critical('CRITICAL|{}|Failed in create_existing_uuid: connection error: {}'.format(nagios, str(exp)))
+        logger.critical(
+            'CRITICAL|{}|Failed in make_uuid: connection error: {}'.format(
+                nagios, str(exp)))
         exp.message = 'connection error: Failed to get uuid: unable to connect to server'
         raise
     except Exception as e:
@@ -79,7 +63,9 @@ def create_existing_uuid(uuid):
         return None
 
     if resp.status_code == 400:
-        raise TypeError('duplicate key for uuid')
+        logger.debug('Duplicate key for uuid: {}'.format(uuid))
+        raise TypeError('Duplicate key for uuid: ' + str(uuid))
+
     resp = resp.json()
     return resp['uuid']
 
@@ -109,6 +95,7 @@ def make_transid():
         return resp['uuid']
     else:
         return None
+
 
 audit_setup = False
 
@@ -151,17 +138,17 @@ def audit_trail(cmd, transaction_id, headers, resource_id, message=None,
     try:
         timestamp = long(round(time.time() * 1000))
         application_id = headers[
-            'X-RANGER-Client'] if 'X-RANGER-Client' in headers else \
+            'X-AIC-ORM-Client'] if 'X-AIC-ORM-Client' in headers else \
             'NA'
         tracking_id = headers[
-            'X-RANGER-Tracking-Id'] if 'X-RANGER-Tracking-Id' in headers \
+            'X-AIC-ORM-Tracking-Id'] if 'X-AIC-ORM-Tracking-Id' in headers \
             else transaction_id
         # transaction_id is function argument
         transaction_type = cmd
         # resource_id is function argument
         service_name = conf.server.name.upper()
         user_id = headers[
-            'X-RANGER-Requester'] if 'X-RANGER-Requester' in headers else \
+            'X-AIC-ORM-Requester'] if 'X-AIC-ORM-Requester' in headers else \
             ''
         external_id = 'NA'
         logger.debug('Sending to audit: timestamp: {}, application_id: {}, '

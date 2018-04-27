@@ -68,7 +68,7 @@ class CustomerRegionRecord:
                 'region with the region name {0} not found'.format(
                     region_name))
         result = self.session.connection().execute(
-            "delete from customer_region where customer_id = %d and region_id = %d" % (customer_id, region_id))
+            "delete from customer_region where customer_id = {} and region_id = {}".format(customer_id, region_id))
         self.session.flush()
 
         if result.rowcount == 0:
