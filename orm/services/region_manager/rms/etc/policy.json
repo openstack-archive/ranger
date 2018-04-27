@@ -1,24 +1,35 @@
 {
     "default": "!",
-    "orm_admin": "role:admin and tenant:admin",
+
+    "admin": "role:admin and tenant:admin or role:admin and tenant:services",
+    "admin_support": "role:admin_support and tenant:admin or role:admin_support and tenant:services",
+    "admin_viewer": "role:admin_viewer and tenant:admin or role:admin_viewer and tenant:services",
+
+    "admin_or_support": "rule:admin or rule:admin_support",
+    "admin_or_support_or_viewer": "rule:admin or rule:admin_support or rule:admin_viewer",
 
     "lcp:get_one": "",
     "lcp:get_all": "",
+
     "region:get_one": "",
     "region:get_all": "",
-    "region:create": "rule:orm_admin",
-    "region:update": "rule:orm_admin",
-    "region:delete": "rule:orm_admin",
+    "region:create": "rule:admin_or_support",
+    "region:update": "rule:admin",
+    "region:delete": "rule:admin",
+
     "group:get_one": "",
     "group:get_all": "",
-    "group:create": "rule:orm_admin",
-    "group:update": "rule:orm_admin",
-    "group:delete": "rule:orm_admin",
-    "configuration:get": "rule:orm_admin",
-    "log:update": "rule:orm_admin",
-    "metadata:get": "rule:orm_admin",
-    "metadata:create": "rule:orm_admin",
-    "metadata:update": "rule:orm_admin",
-    "metadata:delete": "rule:orm_admin",
-    "status:put": "rule:orm_admin"
+    "group:create": "rule:admin_or_support",
+    "group:update": "rule:admin",
+    "group:delete": "rule:admin",
+
+    "configuration:get": "rule:admin_or_support_or_viewer",
+    "log:update": "rule:admin",
+
+    "metadata:get": "rule:admin_or_support_or_viewer",
+    "metadata:create": "rule:admin_or_support",
+    "metadata:update": "rule:admin",
+    "metadata:delete": "rule:admin",
+
+    "status:put": "rule:admin"
 }

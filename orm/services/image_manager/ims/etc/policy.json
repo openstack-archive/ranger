@@ -1,25 +1,27 @@
 {
-  "default": "!",
-  "admin": "role:admin",
-  "admin_support": "role:admin_support",
-  "admin_viewer": "role:admin_viewer",
-  "orm": "user:m01687",
+    "default": "!",
 
-  "admin_or_support": "role:admin or role:admin_support",
-  "admin_or_support_or_viewer": "rule:admin or rule:admin_support or rule:admin_viewer",
+    "admin": "role:admin and tenant:admin or role:admin and tenant:services",
+    "admin_support": "role:admin_support and tenant:admin or role:admin_support and tenant:services",
+    "admin_viewer": "role:admin_viewer and tenant:admin or role:admin_viewer and tenant:services",
 
-  "image:create": "rule:admin_or_support",
-  "image:list": "rule:admin_or_support_or_viewer",
-  "image:get_one": "rule:admin_or_support_or_viewer",
-  "image:update": "rule:admin",
-  "image:delete": "rule:admin",
-  "region:delete": "rule:admin",
-  "region:create": "rule:admin_or_support",
-  "region:update": "rule:admin",
-  "image:enable": "rule:admin",
-  "tenant:create": "rule:admin_or_support",
-  "tenant:delete": "rule:admin",
-  "tenant:update": "rule:admin",
+    "admin_or_support": "rule:admin or rule:admin_support",
+    "admin_or_support_or_viewer": "rule:admin or rule:admin_support or rule:admin_viewer",
 
-  "metadata:create": "rule:orm"
+    "image:create": "rule:admin_or_support",
+    "image:list": "rule:admin_or_support_or_viewer",
+    "image:get_one": "rule:admin_or_support_or_viewer",
+    "image:update": "rule:admin",
+    "image:delete": "rule:admin",
+    "image:enable": "rule:admin",
+
+    "region:create": "rule:admin_or_support",
+    "region:update": "rule:admin",
+    "region:delete": "rule:admin",
+
+    "tenant:create": "rule:admin_or_support",
+    "tenant:update": "rule:admin",
+    "tenant:delete": "rule:admin",
+
+    "metadata:create": "rule:admin_or_support"
 }

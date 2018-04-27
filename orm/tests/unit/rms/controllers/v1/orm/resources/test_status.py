@@ -1,9 +1,9 @@
 import json
+from mock import patch
 
 from orm.services.region_manager.rms.controllers.v2.orm.resources import status
 from orm.tests.unit.rms import FunctionalTest
 
-from mock import patch
 from wsme.exc import ClientSideError
 
 

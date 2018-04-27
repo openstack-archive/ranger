@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 class DBManager(object):
 
     def __init__(self, connection_string=None):
-
         if not connection_string:
             connection_string = conf.database.connection_string
 

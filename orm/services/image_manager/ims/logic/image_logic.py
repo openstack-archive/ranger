@@ -78,8 +78,6 @@ def update_image(image_wrapper, image_uuid, transaction_id, http_action="put"):
         new_image = image_wrapper.to_db_model()
         new_image.id = image_uuid
 
-        datamanager.begin_transaction()
-
         image_rec = datamanager.get_record('image')
         sql_image = image_rec.get_image_by_id(image_uuid)
 
@@ -87,6 +85,10 @@ def update_image(image_wrapper, image_uuid, transaction_id, http_action="put"):
             raise NotFoundError(status_code=404,
                                 message="Image {0} does not exist for update".format(
                                     image_uuid))
+
+        image_wrapper.validate_update(sql_image, new_image)
+
+        datamanager.begin_transaction()
 
         new_image.owner = sql_image.owner
         existing_regions = sql_image.get_existing_region_names()
@@ -126,7 +128,7 @@ def delete_image_by_uuid(image_uuid, transaction_id):
 
         sql_image = image_rec.get_image_by_id(image_uuid)
         if sql_image is None:
-            return
+            raise NotFoundError(message="Image '{}' not found".format(image_uuid))
 
         image_existing_region_names = sql_image.get_existing_region_names()
         if len(image_existing_region_names) > 0:
@@ -254,27 +256,39 @@ def replace_regions(image_uuid, regions, transaction_id):
 
 
 @di.dependsOn('data_manager')
-def delete_region(image_uuid, region_name, transaction_id):
+def delete_region(image_uuid, region_name, transaction_id, on_success_by_rds,
+                  force_delete):
     DataManager = di.resolver.unpack(delete_region)
     datamanager = DataManager()
 
     try:
         image_rec = datamanager.get_record('image')
         sql_image = image_rec.get_image_by_id(image_uuid)
+        if on_success_by_rds and not sql_image:
+            return
         if not sql_image:
             raise ErrorStatus(404, 'image with id: {0} not found'.format(
-                image_uuid))
+                              image_uuid))
+        # do not allow delete_region for protected images
+        if sql_image.protected:
+            protect_msg = "Protected image {} cannot be deleted. Please " \
+                          "update image with protected=false and try again"
+            raise ErrorStatus(400, protect_msg.format(image_uuid))
 
         existing_region_names = sql_image.get_existing_region_names()
-
         sql_image.remove_region(region_name)
 
-        datamanager.flush()  # i want to get any exception created by
+        datamanager.flush()  # Get any exception created by
         # previous actions against the database
-        send_to_rds_if_needed(sql_image, existing_region_names, "put",
-                              transaction_id)
-
-        datamanager.commit()
+        if on_success_by_rds:
+            datamanager.commit()
+        else:
+            send_to_rds_if_needed(sql_image, existing_region_names, "put",
+                                  transaction_id)
+            if force_delete:
+                datamanager.commit()
+            else:
+                datamanager.rollback()
 
     except ErrorStatus as exp:
         LOG.log_exception("ImageLogic - Failed to update image", exp)
@@ -285,6 +299,9 @@ def delete_region(image_uuid, region_name, transaction_id):
         LOG.log_exception("ImageLogic - Failed to delete region", exp)
         datamanager.rollback()
         raise
+
+    finally:
+        datamanager.close()
 
 
 @di.dependsOn('data_manager')
@@ -399,7 +416,12 @@ def delete_customer(image_uuid, customer_id, transaction_id):
 
 @di.dependsOn('data_manager')
 @di.dependsOn('rds_proxy')
-def get_image_by_uuid(image_uuid):
+def get_image_by_uuid(image_uuid, query_by_id_or_name=False):
+    """This function includes an optional boolean parameter "query_by_id_or_name".
+      If query_by_id_or_name evaluates to true, IMS logic will fetch the image
+      record whose "image_uuid" parameter value matches either the image id or name value.
+      Otherwise it defaults to query by image ID value only.
+    """
     DataManager, rds_proxy = di.resolver.unpack(get_image_by_uuid)
     datamanager = DataManager()
 
@@ -407,10 +429,14 @@ def get_image_by_uuid(image_uuid):
     try:
 
         datamanager.begin_transaction()
-
         image_rec = datamanager.get_record('image')
-        sql_image = image_rec.get_image_by_id(image_uuid)
 
+        # Only the get_image API will pass the optional parameter and set it to true
+        if query_by_id_or_name:
+            sql_image = image_rec.get_image(image_uuid)
+        else:
+            # all other image APIs will NOT pass the optional parameter
+            sql_image = image_rec.get_image_by_id(image_uuid)
         if not sql_image:
             raise NotFoundError(status_code=404,
                                 message="Image {0} not found ".format(
@@ -428,15 +454,28 @@ def get_image_by_uuid(image_uuid):
         # Get the status from RDS
         image_status = rds_proxy.get_status(image_wrapper.image.id, False)
 
-        if image_status.status_code != 200:
-            return image_wrapper
-        image_status = image_status.json()
-        image_wrapper.image.status = image_status['status']
-        # update status for all regions
-        for result_regions in image_wrapper.image.regions:
-            for status_region in image_status['regions']:
-                if result_regions.name == status_region['region']:
-                    result_regions.status = status_region['status']
+        if image_status.status_code == 404:
+            # image not on rds resource table - applicable to images created with no region assigned
+            image_wrapper.image.status = 'no regions'
+
+        elif image_status.status_code == 200:
+            image_status = image_status.json()
+            if image_wrapper.image.regions:
+                image_wrapper.image.status = image_status['status']
+            else:
+                image_wrapper.image.status = 'no regions'
+
+            # update status for all regions
+            for result_regions in image_wrapper.image.regions:
+                for status_region in image_status['regions']:
+                    if result_regions.name == status_region['region']:
+                        result_regions.status = status_region['status']
+                        if status_region['error_msg']:
+                            result_regions.set_error_message(status_region['error_msg'])
+
+        # status codes not falling under 404 (not found) or 200 (success)
+        else:
+            raise ErrorStatus(500, "unsuccessful GET - failed to get status for this resource")
 
     except NotFoundError as exp:
         datamanager.rollback()
@@ -452,8 +491,9 @@ def get_image_by_uuid(image_uuid):
 
 
 @di.dependsOn('data_manager')
+@di.dependsOn('rds_proxy')
 def get_image_list_by_params(visibility, region, Customer):
-    DataManager = di.resolver.unpack(get_image_list_by_params)
+    DataManager, rds_proxy = di.resolver.unpack(get_image_list_by_params)
 
     datamanager = DataManager()
     try:
@@ -463,10 +503,17 @@ def get_image_list_by_params(visibility, region, Customer):
                                                          Customer=Customer)
 
         response = ImageSummaryResponse()
-        for sql_image in sql_images:
-            image = ImageSummary.from_db_model(sql_image)
-            response.images.append(image)
+        if sql_images:
+            uuids = ','.join(str("\'" + sql_image.id + "\'")
+                             for sql_image in sql_images if sql_image and sql_image.id)
+            resource_status_dict = image_record.get_images_status_by_uuids(uuids)
 
+            for sql_image in sql_images:
+                image = ImageSummary.from_db_model(sql_image)
+                if sql_image.id:
+                    status = resource_status_dict.get(sql_image.id)
+                    image.status = not status and 'no regions' or status
+                response.images.append(image)
         return response
 
     except ErrorStatus as exp:
@@ -518,7 +565,7 @@ def enable_image(image_uuid, int_enabled, transaction_id):
 
     try:
         image_rec = datamanager.get_record('image')
-        sql_image = image_rec.get_image(image_uuid)
+        sql_image = image_rec.get_image_by_id(image_uuid)
         if not sql_image:
             raise ErrorStatus(404, 'Image with id: {0} not found'.format(
                 image_uuid))

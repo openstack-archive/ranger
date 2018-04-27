@@ -54,9 +54,25 @@ logging = {
 database = {
     'host': 'localhost',
     'username': 'root',
-    'password': 'root',
+    'password': 'xxxxxxxxxxx',
     'db_name': 'orm_fms_db',
 
+}
+
+# valid_flavor_options
+flavor_options = {
+    'valid_cpin_opt_values': [
+        'c2', 'c4'
+    ],
+    'valid_stor_opt_values': [
+        's1', 's2'
+    ],
+    'valid_vnf_opt_values': [
+        'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'
+    ],
+    'valid_numa_values': ['n0'],
+    'valid_nd_vnf_values': ['v8'],
+    'valid_ss_vnf_values': ['v3']
 }
 
 # this table is for calculating default extra specs needed
@@ -67,6 +83,7 @@ extra_spec_needed_table = {
     },
     "nd": {
         "aggregate_instance_extra_specs____nd": "true",
+        "aggregate_instance_extra_specs____v8": "true",
         "hw____mem_page_size": "large"
     },
     "nv": {
@@ -75,11 +92,12 @@ extra_spec_needed_table = {
     },
     "gv": {
         "aggregate_instance_extra_specs____gv": "true",
-        "aggregate_instance_extra_specs____c2": "true",
-        "hw____numa_nodes": "2"
+        "aggregate_instance_extra_specs____c2": "true"
     },
     "ss": {
-        "aggregate_instance_extra_specs____ss": "true"
+        "aggregate_instance_extra_specs____ss": "true",
+        "aggregate_instance_extra_specs____s1": "true",
+        "aggregate_instance_extra_specs____v3": "true"
     }
 }
 
@@ -89,11 +107,13 @@ default_extra_spec_calculated_table = {
     "aggregate_instance_extra_specs____nd": "",
     "aggregate_instance_extra_specs____nv": "",
     "aggregate_instance_extra_specs____gv": "",
-    "aggregate_instance_extra_specs____c2": "",
     "aggregate_instance_extra_specs____ss": "",
     "aggregate_instance_extra_specs____c2": "",
     "aggregate_instance_extra_specs____c4": "",
     "aggregate_instance_extra_specs____v": "",
+    "aggregate_instance_extra_specs____s1": "",
+    "aggregate_instance_extra_specs____v3": "",
+    "aggregate_instance_extra_specs____v8": "",
     "hw____mem_page_size": "",
     "hw____cpu_policy": "",
     "hw____numa_nodes": ""
@@ -128,9 +148,23 @@ verify = False
 authentication = {
     "enabled": False,
     "mech_id": "admin",
-    "mech_pass": "stack",
+    "mech_pass": "xxxxxxxxxxx",
     "rms_url": "http://127.0.0.1:8080",
     "tenant_name": "admin",
     "keystone_version": "2.0",
     "policy_file": "orm/services/flavor_manager/fms_rest/etc/policy.json"
+}
+
+flavor_limits = {
+    # All flavor limits will be converted to integers, and must not
+    # have any non-numeric values.
+    # Root disk, block storage and object storage don't have limits
+    # in ORM, but may be limited via SSP
+    "vcpu_limit": "64",
+    # vram_limit is in MB and must be a multiple of 1024
+    "vram_limit": "393216",
+    # swap_file_limit is in MB and must be a multiple of 1024
+    "swap_file_limit": "393216",
+    # ephemeral_limit is in GB
+    "ephemeral_limit": "10000",
 }

@@ -161,11 +161,19 @@ class UserController(rest.RestController):
                                       status_code=404)
 
         except Exception as exception:
-            result = UserResultWrapper(transaction_id="Users Not Added", users=[])
-            LOG.log_exception("UserController - Failed to Add Users (post)", exception)
-            raise err_utils.get_error(request.transaction_id,
-                                      status_code=500,
-                                      error_details=str(exception))
+            if exception.inner_exception.orig[0] == 1452:
+                result = UserResultWrapper(transaction_id="Users Not Added", users=[])
+                LOG.log_exception("UserController - Failed to Add Users (post)", exception)
+                LOG.log_exception("Region specified must be added to customer first.", exception)
+                raise err_utils.get_error(request.transaction_id,
+                                          status_code=500,
+                                          message="Region specified must be added to customer first.")
+            else:
+                result = UserResultWrapper(transaction_id="Users Not Added", users=[])
+                LOG.log_exception("UserController - Failed to Add Users (post)", exception)
+                raise err_utils.get_error(request.transaction_id,
+                                          status_code=500,
+                                          error_details=str(exception))
 
         return result
 
@@ -225,6 +233,7 @@ class UserController(rest.RestController):
         except ErrorStatus as exception:
             LOG.log_exception("DefaultUserController - Failed to delete users", exception)
             raise err_utils.get_error(request.transaction_id,
+                                      message=exception.message,
                                       status_code=exception.status_code)
 
         except LookupError as exception:
