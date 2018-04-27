@@ -1,5 +1,6 @@
 from orm.services.flavor_manager.fms_rest.data.sql_alchemy import db_models
 from orm.services.flavor_manager.fms_rest.data.wsme import models
+
 from orm.tests.unit.fms import FunctionalTest
 
 

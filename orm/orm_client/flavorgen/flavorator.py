@@ -29,7 +29,7 @@ def sh(harg, file_name):
     print '>> Starting: ' + cmd
     start = time.time()
     output = ''
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+    p = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT)
     for line in iter(p.stdout.readline, b''):
         out = line.rstrip()

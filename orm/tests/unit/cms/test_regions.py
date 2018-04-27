@@ -1,5 +1,6 @@
 import mock
 import requests
+
 from wsme.exc import ClientSideError
 
 from orm.services.customer_manager.cms_rest.controllers.v1.orm.customer import regions
@@ -122,10 +123,11 @@ class TestRegionController(FunctionalTest):
         # assert
         self.assertEqual(response.status_int, 404)
 
-    def test_delete_regions(self):
+    @mock.patch.object(regions, 'request')
+    def test_delete_regions(self, request):
         # given
         requests.delete = mock.MagicMock(return_value=ResponseMock(200))
-
+        request.headers = {'X-AIC-ORM-Requester': "rds_resource_service_proxy"}
         # when
         response = self.app.delete('/v1/orm/customers/{customer id}/regions/{region_id}')
 
@@ -149,12 +151,13 @@ class TestRegionController(FunctionalTest):
         # assert
         self.assertEqual(response.status_int, 500)
 
-    def test_delete_regions_fail(self):
+    @mock.patch.object(regions, 'request')
+    def test_delete_regions_fail(self, request):
         # given
         requests.delete = mock.MagicMock()
 
         regions.CustomerLogic.return_error = 2
-
+        request.headers = {'X-AIC-ORM-Requester': "rds_resource_service_proxy"}
         regions.err_utils.get_error = mock.MagicMock(return_value=ClientSideError("blabla",
                                                                                   404))
 

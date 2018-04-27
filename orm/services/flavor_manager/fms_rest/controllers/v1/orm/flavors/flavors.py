@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from orm.common.orm_common.injector import injector
 from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.utils import utils as common_utils
 from orm.services.flavor_manager.fms_rest.controllers.v1.orm.flavors.os_extra_specs import OsExtraSpecsController
 from orm.services.flavor_manager.fms_rest.controllers.v1.orm.flavors.regions import RegionController
 from orm.services.flavor_manager.fms_rest.controllers.v1.orm.flavors.tags import TagsController
@@ -11,7 +12,7 @@ from orm.services.flavor_manager.fms_rest.logger import get_logger
 from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
 from orm.services.flavor_manager.fms_rest.utils import authentication
 
-from pecan import request, rest
+from pecan import conf, request, rest
 from wsmeext.pecan import wsexpose
 
 di = injector.get_di()
@@ -31,21 +32,17 @@ class FlavorController(rest.RestController):
     @wsexpose(FlavorWrapper, body=FlavorWrapper, rest_content_types='json', status_code=201)
     def post(self, flavors):
         flavor_logic, utils = di.resolver.unpack(FlavorController)
-        uuid = "FailedToGetFromUUIDGen"
+        uuid = ""
         LOG.info("FlavorController - Createflavor: " + str(flavors))
         authentication.authorize(request, 'flavor:create')
+        common_utils.set_utils_conf(conf)
 
         try:
-
-            if not flavors.flavor.id:
-                uuid = utils.make_uuid()
-            else:
-                try:
-                    uuid = utils.create_existing_uuid(
-                        flavor_logic.get_fixed_uuid(flavors.flavor.id))
-                except TypeError:
-                    LOG.error("UUID already exist")
-                    raise ErrorStatus(409, 'UUID already exists')
+            try:
+                uuid = common_utils.create_or_validate_uuid(flavors.flavor.id, 'fmsId')
+            except TypeError:
+                LOG.error("UUID already exists")
+                raise ErrorStatus(409, 'UUID already exists')
 
             result = flavor_logic.create_flavor(flavors, uuid, request.transaction_id)
 
@@ -106,17 +103,20 @@ class FlavorController(rest.RestController):
                                       status_code=500,
                                       error_details=str(exception))
 
-    @wsexpose(FlavorListFullResponse, str, str, str, str, str, str, str, rest_content_types='json')
+    @wsexpose(FlavorListFullResponse, str, str, str, str, str, str, str,
+              str, str, rest_content_types='json')
     def get_all(self, visibility=None, region=None, tenant=None, series=None,
-                starts_with=None, contains=None, alias=None):
+                vm_type=None, vnf_name=None, starts_with=None, contains=None,
+                alias=None):
         flavor_logic, utils = di.resolver.unpack(FlavorController)
         LOG.info("FlavorController - GetFlavorlist")
         authentication.authorize(request, 'flavor:get_all')
 
         try:
             result = flavor_logic.get_flavor_list_by_params(visibility, region,
-                                                            tenant, series, starts_with, contains, alias)
-
+                                                            tenant, series,
+                                                            vm_type, vnf_name,
+                                                            starts_with, contains, alias)
             return result
         except ErrorStatus as exception:
             LOG.log_exception("FlavorController - Failed to GetFlavorlist", exception)

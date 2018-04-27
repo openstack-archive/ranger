@@ -90,22 +90,28 @@ class RegionController(rest.RestController):
                                       status_code=500,
                                       error_details=exception.message)
 
-    @wsexpose(None, str, str, rest_content_types='json', status_code=204)
-    def delete(self, image_id, region_name):
+    @wsexpose(None, str, str, str, rest_content_types='json', status_code=204)
+    def delete(self, image_id, region_name, force_delete='False'):
+        if force_delete == 'True':
+            force_delete = True
+        else:
+            force_delete = False
         image_logic, utils = di.resolver.unpack(RegionController)
         auth.authorize(request, "region:delete")
         try:
-            LOG.info("RegionController - delete region: " + str(region_name))
+            requester = request.headers.get('X-AIC-ORM-Requester')
+            is_rds_client_request = requester == 'rds_resource_service_proxy'
+            LOG.info("RegionController - Delete region:{0} by RDS Proxy: {1} ".format(region_name, is_rds_client_request))
+            result = image_logic.delete_region(image_id, region_name, request.transaction_id, is_rds_client_request,
+                                               force_delete)
+            if is_rds_client_request:
+                LOG.info("RegionController - region deleted: " + str(result))
 
-            result = image_logic.delete_region(image_id, region_name, request.transaction_id)
-
-            LOG.info("RegionController - region deleted: " + str(result))
-
-            event_details = 'Image {} region {} deleted'.format(image_id,
-                                                                region_name)
-            utils.audit_trail('delete region', request.transaction_id,
-                              request.headers, image_id,
-                              event_details=event_details)
+                event_details = 'Image {} region {} deleted'.format(image_id,
+                                                                    region_name)
+                utils.audit_trail('delete region', request.transaction_id,
+                                  request.headers, image_id,
+                                  event_details=event_details)
 
         except ErrorStatus as exception:  # include NotFoundError
             LOG.log_exception("RegionController - Failed to delete region", exception)

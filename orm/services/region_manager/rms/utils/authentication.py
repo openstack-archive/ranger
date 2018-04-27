@@ -9,7 +9,7 @@ from pecan import conf
 logger = logging.getLogger(__name__)
 
 
-def _get_keystone_ep(auth_region):
+def get_keystone_ep(auth_region):
     result = RegionService.get_region_by_id_or_name(auth_region)
     for ep in result.endpoints:
         if ep.type == 'identity':
@@ -25,7 +25,7 @@ def authorize(request, action):
 
     auth_region = request.headers.get('X-Auth-Region')
     try:
-        keystone_ep = _get_keystone_ep(auth_region)
+        keystone_ep = get_keystone_ep(auth_region)
     except Exception:
         # Failed to find Keystone EP - we'll set it to None instead of failing
         # because the rule might be to let everyone pass

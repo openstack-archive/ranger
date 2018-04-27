@@ -1,10 +1,11 @@
 import json
 
+from mock import patch, MagicMock
+
 from orm.services.region_manager.rms.controllers.v2.orm.resources import metadata
 from orm.services.region_manager.rms.model.model import *
 from orm.tests.unit.rms import FunctionalTest
 
-from mock import MagicMock, patch
 from wsme.exc import ClientSideError
 
 result_inst = RegionData("1", "2", "3", "4", "5", "6",
@@ -46,13 +47,13 @@ metadata_result_empty_dict = {u'metadata': {}}
 
 class TestMetadataController(FunctionalTest):
 
-    #   @patch.object(metadata, 'request')
-    #   @patch.object(metadata, 'authentication')
-    #   @patch.object(metadata.RegionService, 'delete_metadata_from_region')
-    #   def test_delete_success(self, result, mock_auth, mock_request):
-    #       response = self.app.delete('/v2/orm/regions/my_region/metadata/mykey',
-    #                                  expect_errors=True)
-    #       self.assertEqual(response.status_int, 204)
+    # @patch.object(metadata, 'request')
+    # @patch.object(metadata, 'authentication')
+    # @patch.object(metadata.RegionService, 'delete_metadata_from_region')
+    # def test_delete_success(self, result, mock_auth, mock_request):
+    #     response = self.app.delete('/v2/orm/regions/my_region/metadata/mykey',
+    #                                expect_errors=True)
+    #     self.assertEqual(response.status_int, 204)
 
     @patch.object(metadata, 'authentication')
     @patch.object(metadata.RegionService, 'delete_metadata_from_region',

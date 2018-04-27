@@ -112,17 +112,19 @@ class Network(Model):
     subnets = wsme.wsattr(wsme.types.text, mandatory=True)
     security_groups = wsme.wsattr(wsme.types.text, mandatory=False, name="security-groups")
     security_group_rules = wsme.wsattr(wsme.types.text, mandatory=False, name="security-group-rules")
-    health_monitor = wsme.wsattr(wsme.types.text, mandatory=False, name="health-monitor")
-    member = wsme.wsattr(wsme.types.text, mandatory=False)
+    health_monitors = wsme.wsattr(wsme.types.text, mandatory=False, name="health-monitors")
+    members = wsme.wsattr(wsme.types.text, mandatory=False)
     nat_instance = wsme.wsattr(wsme.types.text, mandatory=False, name="nat-instance")
-    pool = wsme.wsattr(wsme.types.text, mandatory=False)
+    pools = wsme.wsattr(wsme.types.text, mandatory=False)
     route_table = wsme.wsattr(wsme.types.text, mandatory=False, name="route-table")
-    vip = wsme.wsattr(wsme.types.text, mandatory=False)
+    vips = wsme.wsattr(wsme.types.text, mandatory=False)
+    loadbalancer = wsme.wsattr(wsme.types.text, mandatory=False, name='loadbalancer')
+    listener = wsme.wsattr(wsme.types.text, mandatory=False, name='listener')
 
     def __init__(self, floating_ips='', networks='', ports='', routers='',
                  subnets='', security_groups=None, security_group_rules=None,
-                 health_monitor='', member='', nat_instance='',
-                 pool='', route_table='', vip=''):
+                 health_monitors='', members='', nat_instance='',
+                 pools='', route_table='', vips='', loadbalancer='', listener=''):
 
         """Create a new Network instance.
         :param floating_ips:  num of floating_ips
@@ -132,12 +134,14 @@ class Network(Model):
         :param subnets:  num of subnets
         :param security_groups: security groups
         :param security_group_rules: security group rules
-        :param health_monitor:
-        :param member:
+        :param health_monitors:
+        :param members:
         :param nat_instance:
-        :param pool:
+        :param pools:
         :param route_table:
-        :param vip:
+        :param vips:
+        :param loadbalancer:
+        :param listener:
         """
         self.floating_ips = floating_ips
         self.networks = networks
@@ -153,17 +157,18 @@ class Network(Model):
         else:
             self.security_group_rules = security_group_rules
 
-        self.health_monitor = health_monitor
-        self.member = member
+        self.health_monitors = health_monitors
+        self.members = members
         self.nat_instance = nat_instance
-        self.pool = pool
+        self.pools = pools
         self.route_table = route_table
-        self.vip = vip
+        self.vips = vips
+        self.loadbalancer = loadbalancer
+        self.listener = listener
 
 
 class Quota(Model):
     """network model the customer
-
     """
     compute = wsme.wsattr([Compute], mandatory=False)
     storage = wsme.wsattr([Storage], mandatory=False)
@@ -183,7 +188,6 @@ class Quota(Model):
 
 class User(Model):
     """user model the customer
-
     """
     id = wsme.wsattr(wsme.types.text, mandatory=True)
     role = wsme.wsattr([str])
@@ -200,7 +204,6 @@ class User(Model):
 
 class Region(Model):
     """network model the customer
-
     """
     name = wsme.wsattr(wsme.types.text, mandatory=True)
     type = wsme.wsattr(wsme.types.text, default="single", mandatory=False)
@@ -232,7 +235,6 @@ class Region(Model):
 
 class Customer(Model):
     """customer entity with all it's related data
-
     """
     description = wsme.wsattr(wsme.types.text, mandatory=True)
     enabled = wsme.wsattr(bool, mandatory=True)

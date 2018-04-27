@@ -1,10 +1,10 @@
 #!/usr/bin/python
 import argparse
-import cli_common
 import config
-import orm.base_config as base_config
 import os
 import requests
+
+from orm.orm_client.ormcli import cli_common
 
 
 class ResponseError(Exception):
@@ -42,7 +42,7 @@ def add_to_parser(service_sub):
     parser.add_argument('-v', '--verbose', help='show details',
                         action="store_true")
     parser.add_argument('-f', '--faceless',
-                        help='run without authentication',
+                        help=argparse.SUPPRESS,
                         default=False,
                         action="store_true")
     subparsers = parser.add_subparsers(dest='subcmd',
@@ -74,7 +74,7 @@ def add_to_parser(service_sub):
     parser_delete_image.add_argument('imageid', type=str, help=h2)
 
     # get images
-    h1, h2 = '[<"X-RANGER-Client" header>]', '<image id>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<image id or image name>'
     parser_get_image = subparsers.add_parser('get_image',
                                              help='%s %s' % (h1, h2))
     parser_get_image.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
@@ -92,17 +92,15 @@ def add_to_parser(service_sub):
     parser_list_images.add_argument('--customer', type=str, help='customer id')
 
     # activate/deactivate image
-    h1, h2 = '[<"X-RANGER-Client" header>]', '<image id>'
-    parser_enable = subparsers.add_parser('enable',
-                                          help='%s %s' % (h1, h2))
-    parser_enable.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
-    parser_enable.add_argument('imageid', type=str, help=h2)
-
-    parser_disable = subparsers.add_parser('disable',
-                                           help='%s %s' % (h1, h2))
-
-    parser_disable.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
-    parser_disable.add_argument('imageid', type=str, help=h2)
+    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', \
+                 '<data file with true/false JSON>'
+    parser_enable_image = subparsers.add_parser('enabled',
+                                                help='%s %s %s' % (h1, h2, h3))
+    parser_enable_image.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_enable_image.add_argument('imageid', type=str, help=h2)
+    parser_enable_image.add_argument('datafile',
+                                     type=argparse.FileType('r'),
+                                     help=h3)
 
     # region for image
     h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', \
@@ -128,7 +126,8 @@ def add_to_parser(service_sub):
                                        type=argparse.FileType('r'),
                                        help=h3)
 
-    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', '<region id>'
+    h1, h2, h3 = '[<"X-RANGER-Client" header>] [--force_delete]', \
+                 '<image id>', '<region id>'
     parser_delete_region = subparsers.add_parser('delete_region',
                                                  help='%s %s %s' % (h1,
                                                                     h2,
@@ -136,6 +135,9 @@ def add_to_parser(service_sub):
     parser_delete_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_region.add_argument('imageid', type=str, help=h2)
     parser_delete_region.add_argument('regionid', type=str, help=h3)
+    parser_delete_region.add_argument('--force_delete',
+                                      help='force delete region',
+                                      action="store_true")
 
     # customer for image
     h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<image id>', \
@@ -200,12 +202,12 @@ def get_token(timeout, args, host):
                 globals()[argument] = configuration_value
             else:
                 message = ('ERROR: {} for token generation was not supplied. '
-                           'Please use its command-line '
-                           'argument or environment variable.'.format(argument))
+                           'Please use its command-line argument or '
+                           'environment variable.'.format(argument))
                 print message
                 raise cli_common.MissingArgumentError(message)
 
-    keystone_ep = cli_common.get_keystone_ep('{}:{}'.format(host, base_config.rms['port']),
+    keystone_ep = cli_common.get_keystone_ep('{}:8080'.format(host),
                                              auth_region)
     if keystone_ep is None:
         raise ConnectionError(
@@ -236,40 +238,40 @@ def preparm(p):
 
 
 def cmd_details(args):
-    data = args.datafile.read() if 'datafile' in args else '{}'
     if args.subcmd == 'create_image':
-        cmd, url = requests.post, ''
+        return requests.post, ''
     elif args.subcmd == 'update_image':
-        cmd, url = requests.put, '/%s' % args.imageid
+        return requests.put, '/%s' % args.imageid
+
     elif args.subcmd == 'delete_image':
-        cmd, url = requests.delete, '/%s' % args.imageid
+        return requests.delete, '/%s' % args.imageid
 
     # activate/deactivate image
-    elif args.subcmd in ('enable', 'disable'):
-        cmd, url = requests.put, '/%s/enabled' % args.imageid
-        data = '{"enabled": %s}' % ('true' if args.subcmd == 'enable' else
-                                    'false')
+    elif args.subcmd == 'enabled':
+        return requests.put, '/%s/enabled' % args.imageid
+
     # image regions
     elif args.subcmd == 'add_regions':
-        cmd, url = requests.post, '/%s/regions' % args.imageid
+        return requests.post, '/%s/regions' % args.imageid
     elif args.subcmd == 'update_regions':
-        cmd, url = requests.put, '/%s/regions' % args.imageid
+        return requests.put, '/%s/regions' % args.imageid
     elif args.subcmd == 'delete_region':
-        cmd, url = requests.delete, '/%s/regions/%s' % (args.imageid,
-                                                        args.regionid)
+        return requests.delete, '/%s/regions/%s/%s' % (args.imageid,
+                                                       args.regionid,
+                                                       args.force_delete)
 
     # image customers
     elif args.subcmd == 'add_customers':
-        cmd, url = requests.post, '/%s/customers' % args.imageid
+        return requests.post, '/%s/customers' % args.imageid
     elif args.subcmd == 'update_customers':
-        cmd, url = requests.put, '/%s/customers' % args.imageid
+        return requests.put, '/%s/customers' % args.imageid
     elif args.subcmd == 'delete_customer':
-        cmd, url = requests.delete, '/%s/customers/%s' % (args.imageid,
-                                                          args.customerid)
+        return requests.delete, '/%s/customers/%s' % (args.imageid,
+                                                      args.customer)
 
     # list images
     elif args.subcmd == 'get_image':
-        cmd, url = requests.get, '/%s' % args.imageid
+        return requests.get, '/%s' % args.imageid
     elif args.subcmd == 'list_images':
         param = ''
         if args.visibility:
@@ -281,26 +283,22 @@ def cmd_details(args):
         if args.customer:
             param += '%scustomer=%s' % (preparm(param),
                                         args.customer)
-        cmd, url = requests.get, '/%s' % param
-
-    return cmd, url, data
+        return requests.get, '/%s' % param
 
 
 def cmd_data(args):
     # This is a special case where api has a payload needed but the CLI is
     # seperated into 2 different commands. In this case we need to set the
     # payload.
-    if args.subcmd == 'enable':
+    if args.subcmd == 'enabled':
         return "{\n            \"enabled\": true\n}"
-    elif args.subcmd == 'disable':
-        return "{\n            \"enabled\": false\n}"
     else:
         return args.datafile.read() if 'datafile' in args else '{}'
 
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
-    environment_variable = 'RANGER_{}'.format(
+    environment_variable = 'AIC_ORM_{}'.format(
         argument.replace('-', '_').upper())
 
     return os.environ.get(environment_variable)
@@ -308,10 +306,11 @@ def get_environment_variable(argument):
 
 def run(args):
     host = args.orm_base_url if args.orm_base_url else config.orm_base_url
-    port = args.port if args.port else base_config.ims['port']
+    port = args.port if args.port else 8084
+    data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
 
-    rest_cmd, cmd_url, data = cmd_details(args)
+    rest_cmd, cmd_url = cmd_details(args)
     url = '%s:%d/v1/orm/images' % (host, port,) + cmd_url
     if args.faceless:
         auth_token = auth_region = requester = client = ''
@@ -343,7 +342,7 @@ def run(args):
                                                    url))
     try:
         resp = rest_cmd(url, timeout=timeout, data=data, headers=headers,
-                        verify=False)
+                        verify=config.verify)
     except Exception as e:
         print e
         exit(1)

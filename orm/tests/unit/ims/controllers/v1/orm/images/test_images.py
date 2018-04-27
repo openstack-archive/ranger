@@ -10,6 +10,7 @@ from orm.tests.unit.ims import FunctionalTest
 import mock
 from wsme.exc import ClientSideError
 
+
 utils_mock = None
 image_logic_mock = None
 
@@ -215,6 +216,17 @@ class TestCreateImage(FunctionalTest):
 
         response = self.app.post_json('/v1/orm/images', image_json)
         self.assertEqual(ImageWrapper().tojson(), response.json)
+        self.assertEqual(201, response.status_int)
+
+    def test_create_with_id(self):
+        image_json["image"].update({"id": "test"})
+        global return_error
+        return_error = 0
+        injector.override_injected_dependency(('image_logic', get_logic_mock()))
+
+        response = self.app.post_json('/v1/orm/images', image_json)
+        self.assertEqual(ImageWrapper().tojson(), response.json)
+        del image_json['image']['id']
         self.assertEqual(201, response.status_int)
 
     @mock.patch.object(images, 'err_utils')

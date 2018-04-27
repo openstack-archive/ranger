@@ -2,8 +2,8 @@ import yaml
 
 
 def merge_yamls(document, section):
-    document_dict = yaml.load(document)
-    section_dict = yaml.load(section)
+    document_dict = yaml.safe_load(document)
+    section_dict = yaml.safe_load(section)
     merge_dict(section_dict, document_dict)
     new_document = yaml.dump(document_dict)
     return new_document

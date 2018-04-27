@@ -96,7 +96,7 @@ class CreateResource(unittest.TestCase):
         status_model = StatusModel(status=[result])
         status_model.regions = None
         result.return_value = status_model
-        with self.assertRaises(ResourceService.ErrorMesage):
+        with self.assertRaises(ResourceService.ErrorMessage):
             resource_id = ResourceService.main(jsondata, uuid,
                                                'customer', 'create')
 
@@ -202,7 +202,7 @@ class CreateResource(unittest.TestCase):
         status_model = StatusModel(status=[result])
         status_model.regions = None
         result.return_value = status_model
-        with self.assertRaises(ResourceService.ErrorMesage):
+        with self.assertRaises(ResourceService.ErrorMessage):
             resource_id = ResourceService.main(flavorjsondata, uuid,
                                                'flavor', 'delete')
 
@@ -281,7 +281,7 @@ class CreateResource(unittest.TestCase):
         assert (input_data.__dict__ == expected_image_input_data)
 
     def test_unknown_resource_type(self):
-        with self.assertRaises(ResourceService.ErrorMesage):
+        with self.assertRaises(ResourceService.ErrorMessage):
             input_data = ResourceService._get_inputs_from_resource_type(jsondata,
                                                                         'unknown',
                                                                         'uuid-12345')
