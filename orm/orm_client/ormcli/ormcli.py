@@ -1,9 +1,9 @@
 #!/usr/bin/python
 import argparse
-import cmscli
-import fmscli
-import imscli
-import rmscli
+from orm.orm_client.ormcli import cmscli
+from orm.orm_client.ormcli import fmscli
+from orm.orm_client.ormcli import imscli
+from orm.orm_client.ormcli import rmscli
 import sys
 
 

@@ -5,8 +5,9 @@ class UrlParms(object):
     """class method."""
 
     def __init__(self, type=None, status=None, metadata=None, rangerAgentVersion=None,
-                 clli=None, regionname=None, osversion=None, valet=None,
-                 state=None, country=None, city=None, street=None, zip=None):
+                 clli=None, regionname=None, osversion=None, location_type=None,
+                 state=None, country=None, city=None, street=None, zip=None,
+                 vlcp_name=None):
         """init method.
 
         :param type:
@@ -16,15 +17,16 @@ class UrlParms(object):
         :param clli:
         :param regionname:
         :param osversion:
-        :param valet:
+        :param location_type:
         :param state:
         :param country:
         :param city:
         :param street:
         :param zip:
+        :param vlcp_name:
         """
         if type:
-            self.location_type = type
+            self.design_type = type
         if status:
             self.region_status = status
         if metadata:
@@ -37,8 +39,8 @@ class UrlParms(object):
             self.name = regionname
         if osversion:
             self.open_stack_version = osversion
-        if valet:
-            self.valet = valet
+        if location_type:
+            self.location_type = location_type
         if state:
             self.address_state = state
         if country:
@@ -49,6 +51,8 @@ class UrlParms(object):
             self.address_street = street
         if zip:
             self.address_zip = zip
+        if vlcp_name:
+            self.vlcp_name = vlcp_name
 
     def _build_query(self):
         """nuild db query.

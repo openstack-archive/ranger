@@ -1,10 +1,12 @@
 import datetime
 import logging
+import re
 import uuid
 
-from orm.services.id_generator.uuidgen.db.db_manager import DBManager
 from pecan import expose, response
 from pecan.rest import RestController
+
+from orm.services.id_generator.uuidgen.db.db_manager import DBManager
 
 LOG = logging.getLogger(__name__)
 
@@ -22,8 +24,7 @@ def respond(reason, code, message):
 class UUIDController(RestController):
     @expose(template='json')
     def post(self, **kw):
-        """Method to handle POST /v1/uuids
-        create and return a new uuid
+        """Method to handle POST /v1/uuids - create and return a new uuid
             prameters:
                 uuid_type (optional)
             return: dict describing success or failure of post command
@@ -45,18 +46,23 @@ class UUIDController(RestController):
             LOG.info("UUIDController.post - " + str(messageToReturn))
             return messageToReturn
 
-        if not customer_id:
+        if not customer_id or customer_id == 'Unset':
             return self.create_new_uuid(uuid_type)
 
-        return self.validate_and_add_uuid(customer_id)
+        if not re.match(r'^[A-Za-z0-9]+$', customer_id):
+            response.status = 400
+            messageToReturn = respond("badRequest", 400, "Only alphanumeric characters allowed!")
+            LOG.info("UUIDController.post - " + str(messageToReturn))
+            return messageToReturn
 
-    def validate_and_add_uuid(self, customer_id):
+        return self.validate_and_add_uuid(customer_id, uuid_type)
+
+    def validate_and_add_uuid(self, uuid, uuid_type):
         try:
-            uuid_type = "custId"
             db_manager = DBManager()
-            db_manager.create_uuid(customer_id, uuid_type)
+            db_manager.create_uuid(uuid, uuid_type)
             return {
-                "uuid": customer_id,
+                "uuid": uuid,
                 "issued_at": datetime.datetime.utcnow().isoformat() + 'Z',
                 "uuid_type": uuid_type
             }
@@ -65,13 +71,15 @@ class UUIDController(RestController):
             # we just need to save it in the database that we will not give this value in the future requests
             # but we don't need to throw exception if already exist, this is not our responsible
             # if it is duplicate uuid it will fail in the service which uses this uuid (cms, fms)
-            if e.orig.args[0] != 1062:
+            if e.inner_exception.orig[0] == 1062:
+                LOG.info("Duplicate UUID=" + uuid)
+            else:
                 response.status = 500
                 messageToReturn = respond("badRequest", 500, 'Database error')
                 LOG.error(str(messageToReturn) + "Exception: " + str(e))
                 return messageToReturn
         return {
-            "uuid": customer_id,
+            "uuid": uuid,
             "issued_at": datetime.datetime.utcnow().isoformat() + 'Z',
             "uuid_type": uuid_type
         }

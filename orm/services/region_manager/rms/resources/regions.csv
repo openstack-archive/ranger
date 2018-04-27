@@ -1,2 +1,1 @@
 region_id,region_name,address_state,address_country,address_city,address_street,address_zip,region_status,ranger_agent_version,open_stack_version,design_type,location_type,vlcp_name,clli,description,keystone_url,horizon_url,ord_url
-LOCAL,LOCAL,NY,US,FIL,n/a,3333,functional,ranger_agent1.0,kilo,n/a,n/a,n/a,n/a,DPK lcp in FIL,http://127.0.0.1:5000/v2.0,http://horizon3.com,http://127.0.0.1:9010
