@@ -31,6 +31,9 @@ class ImageTest():
     def validate_model(self, context=None):
         pass
 
+    def validate_update(self, sql_image=None, new_image=None):
+        pass
+
 
 class ImageWrapperTest():
     def __init__(self, image=ImageTest(id=1, status='')):
@@ -106,7 +109,7 @@ class TestImageLogic(FunctionalTest):
 
         mock_di.resolver.unpack.return_value = my_dm, mock_rds_proxy
         result = image_logic.get_image_by_uuid('test')
-        self.assertEqual(result.image.status, '')
+        self.assertEqual(result.image.status, 'no regions')
 
     @mock.patch.object(image_logic.ImsUtils, 'get_server_links',
                        return_value=["ip", "path"])
@@ -141,9 +144,6 @@ class TestDeleteImageLogic(FunctionalTest):
         regions = []
         image_logic.delete_image_by_uuid("image_uuid", "transaction_id")
 
-        regions = []
-        image_logic.delete_image_by_uuid("image_uuid", "transaction_id")
-
     @mock.patch.object(image_logic, 'update_region_actions', return_value=True)
     @mock.patch.object(image_logic, 'di')
     def test_delete_image_success_nords(self, mock_di, mock_update_region):
@@ -165,7 +165,7 @@ class TestDeleteImageLogic(FunctionalTest):
         try:
             image_logic.delete_image_by_uuid("image_uuid", "transaction_id")
         except Exception as e:
-            self.assertEqual(204, e.status_code)
+            self.assertEqual(404, e.status_code)
 
     @mock.patch.object(image_logic, 'update_region_actions',
                        side_effect=ValueError('test'))
@@ -234,12 +234,11 @@ class TestActivateImageLogic(FunctionalTest):
                                                         mock_image,
                                                         mock_di,
                                                         mock_by_uuid):
-
         my_enabled = mock.MagicMock()
         my_enabled.enabled = 0
 
         my_get_image = mock.MagicMock()
-        my_get_image.get_image = mock.MagicMock(return_value=my_enabled)
+        my_get_image.get_image_by_id = mock.MagicMock(return_value=my_enabled)
 
         my_get_record = mock.MagicMock()
         my_get_record.get_record.return_value = my_get_image
@@ -256,12 +255,11 @@ class TestActivateImageLogic(FunctionalTest):
     def test_activate_image_already_activated(self, mock_image,
                                               mock_di,
                                               mock_get_image_by_uuid):
-
         my_enabled = mock.MagicMock()
         my_enabled.enabled = 1
 
         my_get_image = mock.MagicMock()
-        my_get_image.get_image = mock.MagicMock(return_value=my_enabled)
+        my_get_image.get_image_by_id = mock.MagicMock(return_value=my_enabled)
 
         my_get_record = mock.MagicMock()
         my_get_record.get_record.return_value = my_get_image
@@ -276,7 +274,7 @@ class TestActivateImageLogic(FunctionalTest):
     def test_activate_image_image_not_found(self, mock_image,
                                             mock_di):
         my_get_image = mock.MagicMock()
-        my_get_image.get_image.return_value = None
+        my_get_image.get_image_by_id.return_value = None
         my_get_record = mock.MagicMock()
         my_get_record.get_record.return_value = my_get_image
         my_dm = mock.MagicMock(return_value=my_get_record)
@@ -295,7 +293,7 @@ class TestActivateImageLogic(FunctionalTest):
                                                   mock_di,
                                                   log_moc):
         my_get_image = mock.MagicMock()
-        my_get_image.get_image = mock.MagicMock(side_effect=MyError("activate_test"))
+        my_get_image.get_image_by_id = mock.MagicMock(side_effect=MyError("activate_test"))
 
         my_get_record = mock.MagicMock()
         my_get_record.get_record.return_value = my_get_image
@@ -311,13 +309,14 @@ class TestActivateImageLogic(FunctionalTest):
 class TestListImageLogic(FunctionalTest):
     @mock.patch.object(image_logic, 'di')
     def test_list_image_not_found(self, mock_di):
+        mock_rds_proxy = mock.MagicMock()
         my_get_image = mock.MagicMock()
         my_get_image.get_image.return_value = None
         my_get_record = mock.MagicMock()
         my_get_record.get_record.side_effect = image_logic.ErrorStatus(404, 'a')
         my_dm = mock.MagicMock(return_value=my_get_record)
 
-        mock_di.resolver.unpack.return_value = my_dm
+        mock_di.resolver.unpack.return_value = my_dm, mock_rds_proxy
         try:
             image_logic.get_image_list_by_params('a', 'b', 'c')
         except image_logic.ErrorStatus as e:
@@ -326,12 +325,13 @@ class TestListImageLogic(FunctionalTest):
     @mock.patch.object(image_logic, 'di')
     @mock.patch.object(image_logic, 'ImageWrapper')
     def test_list_image_error(self, mock_image, mock_di):
+        mock_rds_proxy = mock.MagicMock()
         my_get_image = mock.MagicMock()
         my_get_record = mock.MagicMock()
         my_get_record.get_record.side_effect = SystemError()
         my_dm = mock.MagicMock(return_value=my_get_record)
 
-        mock_di.resolver.unpack.return_value = my_dm
+        mock_di.resolver.unpack.return_value = my_dm, mock_rds_proxy
         try:
             image_logic.get_image_list_by_params('a', 'b', 'c')
         except Exception as e:
@@ -341,6 +341,8 @@ class TestListImageLogic(FunctionalTest):
     @mock.patch.object(image_logic, 'ImageWrapper')
     def test_list_image_sanity(self, mock_image, mock_di):
         imagejson = [{"regions": {"name": "mdt1"}}]
+        mock_rds_proxy = mock.MagicMock()
+        mock_rds_proxy.get_status.return_value = RDSGetStatus()
         mock_data_manager = mock.MagicMock()
         mock_image_rec = mock.MagicMock()
         image_json = mock.MagicMock()
@@ -348,8 +350,7 @@ class TestListImageLogic(FunctionalTest):
 
         mock_image_rec.get_images_by_criteria.return_value = Image()
         my_dm = mock.MagicMock(mock_data_manager)
-
-        mock_di.resolver.unpack.return_value = my_dm
+        mock_di.resolver.unpack.return_value = my_dm, mock_rds_proxy
         result = image_logic.get_image_list_by_params('a', 'b', 'c')
         self.assertEqual(len(result.images), 0)
 
@@ -364,7 +365,7 @@ class TestCreateImage(FunctionalTest):
     @mock.patch.object(image_logic, 'di')
     @mock.patch.object(image_logic, 'ImageWrapper')
     @mock.patch.object(image_logic, 'get_image_by_uuid', return_value='test')
-    def test_create_image_sanity(self, mock_image, mock_di, mock_req):
+    def test_create_image_sanity(self, mock_di, mock_req, mock_get):
         my_image = mock.MagicMock()
         my_dm = mock.MagicMock()
         my_dm.get_record.return_value = my_image
@@ -482,7 +483,15 @@ class TestDeleteRegion(FunctionalTest):
         rds_proxy, mock_data_manager = get_data_manager_mock()
         mock_di.resolver.unpack.return_value = mock_data_manager
         result = image_logic.delete_region('uuid', mock.MagicMock(),
-                                           'transaction')
+                                           'transaction', True, False)
+
+    @mock.patch.object(image_logic, 'send_to_rds_if_needed', return_value=True)
+    @mock.patch.object(image_logic, 'di')
+    def test_delete_region_rds_err_force_delete(self, mock_di, mock_send_to_rds_if_needed):
+        rds_proxy, mock_data_manager = get_data_manager_mock()
+        mock_di.resolver.unpack.return_value = mock_data_manager
+        result = image_logic.delete_region('uuid', mock.MagicMock(),
+                                           'transaction', False, True)
 
     @mock.patch.object(image_logic, 'send_to_rds_if_needed', return_value=True)
     @mock.patch.object(image_logic, 'di')
@@ -492,7 +501,16 @@ class TestDeleteRegion(FunctionalTest):
             mock_sql_image=None)
         mock_di.resolver.unpack.return_value = mock_data_manager
         self.assertRaises(image_logic.ErrorStatus, image_logic.delete_region,
-                          'uuid', mock.MagicMock(), 'transaction')
+                          'uuid', mock.MagicMock(), 'transaction', False, False)
+
+    @mock.patch.object(image_logic, 'send_to_rds_if_needed', return_value=True)
+    @mock.patch.object(image_logic, 'di')
+    def test_delete_region_protected_image(self, mock_di,
+                                           mock_send_to_rds_if_needed):
+        rds_proxy, mock_data_manager = get_data_manager_mock(protected=True)
+        mock_di.resolver.unpack.return_value = mock_data_manager
+        self.assertRaises(image_logic.ErrorStatus, image_logic.delete_region,
+                          'uuid', mock.MagicMock(), 'transaction', False, False)
 
     @mock.patch.object(image_logic, 'get_image_by_uuid',
                        side_effect=ValueError('test'))
@@ -505,7 +523,7 @@ class TestDeleteRegion(FunctionalTest):
         rds_proxy, mock_data_manager = get_data_manager_mock()
         mock_di.resolver.unpack.return_value = mock_data_manager
         self.assertRaises(ValueError, image_logic.delete_region,
-                          'uuid', mock.MagicMock(), 'transaction')
+                          'uuid', mock.MagicMock(), 'transaction', False, False)
 
 
 class TestAddCustomers(FunctionalTest):
@@ -655,6 +673,7 @@ class TestReplaceCustomers(FunctionalTest):
 def get_data_manager_mock(get_existing_region_names={"name": "mdt1"},
                           imagejson={"regions": {"name": "mdt1"}},
                           delete_image_by_id=True,
+                          protected=False,
                           begin_transaction=True,
                           flush=True,
                           send_image=True,
@@ -669,6 +688,7 @@ def get_data_manager_mock(get_existing_region_names={"name": "mdt1"},
         mock_sql_image = mock.MagicMock()
         mock_sql_image.__json__ = image_json
         mock_sql_image.visibility = visibility
+        mock_sql_image.protected = protected
         mock_sql_image.get_proxy_dict = mock.MagicMock(return_value={'regions': regions})
         mock_sql_image.get_existing_region_names.return_value = \
             get_existing_region_names

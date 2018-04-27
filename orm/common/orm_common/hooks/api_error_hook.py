@@ -67,4 +67,4 @@ class APIErrorHook(PecanHook):
 
             setattr(state.response, 'body', json.dumps(result_json))
             state.response.status_code = status_code
-            state.response.headers.add('X-RANGER-Request-Id', tracking_id)
+            state.response.headers.add('X-AIC-ORM-Request-Id', tracking_id)

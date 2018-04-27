@@ -131,6 +131,10 @@ def authorize(action, request, app_conf, keystone_ep=None):
 
     token_to_validate = request.headers.get('X-Auth-Token')
     lcp_id = request.headers.get('X-Auth-Region')
+
+    keystone_ep = keystone_ep if keystone_ep else (
+        request.headers.get('Keystone-Endpoint'))
+
     try:
         if _is_authorization_enabled(app_conf):
             try:
@@ -139,11 +143,11 @@ def authorize(action, request, app_conf, keystone_ep=None):
 
                 user = tokens.get_token_user(token_to_validate, _TOKEN_CONF,
                                              lcp_id, keystone_ep)
-                request.headers['X-RANGER-Client'] = user.user['name']
-                request.headers['X-RANGER-Owner'] = user.tenant['id']
+                request.headers['X-AIC-ORM-Client'] = user.user['name']
+                request.headers['X-AIC-ORM-Owner'] = user.tenant['id']
             except Exception:
                 user = None
-                request.headers['X-RANGER-Client'] = 'NA'
+                request.headers['X-AIC-ORM-Client'] = 'NA'
                 logger.exception(
                     "policy - Failed to get_token_user, using user={}".format(
                         user))

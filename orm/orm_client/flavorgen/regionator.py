@@ -30,7 +30,7 @@ def get_region_list(regions):
         REGION_NAME = region
         res, output = sh('get_region')
         if not res:
-            result_region = ast.literal_eval(output)
+            result_region = json.loads(output)
             result.append({'name': result_region['name'],
                            'designType': result_region['designType']})
         else:
@@ -44,9 +44,9 @@ def create_command(cli_command):
     if cli_command == 'add_region':
         cmd = 'python %s fms add_region %s %s' % (CLI_PATH, FID, FILE_NAME,)
     elif cli_command == 'get_flavor':
-        cmd = '%s fms get_flavor test %s' % (CLI_PATH, FLAVOR_NAME,)
+        cmd = 'python %s fms get_flavor test %s' % (CLI_PATH, FLAVOR_NAME,)
     elif cli_command == 'get_region':
-        cmd = '%s rms get_region %s' % (CLI_PATH, REGION_NAME,)
+        cmd = 'python %s rms get_region %s' % (CLI_PATH, REGION_NAME,)
     else:
         raise ValueError('Received an unknown command: %s' % (cli_command,))
 
@@ -79,7 +79,7 @@ def sh(cli_command):
     start = time.time()
     output = ''
     errpat = re.compile('error', re.I)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    p = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)
     for line in iter(p.stdout.readline, b''):
         out = line.rstrip()
         print(">>> " + out)

@@ -1,25 +1,28 @@
 """get_groups unittests module."""
 import json
 
+from mock import patch, MagicMock
 from orm.services.region_manager.rms.controllers.v2.orm.resources import groups
+
 from orm.tests.unit.rms import FunctionalTest
 
-from mock import MagicMock, patch
 from wsme.exc import ClientSideError
 
 res = {"regions": ["aaaa", "bbbb", "ccccc"],
-       "name": "mygroup", "id": "any",
-       "description": "this is my only for testing"}
+       "name": "mygroup", "id": "noq",
+       "description": "this is my only for testing",
+       "created": None, "modified": None}
 
 
-group_dict = {'id': 'noq', 'name': 'poq', 'description': 'b', 'regions': ['c']}
+group_dict = {'id': 'noq', 'name': 'poq', 'description': 'b', 'regions': ['c'],
+              "created": None, "modified": None}
 
 
 class Groups(object):
     """class method."""
 
     def __init__(self, id=None, name=None, description=None,
-                 regions=[], any=None):
+                 regions=[], created=None, modified=None, any=None):
         """init function.
 
         :param regions:
@@ -29,6 +32,8 @@ class Groups(object):
         self.name = name
         self.description = description
         self.regions = regions
+        self.created = created
+        self.modified = modified
         if any:
             self.any = any
 
@@ -104,25 +109,27 @@ class TestGetGroups(FunctionalTest):
 class TestCreateGroup(FunctionalTest):
     """Main create_group test case."""
 
-#   @patch.object(groups, 'request')
-#   @patch.object(groups.GroupService, 'create_group_in_db')
-#   @patch.object(groups, 'authentication')
-#   def test_post_success(self, mock_authentication, mock_create_group,
-#                         mock_request):
-#       """Test successful group creation."""
-#       mock_request.application_url = 'http://localhost'
-#       response = self.app.post_json('/v2/orm/groups',
-#                                     {'id': 'd', 'name': 'a',
-#                                      'description': 'b',
-#                                      'regions': ['c']})
-#       # Make sure all keys are in place
-#       self.assertTrue(all([c in response.json['group'] for c in (
-#           'created', 'id', 'links')]))
+    @patch.object(groups, 'request')
+    @patch.object(groups.GroupService, 'create_group_in_db')
+    @patch.object(groups.GroupService, 'get_groups_data',
+                  return_value=Groups(**res))
+    @patch.object(groups, 'authentication')
+    def test_post_success(self, mock_authentication, result, mock_create_group,
+                          mock_request):
+        """Test successful group creation."""
+        mock_request.application_url = 'http://localhost'
+        response = self.app.post_json('/v2/orm/groups',
+                                      {'id': 'd', 'name': 'a',
+                                       'description': 'b',
+                                       'regions': ['c']})
+        # Make sure all keys are in place
+        self.assertTrue(all([c in response.json['group'] for c in (
+            'created', 'id', 'links')]))
 
-#       self.assertEqual(response.json['group']['id'], 'd')
-#       self.assertEqual(response.json['group']['name'], 'a')
-#       self.assertEqual(response.json['group']['links']['self'],
-#                        'http://localhost/v2/orm/groups/d')
+        self.assertEqual(response.json['group']['id'], 'd')
+        self.assertEqual(response.json['group']['name'], 'a')
+        self.assertEqual(response.json['group']['links']['self'],
+                         'http://localhost/v2/orm/groups/d')
 
     @patch.object(groups.GroupService, 'create_group_in_db', side_effect=groups.error_base.ConflictError)
     @patch.object(groups.err_utils, 'get_error',
@@ -153,13 +160,13 @@ class TestCreateGroup(FunctionalTest):
 class TestDeleteGroup(FunctionalTest):
     """Main delete group."""
 
-#   @patch.object(groups, 'request')
-#   @patch.object(groups.GroupService, 'delete_group')
-#   @patch.object(groups, 'authentication')
-#   def test_delete_group_success(self, auth_mock, mock_delete_group,
-#                                 mock_request):
-#       response = self.app.delete('/v2/orm/groups/{id}')
-#       self.assertEqual(response.status_code, 204)
+#    @patch.object(groups, 'request')
+#    @patch.object(groups.GroupService, 'delete_group')
+#    @patch.object(groups, 'authentication')
+#    def test_delete_group_success(self, auth_mock, mock_delete_group,
+#                                  mock_request):
+#        response = self.app.delete('/v2/orm/groups/{id}')
+#        self.assertEqual(response.status_code, 204)
 
     @patch.object(groups.GroupService, 'delete_group', side_effect=Exception("any"))
     @patch.object(groups, 'authentication')
@@ -182,26 +189,28 @@ class TestUpdateGroup(FunctionalTest):
             'details': 'test'
         }), status_code=status_code)
 
-#   @patch.object(groups, 'request')
-#   @patch.object(groups.GroupService, 'update_group',
-#                 return_value=Groups(**group_dict))
-#   @patch.object(groups, 'authentication')
-#   def test_update_group_success(self, auth_mock, mock_delete_group,
-#                                 mock_request):
-#       response = self.app.put_json('/v2/orm/groups/id', group_dict)
-#       self.assertEqual(response.status_code, 201)
-#       self.assertEqual(response.json['group']['id'], group_dict['id'])
+    @patch.object(groups, 'request')
+    @patch.object(groups.GroupService, 'get_groups_data',
+                  return_value=Groups(**res))
+    @patch.object(groups.GroupService, 'update_group',
+                  return_value=Groups(**group_dict))
+    @patch.object(groups, 'authentication')
+    def test_update_group_success(self, auth_mock, mock_delete_group,
+                                  mock_request, result):
+        response = self.app.put_json('/v2/orm/groups/id', group_dict)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json['group']['id'], group_dict['id'])
 
-#     @patch.object(groups, 'err_utils')
-#     @patch.object(groups.GroupService, 'update_group',
-#                   side_effect=error_base.NotFoundError(message="any"))
-#     @patch.object(groups, 'authentication')
-#     def test_update_group_error(self, auth_mock, mock_delete_group,
-#                                 mock_err_utils):
-#         mock_err_utils.get_error = self.get_error
-#         response = self.app.put_json('/v2/orm/groups/{id}', group_dict,
-#                                      expect_errors=True)
-#         self.assertEqual(response.status_code, 404)
+    # @patch.object(groups, 'err_utils')
+    # @patch.object(groups.GroupService, 'update_group',
+    #               side_effect=error_base.NotFoundError(message="any"))
+    # @patch.object(groups, 'authentication')
+    # def test_update_group_error(self, auth_mock, mock_delete_group,
+    #                             mock_err_utils):
+    #     mock_err_utils.get_error = self.get_error
+    #     response = self.app.put_json('/v2/orm/groups/{id}', group_dict,
+    #                                  expect_errors=True)
+    #     self.assertEqual(response.status_code, 404)
 
     @patch.object(groups.GroupService, 'get_all_groups',
                   return_value=GroupsList([res]))

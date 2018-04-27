@@ -22,6 +22,7 @@ import six
 
 import _checks
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -210,7 +211,7 @@ def _parse_check(rule):
     try:
         kind, match = rule.split(':', 1)
     except Exception:
-        LOG.exception('Failed to understand rule %s', rule)
+        LOG.exception(('Failed to understand rule %s'), rule)
         # If the rule is invalid, we'll fail closed
         return _checks.FalseCheck()
 
@@ -220,7 +221,7 @@ def _parse_check(rule):
     elif None in _checks.registered_checks:
         return _checks.registered_checks[None](kind, match)
     else:
-        LOG.error('No handler for matches of kind %s', kind)
+        LOG.error(('No handler for matches of kind %s'), kind)
         return _checks.FalseCheck()
 
 
@@ -336,7 +337,7 @@ def _parse_text_rule(rule):
         return state.result
     except ValueError:
         # Couldn't parse the rule
-        LOG.exception('Failed to understand rule %s', rule)
+        LOG.exception(('Failed to understand rule %s'), rule)
 
         # Fail closed
         return _checks.FalseCheck()

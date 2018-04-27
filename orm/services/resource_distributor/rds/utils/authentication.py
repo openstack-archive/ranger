@@ -29,36 +29,32 @@ def _get_token_conf():
     return conf
 
 
-def get_keystone_ep_region_name():
-    # get any region that hase keystone end point
-    logger.debug("get list of regions from rms")
-    regions = RmsService.get_regions()
-    if not regions:
-        logger.error("failto get regions from rms")
-        return None, None
-    logger.debug("got {} regions".format(len(regions)))
+def get_keystone_ep_region_name(region):
+    # get  end point of a region
+    region_data = RmsService.get_rms_region(region)
+    if not region_data:
+        logger.error("fail to get region from rms")
+        return None
+    logger.debug("got rms region {} for region name {} ".format(
+        region, region_data))
     keystone_ep = None
-    region_name = None
-    for region in regions['regions']:
-        for endpoint in region['endpoints']:
-            if endpoint['type'] == 'identity':
-                keystone_ep = endpoint['publicURL']
-                break
-        if keystone_ep:
-            region_name = region['name']
+    for endpoint in region_data['endpoints']:
+        if endpoint['type'] == 'identity':
+            keystone_ep = endpoint['publicURL']
             break
+
     logger.debug("Got keystone_ep {} for region name {}".format(keystone_ep,
-                                                                region_name))
-    return region_name, keystone_ep
+                                                                region))
+    return keystone_ep
 
 
-def get_token():
+def get_token(region):
 
     logger.debug("create token")
     if not _is_authorization_enabled():
         return
 
-    region, keystone_ep = get_keystone_ep_region_name()
+    keystone_ep = get_keystone_ep_region_name(region)
     if not region or not keystone_ep:
         log_message = "fail to create token reason -- fail to get region-- " \
                       "region:{} keystone {}".format(region, keystone_ep)
@@ -85,7 +81,7 @@ def get_token():
         if respone.status_code != 200:
             logger.error("fail to get token from url")
         logger.debug("got token for region {}".format(region))
-        return region, respone.json()['access']['token']['id']
+        return respone.json()['access']['token']['id']
 
     except Exception as exp:
         logger.error(exp)
