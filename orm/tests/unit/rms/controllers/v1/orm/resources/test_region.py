@@ -1,27 +1,28 @@
 import json
+from mock import patch, MagicMock
 
 from orm.services.region_manager.rms.controllers.v2.orm.resources import regions
 from orm.services.region_manager.rms.model import model as PyModels
 from orm.tests.unit.rms import FunctionalTest
 
-from mock import MagicMock, patch
 from wsme.exc import ClientSideError
 
-result_inst = PyModels.Regions([PyModels.RegionData("2", "3", "4", "5", "6",
+
+result_inst = PyModels.Regions([PyModels.RegionData("2", "3", "4", "5", "6", "7",
                                                     address=PyModels.Address("US", "NY", "HANEGEV", "AIRPORT_CITY", "5"),
                                                     endpoints=[
                                                         PyModels.EndPoint("http://www.example.co.il", "url")
                                                     ],
                                                     metadata={"key1": ["value1"], "key2": ["value2"]}),
-                                PyModels.RegionData("2", "3", "4", "5", "6", endpoints=[
+                                PyModels.RegionData("2", "3", "4", "5", "6", "7", endpoints=[
                                     PyModels.EndPoint("http://www.example.co.il", "url")],
                                 address=PyModels.Address("US", "NY", "HANEGEV", "AIRPORT_CITY", "5"),
                                 metadata={"key3": ["value3"], "key4": ["value4"]})])
 
 
-result_dict = {u'regions': [{u'status': u'2', u'vlcpName': None, u'CLLI': u'5',
-                             u'name': u'3', u'designType': None,
-                             u'rangerAgentVersion': u'6', u'OSVersion': None, u'id': u'3',
+result_dict = {u'regions': [{u'status': u'2', u'vlcpName': None, u'CLLI': u'6',
+                             u'name': u'3', u'description': u'5', u'designType': None,
+                             u'rangerAgentVersion': u'7', u'OSVersion': None, u'id': u'3',
                              u'address': {u'country': u'US', u'state': u'NY',
                                           u'street': u'AIRPORT_CITY',
                                           u'zip': u'5', u'city': u'HANEGEV'},
@@ -29,11 +30,13 @@ result_dict = {u'regions': [{u'status': u'2', u'vlcpName': None, u'CLLI': u'5',
                                  {u'type': u'url',
                                   u'publicURL': u'http://www.example.co.il'}],
                              u'locationType': None,
+                             u'created': None,
+                             u'modified': None,
                              u'metadata': {u'key1': [u'value1'],
                                            u'key2': [u'value2']}},
-                            {u'status': u'2', u'vlcpName': None, u'CLLI': u'5',
-                             u'name': u'3', u'designType': None,
-                             u'rangerAgentVersion': u'6', u'OSVersion': None,
+                            {u'status': u'2', u'vlcpName': None, u'CLLI': u'6',
+                             u'name': u'3', u'description': u'5', u'designType': None,
+                             u'rangerAgentVersion': u'7', u'OSVersion': None,
                              u'id': u'3',
                              u'address': {u'country': u'US',
                                           u'state': u'NY',
@@ -42,6 +45,8 @@ result_dict = {u'regions': [{u'status': u'2', u'vlcpName': None, u'CLLI': u'5',
                              u'endpoints': [{u'type': u'url',
                                              u'publicURL': u'http://www.example.co.il'}],
                              u'locationType': None,
+                             u'created': None,
+                             u'modified': None,
                              u'metadata': {u'key3': [u'value3'],
                                            u'key4': [u'value4']}}]}
 
@@ -54,7 +59,7 @@ db_full_region = {
     'open_stack_version': 'kilo',
     'address_country': 'US',
     'design_type': 'n/a',
-    'ranger_agent_version': 'ranger_agent1.0',
+    'ranger_agent_version': 'aic3.0',
     'vlcp_name': 'n/a',
     'end_point_list': [{
         'url': 'http://horizon1.com',
@@ -76,7 +81,8 @@ db_full_region = {
     'address_zip': '1111',
     'address_street': 'n/a',
     'location_type': 'n/a',
-    'name': 'SNA 18'
+    'name': 'SNA 18',
+    'description': 'SNA 18'
 }
 
 full_region = {
@@ -103,9 +109,12 @@ full_region = {
         ],
         "CLLI": "nn/a",
         "name": "SNA20",
+        "description": "SNA20",
         "designType": "n/a",
         "locationType": "n/a",
         "vlcpName": "n/a",
+        "created": None,
+        "modified": None,
         "address":
             {
                 "country": "US",
@@ -113,7 +122,7 @@ full_region = {
                 "street": "n/a",
                 "zip": "1111",
                 "city": "LAb"},
-        "rangerAgentVersion": "ranger_agent1.0",
+        "rangerAgentVersion": "aic3.0",
         "OSVersion": "kilo",
         "id": "SNA20",
         "metadata":
@@ -137,6 +146,7 @@ class TestAddRegion(FunctionalTest):
         obj = PyModels.RegionData()
         obj.clli = full_region["CLLI"]
         obj.name = full_region["id"]  # need to be same as id
+        obj.description = full_region["description"]
         obj.design_type = full_region["designType"]
         obj.location_type = full_region["locationType"]
         obj.vlcp_name = full_region["vlcpName"]
@@ -157,17 +167,17 @@ class TestAddRegion(FunctionalTest):
                                                        "publicURL"]))
         return obj
 
-#   @patch.object(regions, 'request')
-#   @patch.object(regions.RegionService, 'create_full_region')
-#   @patch.object(regions.authentication, 'authorize', return_value=True)
-#   def test_add_region_success(self, mock_auth, mock_create_logic,
-#                               mock_request):
-#       self.maxDiff = None
-#       mock_create_logic.return_value = self._create_result_from_input(
-#           full_region)
-#       response = self.app.post_json('/v2/orm/regions', full_region)
-#       self.assertEqual(response.status_code, 201)
-#       self.assertEqual(response.json, full_region)
+    @patch.object(regions, 'request')
+    @patch.object(regions.RegionService, 'create_full_region')
+    @patch.object(regions.authentication, 'authorize', return_value=True)
+    def test_add_region_success(self, mock_auth, mock_create_logic,
+                                mock_request):
+        self.maxDiff = None
+        mock_create_logic.return_value = self._create_result_from_input(
+            full_region)
+        response = self.app.post_json('/v2/orm/regions', full_region)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, full_region)
 
     @patch.object(regions.RegionService, 'create_full_region')
     @patch.object(regions.authentication, 'authorize', return_value=True)
@@ -216,42 +226,42 @@ class TestAddRegion(FunctionalTest):
                          'not found')
         self.assertEqual(response.status_code, 404)
 
-#   @patch.object(regions, 'request')
-#   @patch.object(regions, 'err_utils')
-#   @patch.object(regions.RegionService, 'delete_region')
-#   @patch.object(regions.authentication, 'authorize', return_value=True)
-#   def test_delete_region(self, mock_auth, mock_delete_logic,
-#                          mock_get_error, mock_request):
-#       mock_get_error.get_error = self.get_error
-#       mock_request.transaction_id = "555"
-#       mock_delete_logic.return_value = True
-#       response = self.app.delete('/v2/orm/regions/id')
-#       self.assertEqual(response.status_code, 204)
+    @patch.object(regions, 'request')
+    @patch.object(regions, 'err_utils')
+    @patch.object(regions.RegionService, 'delete_region')
+    @patch.object(regions.RegionsController, 'has_no_resources', return_value=True)
+    @patch.object(regions.authentication, 'authorize', return_value=True)
+    def test_delete_region(self, mock_auth, mock_delete_logic,
+                           mock_get_error, mock_request, mock_controller):
+        mock_get_error.get_error = self.get_error
+        mock_request.transaction_id = "555"
+        mock_delete_logic.return_value = True
+        response = self.app.delete('/v2/orm/regions/id')
+        self.assertEqual(response.status_code, 204)
 
     @patch.object(regions, 'request')
     @patch.object(regions, 'err_utils')
     @patch.object(regions.RegionService, 'delete_region')
+    @patch.object(regions.RegionsController, 'has_no_resources', return_value=True)
     @patch.object(regions.authentication, 'authorize', return_value=True)
     def test_delete_region_error(self, mock_auth, mock_delete_logic,
-                                 mock_get_error, mock_request):
+                                 mock_get_error, mock_request, mock_controller):
         mock_get_error.get_error = self.get_error
         mock_request.transaction_id = "555"
-        mock_delete_logic.side_effect = Exception("unknown error")
+        mock_delete_logic.side_effect = regions.error_base.ErrorStatus(message="unknown error", status_code=500)
         response = self.app.delete('/v2/orm/regions/id', expect_errors=True)
         self.assertEqual(response.status_code, 500)
-        self.assertEqual(json.loads(response.json['faultstring'])['message'],
-                         'unknown error')
 
-#   @patch.object(regions, 'request')
-#   @patch.object(regions.RegionService, 'update_region')
-#   @patch.object(regions.authentication, 'authorize', return_value=True)
-#   def test_update_region_success(self, mock_auth, mock_update_logic,
-#                                  mock_request):
-#       mock_update_logic.return_value = self._create_result_from_input(
-#           full_region)
-#       response = self.app.put_json('/v2/orm/regions/id', full_region)
-#       self.assertEqual(response.status_code, 201)
-#       self.assertEqual(response.json, full_region)
+    @patch.object(regions, 'request')
+    @patch.object(regions.RegionService, 'update_region')
+    @patch.object(regions.authentication, 'authorize', return_value=True)
+    def test_update_region_success(self, mock_auth, mock_update_logic,
+                                   mock_request):
+        mock_update_logic.return_value = self._create_result_from_input(
+            full_region)
+        response = self.app.put_json('/v2/orm/regions/id', full_region)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, full_region)
 
     @patch.object(regions, 'request')
     @patch.object(regions, 'err_utils')
@@ -291,6 +301,7 @@ class TestWsmeModelFunctions(TestAddRegion):
         obj = regions.RegionsData()
         obj.clli = full_region["CLLI"]
         obj.name = full_region["name"]
+        obj.description = full_region["description"]
         obj.design_type = full_region["designType"]
         obj.location_type = full_region["locationType"]
         obj.vlcp_name = full_region["vlcpName"]

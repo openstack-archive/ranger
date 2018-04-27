@@ -153,3 +153,19 @@ authentication = {
     "keystone_version": "2.0",
     "policy_file": config.fms['policy_file'],
 }
+
+# valid_flavor_options
+flavor_options = {
+    'valid_cpin_opt_values': [
+        'c2', 'c4'
+    ],
+    'valid_stor_opt_values': [
+        's1', 's2'
+    ],
+    'valid_vnf_opt_values': [
+        'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'
+    ],
+    'valid_numa_values': ['n0'],
+    'valid_nd_vnf_values': ['v8'],
+    'valid_ss_vnf_values': ['v3']
+}

@@ -1,15 +1,14 @@
 """Authentication utilities module unittests."""
+import mock
 from orm.services.region_manager.rms.utils import authentication
 from orm.tests.unit.rms import FunctionalTest
-
-import mock
 
 
 class TestGetConfiguration(FunctionalTest):
     """Main authentication test case."""
 
     @mock.patch.object(authentication.policy, 'authorize')
-    @mock.patch.object(authentication, '_get_keystone_ep')
+    @mock.patch.object(authentication, 'get_keystone_ep')
     @mock.patch.object(authentication, '_is_authorization_enabled')
     def test_authorize_success(self, mock_iae, mock_gke, mock_authorize):
         request = mock.MagicMock()
@@ -27,7 +26,7 @@ class TestGetConfiguration(FunctionalTest):
         self.assertIsNone(kwargs['keystone_ep'])
 
     @mock.patch.object(authentication, 'policy')
-    @mock.patch.object(authentication, '_get_keystone_ep')
+    @mock.patch.object(authentication, 'get_keystone_ep')
     @mock.patch.object(authentication, '_is_authorization_enabled')
     def test_authorize_gke_failed(self, mock_iae, mock_gke, mock_policy):
         request = mock.MagicMock()
@@ -42,7 +41,7 @@ class TestGetConfiguration(FunctionalTest):
         authentication.authorize(request, action)
 
     @mock.patch.object(authentication, 'policy')
-    @mock.patch.object(authentication, '_get_keystone_ep',
+    @mock.patch.object(authentication, 'get_keystone_ep',
                        side_effect=ValueError('test'))
     @mock.patch.object(authentication, '_is_authorization_enabled',
                        return_value=True)
@@ -72,10 +71,10 @@ class TestGetConfiguration(FunctionalTest):
         region.endpoints = [keystone_ep]
         mock_grbion.return_value = region
 
-        self.assertEqual(authentication._get_keystone_ep('region'),
+        self.assertEqual(authentication.get_keystone_ep('region'),
                          keystone_ep.publicurl)
 
     @mock.patch.object(authentication.RegionService,
                        'get_region_by_id_or_name')
     def test_get_keystone_ep_no_keystone_ep(self, mock_grbion):
-        self.assertIsNone(authentication._get_keystone_ep('region'))
+        self.assertIsNone(authentication.get_keystone_ep('region'))

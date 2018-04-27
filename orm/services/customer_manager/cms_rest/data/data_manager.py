@@ -86,20 +86,20 @@ class DataManager(object):
         cms_users = self.session.query(CmsUser)
         return cms_users.all()
 
-    def get_cusomer_by_id(self, customer_id):
+    def get_customer_by_id(self, customer_id):
         customer = self.session.query(Customer).filter(
             Customer.id == customer_id)
         return customer.first()
 
-    def get_cusomer_by_uuid(self, uuid):
+    def get_customer_by_uuid(self, uuid):
         customer = self.session.query(Customer).filter(Customer.uuid == uuid)
         return customer.first()
 
-    def get_cusomer_by_name(self, name):
+    def get_customer_by_name(self, name):
         customer = self.session.query(Customer).filter(Customer.name == name)
         return customer.first()
 
-    def get_cusomer_by_uuid_or_name(self, cust):
+    def get_customer_by_uuid_or_name(self, cust):
         customer = self.session.query(Customer).filter(
             or_(Customer.uuid == cust,
                 Customer.name == cust))

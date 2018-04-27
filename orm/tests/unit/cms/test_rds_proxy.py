@@ -21,10 +21,10 @@ class TestUtil(FunctionalTest):
         FunctionalTest.setUp(self)
         self.rp = rds_proxy.RdsProxy()
 
+    @log_capture('orm.services.customer_manager.cms_rest.rds_proxy')
     @mock.patch.object(rds_proxy, 'request')
     @mock.patch('requests.post')
-    @log_capture('orm.services.customer_manager.cms_rest.rds_proxy')
-    def test_send_good(self, mock_post, mock_request, l):
+    def testsend_good(self, mock_post, mock_request, l):
         resp = Response(200, 'my content')
         mock_post.return_value = resp
         # send_res = self.rp.send_customer(models.Customer(), "1234", "POST")
@@ -32,9 +32,9 @@ class TestUtil(FunctionalTest):
         # self.assertRegexpMatches(l.records[-1].getMessage(), 'Response Content from rds server')
         # self.assertEqual(send_res, 'my content')
 
+    @log_capture('orm.services.customer_manager.cms_rest.rds_proxy')
     @mock.patch.object(rds_proxy, 'request')
     @mock.patch('requests.post')
-    @log_capture('orm.services.customer_manager.cms_rest.rds_proxy')
     def test_bad_status(self, mock_post, mock_request, l):
         resp = Response(400, 'my content')
         mock_post.return_value = resp
@@ -42,9 +42,9 @@ class TestUtil(FunctionalTest):
         # self.assertRegexpMatches(l.records[-3].getMessage(), 'Wrapper JSON before sending action')
         # self.assertRegexpMatches(l.records[-1].getMessage(), 'Response Content from rds server')
 
+    @log_capture('orm.services.customer_manager.cms_rest.rds_proxy')
     @mock.patch.object(rds_proxy, 'request')
     @mock.patch('requests.post')
-    @log_capture('orm.services.customer_manager.cms_rest.rds_proxy')
     def test_no_content(self, mock_post, mock_request, l):
         resp = Response(200, None)
         mock_post.return_value = resp
