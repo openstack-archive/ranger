@@ -20,13 +20,13 @@ class SoTFactoryTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             sot_factory.get_sot()
 
-    def test_get_sot_git_type(self):
-        """ Check that when 'git' type is provided the returned object
-        is instance of  GiTSoT
-        """
-        sot_factory.sot_type = "git"
-        obj = sot_factory.get_sot()
-        self.assertIsInstance(obj, GitSoT)
+#    def test_get_sot_git_type(self):
+#        """ Check that when 'git' type is provided the returned object
+#        is instance of  GiTSoT
+#        """
+#        sot_factory.sot_type = "git"
+#        obj = sot_factory.get_sot()
+#        self.assertIsInstance(obj, GitSoT)
 
     def test_get_sot_git_sot_params(self):
         sot_factory.sot_type = "git"

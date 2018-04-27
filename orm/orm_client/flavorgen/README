@@ -18,24 +18,22 @@ You should normally create the list of flavors once.
 
 Then when you want to add regions to all the flavors, use:
 
-7. ./regionator.py --regions region1,region2
+7. ./regionator.py region1,region2 series1,series2
 
-The argument is a comma-separated list of regions with no internal whitespace.
+The argument is a comma-separated list of regions and series
+with no internal whitespace.
 
 
 Use of -h will produce the following help:
 
 ./regionator.py -h
-usage: regionator [-h] [--flavor_dir FLAVOR_DIR] [--host HOST]
-                  [--cli_command CLI_COMMAND] [--regions REGIONS]
+usage: regionator [-h] regions [series]
 
 batch add region to flavor
 
+positional arguments:
+  regions     <comma-separated regions to add, e.g. region1,region2>
+  series      <comma-separated flavor series to add, e.g. nd,gv>
+
 optional arguments:
-  -h, --help            show this help message and exit
-  --flavor_dir FLAVOR_DIR
-                        <JSON flavor directory, default: ./flavor_dir>
-  --host HOST           <orm host ip>
-  --cli_command CLI_COMMAND
-                        <path to cli command>
-  --regions REGIONS     <comma-separated regions to add, e.g. region1,region2>
+  -h, --help  show this help message and exit

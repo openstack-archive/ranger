@@ -131,6 +131,10 @@ def authorize(action, request, app_conf, keystone_ep=None):
 
     token_to_validate = request.headers.get('X-Auth-Token')
     lcp_id = request.headers.get('X-Auth-Region')
+
+    keystone_ep = keystone_ep if keystone_ep else (
+        request.headers.get('Keystone-Endpoint'))
+
     try:
         if _is_authorization_enabled(app_conf):
             try:

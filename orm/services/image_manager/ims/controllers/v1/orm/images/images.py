@@ -43,13 +43,10 @@ class ImageController(rest.RestController):
             LOG.info("ImageController - Create image: " + str(image_wrapper.image.name))
             image_wrapper.image.owner = request.headers.get('X-RANGER-Owner') or ''
 
-            if not image_wrapper.image.id:
-                uuid = utils.make_uuid()
-            else:
-                try:
-                    uuid = utils.create_existing_uuid(image_wrapper.id)
-                except TypeError:
-                    raise ErrorStatus(409.1, message='Image UUID already exists')
+            try:
+                uuid = utils.create_or_validate_uuid(image_wrapper.image.id, 'imsId')
+            except TypeError:
+                raise ErrorStatus(409.1, message='Image UUID already exists')
 
             try:
                 ret_image = image_logic.create_image(image_wrapper, uuid,
@@ -125,7 +122,7 @@ class ImageController(rest.RestController):
         auth.authorize(request, "image:get_one")
 
         try:
-            return image_logic.get_image_by_uuid(image_uuid)
+            return image_logic.get_image_by_uuid(image_uuid, query_by_id_or_name=True)
 
         except ErrorStatus as exception:
             LOG.log_exception("ImageController - Failed to GetImageDetails", exception)
@@ -140,14 +137,14 @@ class ImageController(rest.RestController):
                                       error_details=str(exception))
 
     @wsexpose(ImageSummaryResponse, str, str, str, rest_content_types='json')
-    def get_all(self, visibility=None, region=None, tenant=None):
+    def get_all(self, visibility=None, region=None, customer=None):
         image_logic, utils = di.resolver.unpack(ImageController)
         auth.authorize(request, "image:list")
 
         try:
             LOG.info("ImageController - GetImagelist")
 
-            result = image_logic.get_image_list_by_params(visibility, region, tenant)
+            result = image_logic.get_image_list_by_params(visibility, region, customer)
             return result
 
         except ErrorStatus as exception:

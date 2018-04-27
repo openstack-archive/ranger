@@ -52,18 +52,15 @@ class CustomerController(rest.RestController):
         authentication.authorize(request, 'customers:create')
         try:
             uuid = None
-            if not customer.custId:
-                uuid = utils.make_uuid()
-            else:
-                if not CustomerController.validate_cust_id(customer.custId):
-                    utils.audit_trail('create customer', request.transaction_id, request.headers, customer.custId)
-                    raise ErrorStatus('400', None)
-                try:
-                    uuid = utils.create_existing_uuid(customer.custId)
-                except TypeError:
-                    raise ErrorStatus(409.1, 'Customer ID {0} already exists'.format(customer.custId))
-
+            if not customer.uuid:
+                customer.uuid = None
             customer_logic = CustomerLogic()
+
+            try:
+                uuid = utils.create_or_validate_uuid(customer.uuid, 'custId')
+            except TypeError:
+                raise ErrorStatus(409.1, 'Unable to create Customer ID {0}'.format(customer.uuid))
+
             try:
                 result = customer_logic.create_customer(customer, uuid, request.transaction_id)
             except oslo_db.exception.DBDuplicateEntry as exception:
@@ -121,19 +118,25 @@ class CustomerController(rest.RestController):
 
         return result
 
-    @wsexpose(CustomerSummaryResponse, str, str, str, str, [str],
+    @wsexpose(CustomerSummaryResponse, str, str, str, str, [str], int, int,
               rest_content_types='json')
     def get_all(self, region=None, user=None, starts_with=None,
-                contains=None, metadata=None):
+                contains=None, metadata=None, start=0, limit=0):
         LOG.info("CustomerController - GetCustomerlist")
         authentication.authorize(request, 'customers:get_all')
+
+        # This shouldn't be necessary, but apparently is on mtn29
+        start = 0 if start is None else start
+        limit = 0 if limit is None else limit
+
         try:
             customer_logic = CustomerLogic()
             result = customer_logic.get_customer_list_by_criteria(region, user,
                                                                   starts_with,
                                                                   contains,
-                                                                  metadata)
-
+                                                                  metadata,
+                                                                  start,
+                                                                  limit)
             return result
         except ErrorStatus as exception:
             LOG.log_exception("CustomerController - Failed to GetCustomerlist", exception)
@@ -174,9 +177,3 @@ class CustomerController(rest.RestController):
             raise err_utils.get_error(request.transaction_id,
                                       status_code=500,
                                       error_details=exception.message)
-
-    @staticmethod
-    def validate_cust_id(cust_id):
-        # regex = re.compile('[a-zA-Z]')
-        # return regex.match(cust_id[0])
-        return True

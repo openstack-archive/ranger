@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+
 from orm.common.orm_common.injector import injector
 from orm.common.orm_common.utils import api_error_utils as err_utils
 from orm.services.flavor_manager.fms_rest.data.wsme.models import RegionWrapper
@@ -49,23 +50,30 @@ class RegionController(rest.RestController):
                                       status_code=500,
                                       error_details=str(exception))
 
-    @wsexpose(None, str, str, rest_content_types='json', status_code=204)
-    def delete(self, flavor_id, region_name):
+    @wsexpose(None, str, str, str, rest_content_types='json', status_code=204)
+    def delete(self, flavor_id, region_name, force_delete='False'):
+        if force_delete == 'True':
+            force_delete = True
+        else:
+            force_delete = False
         flavor_logic, utils = di.resolver.unpack(RegionController)
+        requester = request.headers.get('X-RANGER-Requester')
+        is_rds_client_request = requester == 'rds_resource_service_proxy'
+        LOG.info("RegionController - Delete region:{0} by RDS Proxy: {1} ".format(region_name, is_rds_client_request))
 
-        LOG.info("RegionController - delete region: " + str(region_name))
         authentication.authorize(request, 'flavor:delete_flavor_region')
-
         try:
-            result = flavor_logic.delete_region(flavor_id, region_name, request.transaction_id)
+            result = flavor_logic.delete_region(flavor_id, region_name, request.transaction_id,
+                                                is_rds_client_request, force_delete)
 
-            LOG.info("RegionController - region deleted: " + str(result))
+            if is_rds_client_request:
+                LOG.info("RegionController - region deleted: " + str(result))
 
-            event_details = 'Flavor {} region {} deleted'.format(flavor_id,
-                                                                 region_name)
-            utils.audit_trail('delete region', request.transaction_id,
-                              request.headers, flavor_id,
-                              event_details=event_details)
+                event_details = 'Flavor {} region {} deleted'.format(flavor_id,
+                                                                     region_name)
+                utils.audit_trail('delete region', request.transaction_id,
+                                  request.headers, flavor_id,
+                                  event_details=event_details)
 
         except ErrorStatus as exception:
             LOG.log_exception("RegionController - Failed to delete region", exception)

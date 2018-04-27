@@ -23,7 +23,7 @@ class TestCustomerController(FunctionalTest):
         root.utils = mock.MagicMock()
         root.utils.make_transid.return_value = 'some_trans_id'
         root.utils.audit_trail.return_value = None
-        root.utils.make_uuid.return_value = 'some_uuid'
+        root.utils.create_or_validate_uuid.return_value = 'some_uuid'
 
         root.err_utils = mock.MagicMock()
 
@@ -40,7 +40,7 @@ class TestCustomerController(FunctionalTest):
         # assert
         assert response.status_int == 201
         assert root.utils.audit_trail.called
-        assert root.utils.make_uuid.called
+        assert root.utils.create_or_validate_uuid.called
         assert customer_logic_mock.create_customer.called
 
     def test_create_customer_fail(self):
@@ -76,18 +76,18 @@ class TestCustomerController(FunctionalTest):
         self.assertEqual(response.status_int, 409)
 
     def test_create_flavor_duplicate_uuid(self):
-        CUSTOMER_JSON['custId'] = 'test'
-        create_existing_uuid = root.utils.create_existing_uuid
+        CUSTOMER_JSON['uuid'] = 'test'
+        create_or_validate_uuid = root.utils.create_or_validate_uuid
 
-        root.utils.create_existing_uuid = mock.MagicMock(side_effect=TypeError('test'))
+        root.utils.create_or_validate_uuid = mock.MagicMock(side_effect=TypeError('test'))
 
         root.err_utils.get_error = mock.MagicMock(return_value=ClientSideError("blabla",
                                                                                409))
         response = self.app.post_json('/v1/orm/customers', CUSTOMER_JSON,
                                       expect_errors=True)
 
-        root.utils.create_existing_uuid = create_existing_uuid
-        del CUSTOMER_JSON['custId']
+        root.utils.ccreate_or_validate_uuid = create_or_validate_uuid
+        del CUSTOMER_JSON['uuid']
 
         self.assertEqual(response.status_int, 409)
 
@@ -444,8 +444,9 @@ RET_CUSTOMER_JSON = {
                                    server_groups='1', server_group_members='1')],
         "storage": [Models.Storage(gigabytes='1', snapshots='1', volumes='1')],
         "network": [Models.Network(floating_ips='1', networks='1', ports='1', routers='1', subnets='1',
-                                   security_groups='1', security_group_rules='1', health_monitor='1',
-                                   member='1', pool='1', nat_instance='1', route_table='1', vip='1')]
+                                   security_groups='1', security_group_rules='1', health_monitors='1',
+                                   members='1', pools='1', nat_instance='1', route_table='1', vips='1',
+                                   loadbalancer='1', listener='1')]
     })]})],
     "users": [Models.User(**
                           {"id": "userId1", "role": ["admin", "other"]})
@@ -457,8 +458,9 @@ RET_CUSTOMER_JSON = {
                                    server_groups='1', server_group_members='1')],
         "storage": [Models.Storage(gigabytes='1', snapshots='1', volumes='1')],
         "network": [Models.Network(floating_ips='1', networks='1', ports='1', routers='1', subnets='1',
-                                   security_groups='1', security_group_rules='1', health_monitor='1',
-                                   member='1', pool='1', nat_instance='1', route_table='1', vip='1')]
+                                   security_groups='1', security_group_rules='1', health_monitors='1',
+                                   members='1', pools='1', nat_instance='1', route_table='1', vips='1',
+                                   loadbalancer='1', listener='1')]
     })]
 }
 

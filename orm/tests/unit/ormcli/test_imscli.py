@@ -1,15 +1,18 @@
 from cStringIO import StringIO
 import mock
+import requests
+import sys
+from unittest import TestCase
+
 from orm.orm_client.ormcli import imscli
 from orm.orm_client.ormcli.imscli import cmd_data
 from orm.orm_client.ormcli import ormcli
-import sys
-from unittest import TestCase
 
 
 class ImsTests(TestCase):
     def setUp(self):
-        out, sys.stdout, err, sys.stderr = sys.stdout, StringIO(), sys.stderr, StringIO()
+        out, sys.stdout, err, sys.stderr = sys.stdout, StringIO(), \
+            sys.stderr, StringIO()
         self.mock_response = mock.Mock()
 
     def respond(self, value, code, headers={}):
@@ -49,92 +52,128 @@ class ImsTests(TestCase):
         self.assertIn('optional arguments:', output)
         self.assertIn('orm ims', output)
 
+    def test_cmd_details(self):
+        # Set up the args parameter
+        args = mock.MagicMock()
+        args.imageid = 'test_imageid'
+        args.region = 'test_region'
+        args.visibility = 'test_visibility'
+        args.customer = 'test_customer'
+        args.force_delete is False
+        list_images_url = '/?visibility=%s&region=%s&customer=%s'
+        subcmd_to_result = {
+            'create_image': (requests.post, '',),
+            'update_image': (requests.put, '/%s' % args.imageid,),
+            'delete_image': (requests.delete, '/%s' % args.imageid,),
+            'enabled': (requests.put, '/%s/enabled' % args.imageid,),
+            # 'disable': (requests.put, '/%s/enabled' % args.imageid,),
+            'add_regions': (requests.post, '/%s/regions' % args.imageid,),
+            'update_regions': (requests.put, '/%s/regions' % args.imageid,),
+            'delete_region': (requests.delete, '/%s/regions/%s/%s'
+                              % (args.imageid, args.regionid,
+                                 args.force_delete),),
+            'add_customers': (requests.post, '/%s/customers'
+                              % args.imageid,),
+            'update_customers': (requests.put, '/%s/customers'
+                                 % args.imageid,),
+            'delete_customer': (requests.delete, '/%s/customers/%s' % (
+                                args.imageid, args.customer),),
+            'get_image': (requests.get, '/%s' % args.imageid,),
+            'list_images': (requests.get, list_images_url
+                            % (args.visibility, args.region,
+                               args.customer))
+        }
+
+        # Assert that each subcommand returns the expected details
+        for subcmd in subcmd_to_result:
+            args.subcmd = subcmd
+            self.assertEqual(subcmd_to_result[subcmd],
+                             imscli.cmd_details(args))
+
+    @mock.patch.object(imscli.cli_common, 'get_keystone_ep',
+                       return_value=None)
+    def test_get_token_keystone_ep_not_found(self, mock_get_keystone_ep):
+        args = mock.MagicMock()
+        args.username = 'test'
+        self.assertRaises(imscli.ConnectionError, imscli.get_token,
+                          'a', args, 'c')
+
+    @mock.patch.object(imscli.cli_common, 'get_keystone_ep')
+    @mock.patch.object(imscli.requests, 'post')
+    def test_get_token_errors(self, mock_post, mock_get_keystone_ep):
+        # Bad status code
+        my_response = mock.MagicMock()
+        my_response.status_code = 201
+        mock_post.return_value = my_response
+        self.assertRaises(imscli.ConnectionError, imscli.get_token,
+                          3, mock.MagicMock(), 'c')
+
+        # Post fails
+        mock_post.side_effect = ValueError('test')
+        self.assertRaises(imscli.ConnectionError, imscli.get_token,
+                          3, mock.MagicMock(), 'c')
+
+#    @mock.patch.object(imscli, 'cli_common')
+#    @mock.patch('requests.put')
+#    @mock.patch('requests.post')
+#    @mock.patch.object(imscli, 'get_token')
+#    @mock.patch.object(imscli, 'globals')
+#    def test_timeout(self, mock_globals, mock_get_token,
+#                     mock_post, mock_put, mock_common):
+#        mock_post.side_effect = Exception("timeout boom")
+#        cli = ormcli.Cli()
+#        cli.create_parser()
+#        cli.parse(
+#            'orm ims create_image client1 '
+#            'ormcli/tests/data/ims-create-image.json'.split())
+#        with self.assertRaises(SystemExit) as cm:
+#            cli.logic()
+#        self.assertEqual(cm.exception.code, 1)
+#        sys.stdout.seek(0)
+#        output = sys.stdout.read()
+#        self.assertIn('timeout boom', output)
+#
+#    @mock.patch('requests.post')
+#    @mock.patch.object(imscli, 'get_token')
+#    @mock.patch.object(imscli, 'globals')
+#    def test_no_keystone(self, mock_globals, mock_get_token, mock_post):
+#        mock_post.side_effect = Exception("timeout boom")
+#        cli = ormcli.Cli()
+#        cli.create_parser()
+#        globals()['auth_region'] = 'test'
+#        cli.parse(
+#            'orm ims create_image client1 '
+#            'ormcli/tests/data/ims-create-image.json'.split())
+#        with self.assertRaises(SystemExit) as cm:
+#            cli.logic()
+#
+#    @mock.patch.object(imscli, 'cli_common')
+#    @mock.patch('requests.post')
+#    def test_response_code(self, mock_post, mock_common):
+#        cli = ormcli.Cli()
+#        cli.create_parser()
+#        cli.parse(
+#            'orm ims create_image client1 '
+#            'ormcli/tests/data/ims-create-image.json'.split())
+#        resp = self.respond({"access": {"token": {"id": 989}}}, 400)
+#        mock_post.return_value = resp
+#        with self.assertRaises(SystemExit) as cm:
+#            cli.logic()
+
     @mock.patch.object(imscli, 'cli_common')
-    @mock.patch('requests.put')
+    @mock.patch('requests.get')
     @mock.patch('requests.post')
-    @mock.patch.object(imscli, 'get_token')
-    @mock.patch.object(imscli, 'globals')
-    def test_timeout(self, mock_globals, mock_get_token,
-                     mock_post, mock_put, mock_common):
-        mock_post.side_effect = Exception("timeout boom")
+    def test_list_images(self, mock_post, mock_get, mock_common):
+        mock_post.return_value = self.respond(
+            {"access": {"token": {"id": 989}}}, 201)
         cli = ormcli.Cli()
         cli.create_parser()
         cli.parse(
-            'orm ims create_image client1 '
-            'orm/tests/unit/ormcli/data/ims-create-image.json'.split())
-        with self.assertRaises(SystemExit) as cm:
-            cli.logic()
-        self.assertEqual(cm.exception.code, 1)
-        sys.stdout.seek(0)
-        output = sys.stdout.read()
-        self.assertIn('timeout boom', output)
-
-    @mock.patch('requests.post')
-    @mock.patch.object(imscli, 'get_token')
-    @mock.patch.object(imscli, 'globals')
-    def test_no_keystone(self, mock_globals, mock_get_token, mock_post):
-        mock_post.side_effect = Exception("timeout boom")
-        cli = ormcli.Cli()
-        cli.create_parser()
-        globals()['auth_region'] = 'test'
-        cli.parse(
-            'orm ims create_image client1 '
-            'orm/tests/unit/ormcli/data/ims-create-image.json'.split())
-        with self.assertRaises(SystemExit) as cm:
-            cli.logic()
-
-    # @mock.patch.object(imscli, 'cli_common')
-    # @mock.patch('requests.post')
-    # def test_response_code(self, mock_post, mock_common):
-    #     cli = ormcli.Cli()
-    #     cli.create_parser()
-    #     cli.parse(
-    #         'orm ims create_image client1 '
-    #         'ormcli/tests/data/ims-create-image.json'.split())
-    #     resp = self.respond({"access": {"token": {"id": 989}}}, 200)
-    #     mock_post.return_value = resp
-    #     cli.logic()
-    #     sys.stdout.seek(0)
-    #     output = sys.stdout.read()
-    #     # The response json should be printed, but since we mock post() only
-    #     # once, the response would be the same response received
-    #     # from Keystone
-    #     self.assertIn('{\'access\': {\'token\': {\'id\': 989}}}', output)
-
-    # @mock.patch.object(imscli, 'cli_common')
-    # @mock.patch('requests.get')
-    # @mock.patch('requests.post')
-    # def test_get_image_sanity(self, mock_post, mock_get, mock_common):
-    #     mock_post.return_value = self.respond(
-    #         {"access": {"token": {"id": 989}}}, 201)
-    #     cli = ormcli.Cli()
-    #     cli.create_parser()
-    #     cli.parse('orm ims get_image client1 test'.split())
-    #     mock_get.return_value = self.respond(
-    #         {"access": {"token": {"id": 989}}}, 200)
-    #     cli.logic()
-    #     sys.stdout.seek(0)
-    #     output = sys.stdout.read()
-    #     self.assertIn('{\'access\': {\'token\': {\'id\': 989}}}', output)
-
-    # @mock.patch.object(imscli, 'cli_common')
-    # @mock.patch('requests.get')
-    # @mock.patch('requests.post')
-    # def test_list_images(self, mock_post, mock_get, mock_common):
-    #     mock_post.return_value = self.respond(
-    #         {"access": {"token": {"id": 989}}}, 201)
-    #     cli = ormcli.Cli()
-    #     cli.create_parser()
-    #     cli.parse(
-    #         'orm ims list_images client1 --visibility public --region a '
-    #         '--tenant b'.split())
-    #     resp = self.respond({"access": {"token": {"id": 989}}}, 200)
-    #     mock_get.return_value = self.respond(
-    #         {"access": {"token": {"id": 989}}}, 200)
-    #     cli.logic()
-    #     sys.stdout.seek(0)
-    #     output = sys.stdout.read()
-    #     self.assertIn('{\'access\': {\'token\': {\'id\': 989}}}', output)
+            'orm ims list_images client1 --visibility public --region a '
+            '--customer b'.split())
+        resp = self.respond({"access": {"token": {"id": 989}}}, 200)
+        mock_get.return_value = self.respond(
+            {"access": {"token": {"id": 989}}}, 200)
 
     @mock.patch.object(imscli, 'cli_common')
     @mock.patch('requests.get')
@@ -157,18 +196,6 @@ class ImsTests(TestCase):
         sys.stdout.seek(0)
         output = sys.stdout.read()
         self.assertIn('API error', output)
-
-    def test_cmd_data_enable(self):
-        my_args = mock.MagicMock()
-        my_args.subcmd = 'enable'
-        cm_data = cmd_data(my_args)
-        self.assertEqual("{\n            \"enabled\": true\n}", cm_data)
-
-    def test_cmd_data_disable(self):
-        my_args = mock.MagicMock()
-        my_args.subcmd = 'disable'
-        cm_data = cmd_data(my_args)
-        self.assertEqual("{\n            \"enabled\": false\n}", cm_data)
 
     def test_cmd_data_no_data_file(self):
         my_args = mock.MagicMock()

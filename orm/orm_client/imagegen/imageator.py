@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-from os.path import isfile, join
 import argparse
 import json
 import os
+from os.path import isfile, join
 import re
 import subprocess
 import tempfile
@@ -29,7 +29,9 @@ def sh(cmd):
     start = time.time()
     output = ''
     errpat = re.compile('error', re.I)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+
+    cmd = 'python ' + cmd
+    p = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT)
     for line in iter(p.stdout.readline, b''):
         out = line.rstrip()

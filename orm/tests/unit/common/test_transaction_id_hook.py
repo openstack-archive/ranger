@@ -1,8 +1,7 @@
 import logging
-from unittest import TestCase
-
 import mock
 from orm.common.orm_common.hooks import transaction_id_hook
+from unittest import TestCase
 
 logger = logging.getLogger(__name__)
 
