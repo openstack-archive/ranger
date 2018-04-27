@@ -1,15 +1,15 @@
 orm_protocal = 'http'
 orm_host = '127.0.0.1'
 log_location = '{}'
-ranger_base = '/opt/stack/upstream_ranger/ranger'
-log_location = ranger_base + '/logs/{}'
+ranger_base = '/opt/app/ranger'
+log_location = '/var/log/ranger/{}'
 db_user = 'root'
-db_pass = 'stack'
+db_pass = 'devstack'
 db_host = '127.0.0.1'
 ssl_verify = False
 token_auth_enabled = False
 token_auth_user = 'admin'
-token_auth_pass = 'nova'
+token_auth_pass = 'devstack'
 token_auth_tenant = 'admin'
 token_auth_user_role = 'admin'
 uuid_port = 7001
@@ -58,7 +58,7 @@ rms = {
 }
 rds = {
     'port': rds_port,
-    'repo_local_location': '/opt/app/orm/ORM',
+    'repo_local_location': '/opt/app/git_repo',
     'repo_user': 'orm',
     'repo_email': 'orm@test.com',
     'repo_remote_location': 'git@127.0.0.1:/home/repo/ORM.git',

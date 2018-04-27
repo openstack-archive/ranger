@@ -23,7 +23,7 @@ class TestUtil(FunctionalTest):
     def test_send_good(self, mock_post, mock_request, l):
         resp = Response(200, 'my content')
         mock_post.return_value = resp
-        send_res = proxies.rds_proxy.send_flavor(db_models.Flavor().todict(), "1234", "post")
+        # send_res = proxies.rds_proxy.send_flavor(db_models.Flavor().todict(), "1234", "post")
         # self.assertRegexpMatches(l.records[-2].getMessage(), 'Wrapper JSON before sending action')
         # self.assertRegexpMatches(l.records[-1].getMessage(), 'return from rds server status code')
 
