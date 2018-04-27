@@ -42,7 +42,8 @@ class Compute(Model):
                  vcpus=None, metadata_items=None, injected_file_content_bytes=None,
                  floating_ips='', fixed_ips='', injected_file_path_bytes='',
                  server_groups='', server_group_members=''):
-        """Create a new compute instance.
+        """
+        Create a new compute instance.
         :param instances:
         :param injected_files:
         :param key_pairs:
@@ -91,7 +92,8 @@ class Storage(Model):
     volumes = wsme.wsattr(wsme.types.text, mandatory=True)
 
     def __init__(self, gigabytes='', snapshots='', volumes=''):
-        """create a new Storage instance.
+        """
+        create a new Storage instance.
         :param gigabytes:
         :param snapshots:
         :param volumes:
@@ -112,19 +114,22 @@ class Network(Model):
     subnets = wsme.wsattr(wsme.types.text, mandatory=True)
     security_groups = wsme.wsattr(wsme.types.text, mandatory=False, name="security-groups")
     security_group_rules = wsme.wsattr(wsme.types.text, mandatory=False, name="security-group-rules")
-    health_monitor = wsme.wsattr(wsme.types.text, mandatory=False, name="health-monitor")
-    member = wsme.wsattr(wsme.types.text, mandatory=False)
+    health_monitors = wsme.wsattr(wsme.types.text, mandatory=False, name="health-monitors")
+    members = wsme.wsattr(wsme.types.text, mandatory=False)
     nat_instance = wsme.wsattr(wsme.types.text, mandatory=False, name="nat-instance")
-    pool = wsme.wsattr(wsme.types.text, mandatory=False)
+    pools = wsme.wsattr(wsme.types.text, mandatory=False)
     route_table = wsme.wsattr(wsme.types.text, mandatory=False, name="route-table")
-    vip = wsme.wsattr(wsme.types.text, mandatory=False)
+    vips = wsme.wsattr(wsme.types.text, mandatory=False)
+    loadbalancer = wsme.wsattr(wsme.types.text, mandatory=False, name='loadbalancer')
+    listener = wsme.wsattr(wsme.types.text, mandatory=False, name='listener')
 
     def __init__(self, floating_ips='', networks='', ports='', routers='',
                  subnets='', security_groups=None, security_group_rules=None,
-                 health_monitor='', member='', nat_instance='',
-                 pool='', route_table='', vip=''):
+                 health_monitors='', members='', nat_instance='',
+                 pools='', route_table='', vips='', loadbalancer='', listener=''):
 
-        """Create a new Network instance.
+        """
+        Create a new Network instance.
         :param floating_ips:  num of floating_ips
         :param networks:  num of networks
         :param ports:  num of ports
@@ -132,12 +137,14 @@ class Network(Model):
         :param subnets:  num of subnets
         :param security_groups: security groups
         :param security_group_rules: security group rules
-        :param health_monitor:
-        :param member:
+        :param health_monitors:
+        :param members:
         :param nat_instance:
-        :param pool:
+        :param pools:
         :param route_table:
-        :param vip:
+        :param vips:
+        :param loadbalancer:
+        :param listener:
         """
         self.floating_ips = floating_ips
         self.networks = networks
@@ -153,12 +160,14 @@ class Network(Model):
         else:
             self.security_group_rules = security_group_rules
 
-        self.health_monitor = health_monitor
-        self.member = member
+        self.health_monitors = health_monitors
+        self.members = members
         self.nat_instance = nat_instance
-        self.pool = pool
+        self.pools = pools
         self.route_table = route_table
-        self.vip = vip
+        self.vips = vips
+        self.loadbalancer = loadbalancer
+        self.listener = listener
 
 
 class Quota(Model):
@@ -266,7 +275,8 @@ class Customer(Model):
             self.uuid = uuid
 
     def validate_model(self, context=None):
-        """this function check if the customer model meet the demands
+        """
+        this function check if the customer model meet the demands
         :param context: i.e. 'create 'update'
         :return: none
         """

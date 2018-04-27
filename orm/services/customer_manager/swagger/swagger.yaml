@@ -10,7 +10,7 @@ info:
                 X-Auth-Region - The region
 
 # the domain of the service
-host: 127.0.0.1
+host: 135.76.2.229
 # array of all schemes that your API supports
 schemes:
   - https
@@ -886,17 +886,17 @@ definitions:
         type: string
       security_group_rules:
         type: string
-      health_monitor:
+      health_monitors:
         type: string
-      member:
+      members:
         type: string
       nat_instance:
         type: string
-      pool:
+      pools:
         type: string
       route_table:
         type: string
-      vip:
+      vips:
         type: string
 
   Quota:
@@ -1064,7 +1064,7 @@ parameters:
     type: string
 
   Client:
-    name: X-RANGER-Client
+    name: X-AIC-ORM-Client
     in: header
     description: Client name
     required: false
