@@ -10,7 +10,7 @@ class ResourceProviderRegister:
         # Maps resource names to a provider
         self.resource_providers = {}
 
-    def register(self, resource_name, provider=None, allow_override=True):
+    def register(self, resource_name, provider=None, allow_override=False):
         if provider is None:
             # Give a partial usable as a decorator
             return partial(

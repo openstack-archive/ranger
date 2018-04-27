@@ -1,6 +1,6 @@
 import logging
 import mock
-from orm.common.orm_common.utils import utils
+from orm_common.utils import utils
 import pprint
 from testfixtures import log_capture
 from unittest import TestCase
