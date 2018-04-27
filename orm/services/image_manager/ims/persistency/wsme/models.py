@@ -4,7 +4,7 @@ from orm.services.image_manager.ims.persistency.sql_alchemy import db_models
 from orm.services.image_manager.ims.persistency.wsme.base import Model
 from orm.common.orm_common.utils.cross_api_utils import (get_regions_of_group,
                                                          set_utils_conf)
-from pecan import conf, request
+from pecan import conf
 import wsme
 
 
@@ -52,6 +52,7 @@ class Region(Model):
     checksum = wsme.wsattr(wsme.types.text, mandatory=False)
     size = wsme.wsattr(wsme.types.text, mandatory=False)
     virtual_size = wsme.wsattr(wsme.types.text, mandatory=False)
+    error_message = wsme.wsattr(wsme.types.text, mandatory=False)
 
     def __init__(self, name="", type="single", status="", checksum='',
                  size='', virtual_size=''):
@@ -81,6 +82,9 @@ class Region(Model):
         region_rec.virtual_size = self.virtual_size
 
         return region_rec
+
+    def set_error_message(self, error_message):
+        self.error_message = error_message
 
 
 class RegionWrapper(Model):  # pragma: no cover
@@ -133,9 +137,9 @@ class Image(Model):
     owner = wsme.wsattr(wsme.types.text, mandatory=False)
     schema = wsme.wsattr(wsme.types.text, mandatory=False)
     protected = wsme.wsattr(bool, mandatory=False, default=default_protected)
+    id = wsme.wsattr(wsme.types.text, mandatory=False, name='id')
 
     # Output-only fields
-    id = wsme.wsattr(wsme.types.text, mandatory=False)
     status = wsme.wsattr(wsme.types.text, mandatory=False)
     created_at = wsme.wsattr(wsme.types.IntegerType(minimum=0),
                              mandatory=False, name='created-at')
@@ -214,6 +218,13 @@ class Image(Model):
         self.links = links
 
     def validate_model(self, context=None):
+
+        if self.name.strip() == '':
+            raise ErrorStatus(400, "Image name is required.")
+
+        if self.url.strip() == '':
+            raise ErrorStatus(400, "Image location URL is required.")
+
         # Validate visibility
         if self.visibility == 'public' and self.customers:
             raise ErrorStatus(400,
@@ -223,6 +234,9 @@ class Image(Model):
             raise ErrorStatus(400,
                               'Visibility is private but no customers were'
                               ' specified!')
+        elif self.visibility not in ["private", "public"]:
+            raise ErrorStatus(400,
+                              "Image visibility can only be 'public' or 'private'")
 
         # Validate disk format
         valid_disk_formats = ('ami', 'ari', 'aki', 'vhd', 'vmdk', 'raw',
@@ -242,22 +256,9 @@ class Image(Model):
         if self.container_format not in valid_container_formats:
             raise ErrorStatus(400, 'Invalid container format! {}'.format(self.container_format))
 
-        # Validate min-disk and min-ram (wsme automatically converts booleans
-        # to int, and isinstance(False, int) returns True, so that is how we
-        # validate the type)
-        if 'min-disk' in request.json['image'] and not type(
-                request.json['image']['min-disk']) == int:
-            raise ErrorStatus(400, 'min-disk must be an integer!')
-        if 'min-ram' in request.json['image'] and not type(
-                request.json['image']['min-ram']) == int:
-            raise ErrorStatus(400, 'min-ram must be an integer!')
+        if int(self.min_ram) not in range(0, self.min_ram + 1, 1024):
+            raise ErrorStatus(400, "mininum RAM value must be a multiple of 1024")
 
-        if self.min_disk != wsme.Unset and int(self.min_disk) > 2147483646 or int(self.min_disk) < 0:
-            raise ErrorStatus(400,
-                              'value must be positive less than 2147483646')
-        if self.min_ram != wsme.Unset and int(self.min_ram) > 2147483646 or int(self.min_ram) < 0:
-            raise ErrorStatus(400,
-                              'value must be positive less than 2147483646')
         if context == "update":
             for region in self.regions:
                 if region.type == "group":
@@ -406,6 +407,32 @@ class ImageWrapper(Model):
     def validate_model(self, context=None):
         return self.image.validate_model(context)
 
+    def validate_update(self, sql_image=None, new_image=None):
+
+        if sql_image and new_image:
+            if sql_image.name != new_image.name:
+                raise ErrorStatus(400, "Cannot change name of existing image")
+
+            if sql_image.container_format != new_image.container_format:
+                raise ErrorStatus(400, "Cannot change container format of "
+                                       "existing image")
+
+            if sql_image.disk_format != new_image.disk_format:
+                raise ErrorStatus(400,
+                                  "Cannot change disk format of existing image")
+
+            if sql_image.min_ram != new_image.min_ram:
+                raise ErrorStatus(400,
+                                  "Cannot change min_ram of existing image")
+
+            if sql_image.min_disk != new_image.min_disk:
+                raise ErrorStatus(400,
+                                  "Cannot change min_disk of existing image")
+
+            if sql_image.url != new_image.url:
+                raise ErrorStatus(400, "Cannot change source data URL of "
+                                       "existing image")
+
     def handle_region_group(self):
         return self.image.handle_region_group()
 
@@ -419,20 +446,26 @@ class ImageWrapper(Model):
         return image
 
 
-# ImageSummary a DataObject contains all the fields defined in ImageSummary.
+'''
+' ImageSummary a DataObject contains all the fields defined in ImageSummary.
+'''
 
 
 class ImageSummary(Model):
     name = wsme.wsattr(wsme.types.text)
     id = wsme.wsattr(wsme.types.text)
     visibility = wsme.wsattr(wsme.types.text)
+    status = wsme.wsattr(wsme.types.text, mandatory=True)
+    regions = wsme.wsattr([str], mandatory=True)
 
-    def __init__(self, name='', id='', visibility=''):
+    def __init__(self, name='', id='', visibility='', status='', regions=[]):
         Model.__init__(self)
 
         self.name = name
         self.id = id
         self.visibility = visibility
+        self.status = status
+        self.regions = regions
 
     @staticmethod
     def from_db_model(sql_image):
@@ -440,6 +473,11 @@ class ImageSummary(Model):
         image.id = sql_image.id
         image.name = sql_image.name
         image.visibility = sql_image.visibility
+        image.regions = []
+        for sql_region in sql_image.regions:
+            region = Region()
+            region.name = sql_region.region_name
+            image.regions.append(region.name)
 
         return image
 

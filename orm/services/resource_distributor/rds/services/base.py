@@ -9,7 +9,7 @@ class InputError(Error):
         self.value = value
 
 
-class ErrorMesage(Error):
+class ErrorMessage(Error):
     def __init__(self, message=None):
         self.message = message
 

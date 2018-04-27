@@ -1,12 +1,10 @@
-from oslo_config import cfg
+from orm import base_config as config
 
-
-CONF = cfg.CONF
 
 # Server Specific Configurations
 server = {
-    'port': CONF.uuid.port,
-    'host': CONF.api.host
+    'port': config.uuid['port'],
+    'host': config.orm_host
 }
 # Pecan Application Configurations
 app = {
@@ -15,10 +13,9 @@ app = {
     'debug': True,
 }
 
-verify = CONF.api.ssl_verify
-
+verify = config.ssl_verify
 database = {
-    'connection_string': CONF.database.connection + '/orm'
+    'connection_string': config.db_url + 'orm'
 }
 # Custom Configurations must be in Python dictionary format::
 #

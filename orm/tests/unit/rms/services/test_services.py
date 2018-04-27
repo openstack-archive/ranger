@@ -1,13 +1,13 @@
 """Services module unittests."""
+import mock
+from mock import patch
+from pecan import conf
+
+from orm.services.region_manager.rms.controllers.v2.orm.resources import groups
 from orm.services.region_manager.rms.controllers.v2.orm.resources import regions
 from orm.services.region_manager.rms.services import services
 from orm.tests.unit.rms.controllers.v1.orm.resources.test_region import full_region
 from orm.tests.unit.rms import FunctionalTest
-
-import mock
-from mock import patch
-from pecan import conf
-# from rms.model import url_parm as parms
 
 
 class db(object):
@@ -157,26 +157,33 @@ class TestServices(FunctionalTest):
 
     @patch.object(services.data_manager_factory, 'get_data_manager')
     def test_create_group_in_db_success(self, mock_get_data_manager):
-        """Make sure that no exception is raised."""
-        services.create_group_in_db('d', 'a', 'b', ['c'])
+        services.create_group_in_db(groups.Groups('d', 'd', 'b', ['c']))
 
-    @patch.object(services.data_manager_factory, 'get_data_manager',
-                  return_value=db())
+    @patch.object(services.data_manager_factory, 'get_data_manager')
+    def test_create_group_no_name_or_id(self, mock_get_data_manager):
+        with self.assertRaises(services.error_base.InputValueError) as exp:
+            services.create_group_in_db(groups.Groups('', '', 'b', ['c']))
+
+    @patch.object(services.data_manager_factory, 'get_data_manager')
+    def test_create_group_no_description(self, mock_get_data_manager):
+        with self.assertRaises(services.error_base.InputValueError) as exp:
+            services.create_group_in_db(groups.Groups('d', 'a', '', ['c']))
+
+    @patch.object(services.data_manager_factory, 'get_data_manager', return_value=db())
     def test_create_group_in_db_not_valid_regions(self, mock_get_data_manager):
-        """Make sure that no exception is raised."""
-        with self.assertRaises(services.error_base.NotFoundError) as exp:
-            services.create_group_in_db('d', 'a', 'b', ['bad_region'])
+        with self.assertRaises(services.error_base.InputValueError) as exp:
+            services.create_group_in_db(groups.Groups('d', 'd', 'b',
+                                                      ['bad_region']))
 
     @patch.object(services.data_manager_factory, 'get_data_manager')
     def test_create_group_in_db_duplicate_entry(self, mock_get_data_manager):
-        """Make sure that the expected exception is raised if group exists."""
         my_manager = mock.MagicMock()
         my_manager.add_group = mock.MagicMock(
             side_effect=services.error_base.ConflictError(
                 'test'))
         mock_get_data_manager.return_value = my_manager
-        self.assertRaises(services.error_base.ConflictError,
-                          services.create_group_in_db, 'd', 'a', 'b', ['c'])
+        with self.assertRaises(services.error_base.ConflictError) as exp:
+            services.create_group_in_db(groups.Groups('d', 'd', 'b', ['c']))
 
     @patch.object(services.data_manager_factory, 'get_data_manager',
                   return_value=db())

@@ -205,8 +205,10 @@ class TokensTest(unittest.TestCase):
         conf = tokens.TokenConf(*('3',) * 5)
         self.assertIsNone(tokens.get_token_user('a', conf, 'c', 'd'))
 
+    @mock.patch.object(tokens, 'request')
     @mock.patch.object(tokens, '_get_keystone_client')
-    def test_get_token_user_success(self, mock_get_keystone_client):
+    def test_get_token_user_success(self, mock_get_keystone_client,
+                                    mock_request):
         token_info = mock.MagicMock()
         token_info.token = 'a'
         token_info.user = 'test_user'

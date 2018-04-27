@@ -79,8 +79,14 @@ def delete_region(region_id):
     LOG.debug("logic:- delete region {}".format(region_id))
     try:
         db = data_manager_factory.get_data_manager()
+        # logic to allow 'delete_region' to issue NotFoundError when region_id is non-existent
+        region = db.get_region_by_id_or_name(region_id)
+        if not region:
+            raise error_base.NotFoundError(message="Region '{}' not found".format(region_id))
+
         db.delete_region(region_id)
         LOG.debug("region deleted")
+
     except Exception as exp:
         LOG.exception("fail to delete region {}".format(exp))
         raise
@@ -206,8 +212,12 @@ def delete_group(group_id):
     """
     LOG.debug("delete group logic")
     try:
-
         db = data_manager_factory.get_data_manager()
+        # logic to allow 'delete_group' to issue NotFoundError when group_id is non-existent
+        groups = db.get_group(group_id)
+        if not groups:
+            raise error_base.NotFoundError(message="Group '{}' not found".format(group_id))
+
         LOG.debug("delete group id {} from db".format(group_id))
         db.delete_group(group_id)
 
@@ -217,7 +227,7 @@ def delete_group(group_id):
     return
 
 
-def create_group_in_db(group_id, group_name, description, regions):
+def create_group_in_db(group):
     """Create a region group in the database.
 
     :param group_id: The ID of the group to create
@@ -227,16 +237,18 @@ def create_group_in_db(group_id, group_name, description, regions):
     :raise: GroupExistsError (status code 400) if the group already exists
     """
     try:
+        group = group._to_python_obj()
+        group._validate_model()
         manager = data_manager_factory.get_data_manager()
-        manager.add_group(group_id, group_name, description, regions)
+        manager.add_group(group.id, group.name,
+                          group.description, group.regions)
     except error_base.ConflictError:
-        LOG.exception("Group {} already exists".format(group_id))
+        LOG.exception("Group {} already exists".format(group.id))
         raise error_base.ConflictError(
-            message="Group {} already exists".format(group_id))
-    except error_base.InputValueError:
-        LOG.exception("Some of the regions not found")
-        raise error_base.NotFoundError(
-            message="Some of the regions not found")
+            message="Group {} already exists".format(group.id))
+    except error_base.InputValueError as e:
+        LOG.exception(e.message)
+        raise
 
 
 def update_group(group, group_id):

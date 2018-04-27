@@ -88,3 +88,8 @@ create table if not exists user_role
 	 foreign key (role_id) references cms_role(id),
 	 index region_id (region_id),
 	 index user_id (user_id));
+
+CREATE OR REPLACE VIEW  rds_resource_status_view AS
+    (
+        SELECT ID, RESOURCE_ID, REGION,STATUS,
+        ERR_CODE,OPERATION from orm_rds.resource_status);

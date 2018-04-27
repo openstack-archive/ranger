@@ -1,6 +1,8 @@
 import wsme
 
-from orm.common.orm_common.utils.cross_api_utils import set_utils_conf, get_regions_of_group
+from orm.common.orm_common.utils.cross_api_utils import (set_utils_conf,
+                                                         get_regions_of_group,
+                                                         validate_description)
 from orm.services.flavor_manager.fms_rest.data.sql_alchemy import db_models
 from orm.services.flavor_manager.fms_rest.data.wsme.model import Model
 from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
@@ -42,7 +44,6 @@ class ExtraSpecsWrapper(Model):
 
     def to_db_model(self):
         extra_spec = []
-
         for key, value in self.os_extra_specs.iteritems():
             if Flavor.ignore_extra_specs_input(key.replace(":", "____")):
                 continue
@@ -164,7 +165,6 @@ class Flavor(Model):
     visibility = wsme.wsattr(wsme.types.text, mandatory=True)
     tenants = wsme.wsattr(wsme.types.ArrayType(str), mandatory=False)
     status = wsme.wsattr(wsme.types.text, mandatory=False)
-    tags = wsme.wsattr(wsme.types.DictType(str, str), mandatory=False)
     tag = wsme.wsattr(wsme.types.DictType(str, str), mandatory=False)
     options = wsme.wsattr(wsme.types.DictType(str, str), mandatory=False)
     extra_specs = wsme.wsattr(wsme.types.DictType(str, str), mandatory=False,
@@ -182,7 +182,6 @@ class Flavor(Model):
                  swap="0",
                  ephemeral="0",
                  extra_specs={},
-                 tags={},
                  tag={},
                  options={},
                  regions=[],
@@ -199,7 +198,7 @@ class Flavor(Model):
         :param vcpus:
         :param disk: Disk in GB
         :param swap: is optional and default is 0
-        :param ephemeral: is optional and default is 0
+        :param ephemeral: is optional and default is 0, size in GB
         :param extra_spec: key-value dictionary
         :param tags: key-value dictionary
         :param options: key-value dictionary
@@ -220,7 +219,6 @@ class Flavor(Model):
         self.swap = swap
         self.ephemeral = "0" if not ephemeral else ephemeral
         self.extra_specs = extra_specs
-        self.tags = tags
         self.tag = tag
         self.options = options
         self.regions = regions
@@ -232,13 +230,20 @@ class Flavor(Model):
         bundle = ['b1', 'b2']
         numa = ['n0', 'n1']
         vlan = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']
-
+        vcpu_limit = int(conf.flavor_limits.vcpu_limit)
+        vram_limit = int(conf.flavor_limits.vram_limit)
+        swap_file_limit = int(conf.flavor_limits.swap_file_limit)
+        ephemeral_limit = int(conf.flavor_limits.ephemeral_limit)
         try:
+            isValid = validate_description(self.description)
+            if not isValid:
+                raise ErrorStatus(400, "Flavor description does not allow special characters :"
+                                       " only dashes, commas, and period allowed.")
             if not self.ram.isdigit():
                 raise ErrorStatus(400, "ram must be a number")
             if not self.vcpus.isdigit():
                 raise ErrorStatus(400, "vcpus must be a number")
-            if not self.disk.isdigit():
+            if not self.validInt(self.disk):
                 raise ErrorStatus(400, "disk must be a number")
             if not self.swap.isdigit():
                 raise ErrorStatus(400, "swap must be a number")
@@ -249,20 +254,24 @@ class Flavor(Model):
                 if self.series not in allowed_series:
                     raise ErrorStatus(400, "series possible values are {}".format(
                         allowed_series))
-            if int(self.ram) not in range(1024, 327680 + 1, 1024):
+            if int(self.ram) not in range(1024, vram_limit + 1, 1024):
                 raise ErrorStatus(400,
-                                  "ram value is out of range. Expected range is 1024(1GB)-327680(320GB) "
-                                  "and must be a multiple of 1024")
-            if int(self.vcpus) not in range(1, 48 + 1):
-                raise ErrorStatus(400, "vcpus value is out of range. Expected range is 1-48")
+                                  "ram value is out of range. Expected range is 1024(1GB)-"
+                                  "%6d(%3dGB) and must be a multiple of 1024" %
+                                  (vram_limit, vram_limit / 1024))
+            if int(self.vcpus) not in range(1, vcpu_limit + 1):
+                raise ErrorStatus(400, "vcpus value is out of range. Expected range is 1-"
+                                  "%2d" % (vcpu_limit))
             if int(self.disk) < 0:
-                raise ErrorStatus(400, "disk must be a non negative number")
-            if int(self.ephemeral) not in range(0, 320 + 1):
-                raise ErrorStatus(400, "ephemeral value is out of range. Expected range is 0-320")
-            if int(self.swap) not in range(0, 327680 + 1, 1024):
+                raise ErrorStatus(400, "disk cannot be less than zero")
+            if int(self.ephemeral) not in range(0, ephemeral_limit + 1):
+                raise ErrorStatus(400, "ephemeral value is out of range. Expected range is 0-"
+                                       "%5d(%2dTB)" % (ephemeral_limit, ephemeral_limit / 1000))
+            if int(self.swap) not in range(0, swap_file_limit + 1, 1024):
                 raise ErrorStatus(400,
-                                  "swap value is out of range. Expected range is 0-327680(320GB) "
-                                  "and must be a multiple of 1024")
+                                  "swap value is out of range. Expected range is 0-"
+                                  "%6d(%3dGB) and must be a multiple of 1024" %
+                                  (swap_file_limit, swap_file_limit / 1024))
         except ValueError:
             raise ErrorStatus(400, "ram, vcpus, disk, ephemeral and swap must be integers")
         for symbol, value in self.extra_specs.iteritems():
@@ -284,13 +293,6 @@ class Flavor(Model):
                                       "region type \'group\' is invalid in this "
                                       "action, \'group\' can be only in create flavor action")
 
-        # check if user entered tag instead of tags
-        if self.tags and self.tag:
-            raise ErrorStatus(400, "you entered \'tag\' and \'tags\' arguments, "
-                                   "please remove the \'tag\'")
-        if self.tag and not self.tags:
-            self.tags = self.tag
-
     def to_db_model(self):
         flavor = db_models.Flavor()
         extra_spec = []
@@ -310,7 +312,7 @@ class Flavor(Model):
         if self.series:
             extra_spec.extend(self.get_extra_spec_needed())
 
-        for symbol, value in self.tags.iteritems():
+        for symbol, value in self.tag.iteritems():
             tag = db_models.FlavorTag()
             tag.key_name = symbol
             tag.key_value = value
@@ -389,7 +391,7 @@ class Flavor(Model):
             flavor.extra_specs[extra_spec.key_name] = extra_spec.key_value
 
         for tag in sql_flavor.flavor_tags:
-            flavor.tags[tag.key_name] = tag.key_value
+            flavor.tag[tag.key_name] = tag.key_value
 
         for option in sql_flavor.flavor_options:
             flavor.options[option.key_name] = option.key_value
@@ -406,38 +408,52 @@ class Flavor(Model):
         return False
 
     def get_extra_spec_needed(self):
+        valid_vnf_opts = conf.flavor_options.valid_vnf_opt_values[:]
+        valid_stor_opts = conf.flavor_options.valid_stor_opt_values[:]
+        valid_cpin_opts = conf.flavor_options.valid_cpin_opt_values[:]
+
         extra_spec_needed = []
         items = conf.extra_spec_needed_table.to_dict()
         for symbol, value in items[self.series].iteritems():
             es = db_models.FlavorExtraSpec()
             es.key_name = symbol.replace("____", ":")
             es.key_value = value
+
+            # update extra_spec default values as needed
             if self.series == "gv" and "c2" in es.key_name:
                 if "c4" in self.options and self.options['c4'].lower() == "true":
                     es.key_name = es.key_name.replace("c2", "c4")
+            elif self.series == "ss" and "s1" in es.key_name:
+                if "s2" in self.options and self.options['s2'].lower() == "true":
+                    es.key_name = es.key_name.replace("s1", "s2")
             extra_spec_needed.append(es)
+
         options_items = self.options
         # check some keys if they exist in option add values to extra specs
-        if len(options_items) > 0 and self.series in ('ns', 'nv', 'nd'):
+        if self.series in ('ns', 'nv', 'nd', 'ss'):
             c2_c4_in = False
             n0_in = False
             for symbol, value in options_items.iteritems():
                 es = db_models.FlavorExtraSpec()
                 es.key_name = "aggregate_instance_extra_specs:%s" % symbol
                 es.key_value = "true"
+                # format numa node extra spec as appropriate
                 if symbol == "n0" and options_items[symbol].lower() == "true":
                     n0_in = True
                     es.key_value = 2
                     es.key_name = "hw:numa_nodes"
                     extra_spec_needed.append(es)
-                elif symbol in ('c2', 'c4') and options_items[symbol].lower() == "true":
+                # format cpu pinnin extra spec as appropriate
+                elif symbol in valid_cpin_opts and options_items[symbol].lower() == "true":
                     c2_c4_in = True
                     extra_spec_needed.append(es)
+                # format vnf profile extra spec as appropriate
                 try:
-                    if len(symbol) == 2 and symbol[0] == 'v' and 0 < int(symbol[1]) < 9 and options_items[symbol].lower() == "true":
+                    if self.series == 'ns' and symbol in valid_vnf_opts and options_items[symbol].lower() == "true":
                         extra_spec_needed.append(es)
                 except Exception:
                     pass
+
             # if c4, c2 and n0 not in options keys add these values to extra specs
             if not c2_c4_in:
                 es = db_models.FlavorExtraSpec()
@@ -449,6 +465,33 @@ class Flavor(Model):
                 es.key_value = 1
                 es.key_name = "hw:numa_nodes"
                 extra_spec_needed.append(es)
+            if {'v5', 'i1'}.issubset(options_items.keys()):
+                es = db_models.FlavorExtraSpec()
+                es.key_name = "hw:cpu_sockets"
+                es.key_value = "1"
+                extra_spec_needed.append(es)
+
+                es = db_models.FlavorExtraSpec()
+                es.key_name = "hw:cpu_threads"
+                es.key_value = "1"
+                extra_spec_needed.append(es)
+
+                es = db_models.FlavorExtraSpec()
+                es.key_name = "hw:pci_numa_custom_policy"
+                es.key_value = "ignore"
+                extra_spec_needed.append(es)
+
+                es = db_models.FlavorExtraSpec()
+                es.key_name = "hw:cpu_cores"
+                es.key_value = self.vcpus
+                extra_spec_needed.append(es)
+
+        # convert the key_value to a string to avoid/fix pecan json rendering error in update extra_specs
+        i = 0
+        while i < len(extra_spec_needed):
+            extra_spec_needed[i].key_value = str(extra_spec_needed[i].key_value)
+            i += 1
+
         return extra_spec_needed
 
     def get_as_summary_dict(self):
@@ -477,6 +520,13 @@ class Flavor(Model):
         set_utils_conf(conf)
         regions = get_regions_of_group(group_name)
         return regions
+
+    def validInt(self, check_value):
+        try:
+            int(check_value)
+        except ValueError:
+            return False
+        return True
 
 
 class FlavorWrapper(Model):

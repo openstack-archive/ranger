@@ -2,7 +2,6 @@ import unittest
 
 import mock
 from orm.common.orm_common.policy import _checks
-from wsme.exc import ClientSideError
 
 
 class TestChecks(unittest.TestCase):
@@ -61,11 +60,15 @@ class TestChecks(unittest.TestCase):
 
     def test_call_custom_checks_error(self):
         check = _checks.RoleCheck('a', 'admin')
-        try:
-            check(1, mock.MagicMock(), 3)
-            self.fail('ClientSideError not raised!')
-        except ClientSideError as exc:
-            self.assertEqual(exc.code, 403)
+    # test no longer valid.
+    # change: https://gerrit.mtn5.cci.att.com/#/c/25690/
+    # removed the exception raise
+    #
+    #    try:
+    #        check(1, mock.MagicMock(), 3)
+    #        self.fail('ClientSideError not raised!')
+    #    except ClientSideError as exc:
+    #        self.assertEqual(exc.code, 403)
 
         for check_type in (_checks.TenantCheck,
                            _checks.DomainCheck):

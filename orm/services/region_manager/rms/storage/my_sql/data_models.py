@@ -1,4 +1,7 @@
 # coding: utf-8
+import datetime
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from orm.services.region_manager.rms.model.model import Address, EndPoint, RegionData
 
 from sqlalchemy import Column, ForeignKey, Integer, String
@@ -28,7 +31,9 @@ class Region(Base):
     vlcp_name = Column(String(64), nullable=False)
     clli = Column(String(64), nullable=False)
     description = Column(String(255), nullable=False)
-
+    created = Column(DateTime(timezone=False),
+                     default=datetime.datetime.now())
+    modified = Column(DateTime(timezone=False))
     end_points = relationship(u'RegionEndPoint')
     meta_data = relationship(u'RegionMetaData')
 
@@ -56,6 +61,7 @@ class Region(Base):
 
         id = self.region_id
         name = self.name
+        description = self.description
         status = self.region_status
         clli = self.clli
         ranger_agent_version = self.ranger_agent_version
@@ -63,13 +69,17 @@ class Region(Base):
         location_type = self.location_type
         vlcp_name = self.vlcp_name
         open_stack_version = self.open_stack_version
+        created = self.created
+        modified = self.modified
         address = self.address_to_wsme()
 
-        return RegionData(status, id, name, clli, ranger_agent_version,
+        return RegionData(status, id, name, description, clli, ranger_agent_version,
                           design_type, location_type, vlcp_name,
                           open_stack_version, address,
                           metadata=wsme_meta_data,
-                          endpoints=wsme_end_points)
+                          endpoints=wsme_end_points,
+                          created=created,
+                          modified=modified)
 
 
 class Group(Base):
@@ -79,12 +89,17 @@ class Group(Base):
     group_id = Column(String(64), nullable=False, unique=True)
     name = Column(String(64), nullable=False, unique=True)
     description = Column(String(255), nullable=False)
+    created = Column(DateTime(timezone=False),
+                     default=datetime.datetime.now())
+    modified = Column(DateTime(timezone=False))
 
     def __json__(self):
         return dict(
             group_id=self.group_id,
             name=self.name,
-            description=self.description
+            description=self.description,
+            created=self.created,
+            modified=self.modified
         )
 
     def to_wsme(self):
