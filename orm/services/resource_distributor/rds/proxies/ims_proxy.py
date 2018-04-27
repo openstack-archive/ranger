@@ -2,7 +2,7 @@ import json
 import logging
 import requests
 
-from orm.services.resource_distributor.rds.services.base import ErrorMesage
+from orm.services.resource_distributor.rds.services.base import ErrorMessage
 from orm.services.resource_distributor.rds.utils import authentication as AuthService
 
 from pecan import conf
@@ -51,10 +51,10 @@ def send_image_metadata(meta_data, region, resource_id, action='post'):
         except requests.ConnectionError as exp:
             logger.error(exp)
             logger.exception(exp)
-            raise ErrorMesage("fail to connect to server {}".format(exp.message))
+            raise ErrorMessage("fail to connect to server {}".format(exp.message))
 
     if response.status_code != 200:
-        raise ErrorMesage(
+        raise ErrorMessage(
             "Got error from orm.services.resource_distributor.rds server, code: {0} message: {1}".format(
                 response.status_code, response.content))
     return

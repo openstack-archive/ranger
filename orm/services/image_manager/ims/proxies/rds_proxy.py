@@ -51,11 +51,11 @@ def send_image(image_dict, transaction_id, action="put"):
             pretty_text = pp.pformat(data_to_display)
             wrapper_json = json.dumps(data)
 
-            headers['X-RANGER-Client'] = request.headers[
-                'X-RANGER-Client'] if 'X-RANGER-Client' in request.headers else \
+            headers['X-AIC-ORM-Client'] = request.headers[
+                'X-AIC-ORM-Client'] if 'X-AIC-ORM-Client' in request.headers else \
                 'NA'
-            headers['X-RANGER-Requester'] = request.headers[
-                'X-RANGER-Requester'] if 'X-RANGER-Requester' in request.headers else \
+            headers['X-AIC-ORM-Requester'] = request.headers[
+                'X-AIC-ORM-Requester'] if 'X-AIC-ORM-Requester' in request.headers else \
                 ''
 
             LOG.debug("Wrapper JSON before sending action: {0} to Rds Proxy {1}".format(action, pretty_text))

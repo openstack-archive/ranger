@@ -1,9 +1,8 @@
 import logging
-import time
-
-import requests
-
 from pecan import conf
+import requests
+import string
+import time
 
 # from orm_common.logger import get_logger
 
@@ -21,6 +20,28 @@ def set_utils_conf(_conf):
 def _check_conf_initialization():
     if not conf:
         raise AssertionError('Configurations wasnt initiated, please run set_utils_conf and pass pecan configuration')
+
+
+def validate_description(data_value):
+    """ only special characters commas, periods, and dashes allowed in
+        description field.  Return 'False' if other special chars or
+        escape sequences detected
+    """
+
+    allowed_punctuations = ['.', '-', ',']
+
+    # if  type of data_value != 'string' then convert it to string
+    if not isinstance(data_value, str):
+        desc = str(data_value)
+
+    invalidChars = (string.punctuation).translate(None, ''.join(allowed_punctuations))
+
+    # detect any escape sequences or special characters in data string
+    encoded_string = desc.encode('string_escape')
+    if any(char in invalidChars for char in encoded_string):
+        return False
+
+    return True
 
 
 def is_region_group_exist(group_name):

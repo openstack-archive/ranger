@@ -1,5 +1,4 @@
 import logging
-import os
 
 from orm.common.client.audit.audit_client.api import audit
 from pecan import conf, make_app
@@ -63,11 +62,8 @@ def validate_sot():
 
 
 def main():
-    dir_name = os.path.dirname(__file__)
-    drive, path_and_file = os.path.splitdrive(dir_name)
-    path, filename = os.path.split(path_and_file)
     runner = CommandRunner()
-    runner.run(['serve', path + '/config.py'])
+    runner.run(['serve', '../config.py'])
 
 if __name__ == "__main__":
     main()

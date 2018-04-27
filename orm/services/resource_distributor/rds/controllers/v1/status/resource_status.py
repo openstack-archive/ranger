@@ -4,11 +4,12 @@ import time
 
 from orm.services.resource_distributor.rds.controllers.v1.base import InputValueError
 from orm.services.resource_distributor.rds.controllers.v1.status import get_resource
-from orm.services.resource_distributor.rds.services.base import ErrorMesage, InputError
+from orm.services.resource_distributor.rds.services.base import ErrorMessage, InputError
 from orm.services.resource_distributor.rds.services import region_resource_id_status as regionResourceIdStatus
 from orm.services.resource_distributor.rds.utils import utils
 
 from pecan import rest
+
 import wsme
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose
@@ -144,9 +145,11 @@ class Status(rest.RestController):
         logger.debug("save data to database.. data :- %s" % data_to_save)
         try:
             regionResourceIdStatus.add_status(data_to_save)
+            # invoke regin data to delete on sucess
+            utils.invoke_delete_region(data_to_save)
             # send data to ims
             utils.post_data_to_image(data_to_save)
-        except ErrorMesage as exp:
+        except ErrorMessage as exp:
             logger.error(exp.message)
             # raise ClientSideError(status_code=400, error=exp.message)
         except InputError as e:

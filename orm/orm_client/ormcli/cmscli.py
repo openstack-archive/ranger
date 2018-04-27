@@ -2,7 +2,6 @@
 import argparse
 import cli_common
 import config
-import orm.base_config as base_config
 import os
 import requests
 
@@ -44,7 +43,7 @@ def add_to_parser(service_sub):
     parser.add_argument('-v', '--verbose', help='show details',
                         action="store_true")
     parser.add_argument('-f', '--faceless',
-                        help='run without authentication',
+                        help=argparse.SUPPRESS,
                         default=False,
                         action="store_true")
     subparsers = parser.add_subparsers(dest='subcmd',
@@ -112,11 +111,16 @@ def add_to_parser(service_sub):
 
     parser_delete_region = subparsers.add_parser('delete_region',
                                                  help='[<"X-RANGER-Client" '
-                                                      'header>] <customer id> '
+                                                      'header>] '
+                                                      '[--force_delete] '
+                                                      '<customer id> '
                                                       '<region id>')
     parser_delete_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_region.add_argument('custid', type=str, help='<customer id>')
     parser_delete_region.add_argument('regionid', type=str, help='<region id>')
+    parser_delete_region.add_argument('--force_delete',
+                                      help='force delete region',
+                                      action="store_true")
 
     # add user
     parser_add_user = subparsers.add_parser('add_user',
@@ -216,11 +220,8 @@ def add_to_parser(service_sub):
                                             help='<user id>')
 
     # add metadata
-    h1, h2, h3 = \
-        '[<"X-RANGER-Client" header>]', '<customer id>', '<data file ' \
-                                                         'with ' \
-                                                         'metadata(' \
-                                                         's) JSON>'
+    h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<customer id>',
+                  '<data file with metadata(s) JSON>')
     parser_add_metadata = subparsers.add_parser('add_metadata',
                                                 help='%s %s %s' % (h1, h2, h3))
     parser_add_metadata.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
@@ -230,11 +231,8 @@ def add_to_parser(service_sub):
                                      help=h3)
 
     # replace metadata
-    h1, h2, h3 = \
-        '[<"X-RANGER-Client" header>]', '<customer id>', '<data file ' \
-                                                         'with ' \
-                                                         'metadata(' \
-                                                         's) JSON>'
+    h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<customer id>',
+                  '<data file with metadata(s) JSON>')
     parser_replace_metadata = subparsers.add_parser('replace_metadata',
                                                     help='%s %s %s' % (
                                                         h1, h2, h3))
@@ -247,16 +245,16 @@ def add_to_parser(service_sub):
                                          help=h3)
 
     # get customer
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<customer id or customer name>'
     parser_get_customer = subparsers.add_parser('get_customer',
-                                                help='[<"X-RANGER-Client" '
-                                                     'header>] <customer id>')
+                                                help='%s %s' % (h1, h2))
     parser_get_customer.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
-    parser_get_customer.add_argument('custid', type=str, help='<customer id>')
+    parser_get_customer.add_argument('custid', type=str, help=h2)
 
     # list customers
     h1 = '[<"X-RANGER-Client" header>]'
     h2 = '[--region <name>] [--user <name>] [--metadata <key:value>]' \
-         ' [starts_with <name>] [contains <name>]'
+         ' [--starts_with <name>] [--contains <name>]'
     parser_list_customer = subparsers.add_parser('list_customers',
                                                  help='%s %s' % (h1, h2))
     parser_list_customer.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
@@ -288,7 +286,9 @@ def cmd_details(args):
     elif args.subcmd == 'replace_region':
         return requests.put, '/%s/regions' % args.custid
     elif args.subcmd == 'delete_region':
-        return requests.delete, '/%s/regions/%s' % (args.custid, args.regionid)
+        return requests.delete, '/%s/regions/%s/%s' % (args.custid,
+                                                       args.regionid,
+                                                       args.force_delete)
     elif args.subcmd == 'add_user':
         return requests.post, '/%s/regions/%s/users' % (
             args.custid, args.regionid)
@@ -353,12 +353,12 @@ def get_token(timeout, args, host):
                 globals()[argument] = configuration_value
             else:
                 message = ('ERROR: {} for token generation was not supplied. '
-                           'Please use its command-line '
-                           'argument or environment variable.'.format(argument))
+                           'Please use its command-line argument or '
+                           'environment variable.'.format(argument))
                 print message
                 raise cli_common.MissingArgumentError(message)
 
-    keystone_ep = cli_common.get_keystone_ep('{}:{}'.format(host, base_config.rms['port']),
+    keystone_ep = cli_common.get_keystone_ep('{}:8080'.format(host),
                                              auth_region)
     if keystone_ep is None:
         raise ConnectionError(
@@ -386,7 +386,7 @@ def get_token(timeout, args, host):
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
-    environment_variable = 'RANGER_{}'.format(
+    environment_variable = 'AIC_ORM_{}'.format(
         argument.replace('-', '_').upper())
 
     return os.environ.get(environment_variable)
@@ -394,7 +394,7 @@ def get_environment_variable(argument):
 
 def run(args):
     host = args.orm_base_url if args.orm_base_url else config.orm_base_url
-    port = args.port if args.port else base_config.cms['port']
+    port = args.port if args.port else 7080
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
 
@@ -429,7 +429,7 @@ def run(args):
 
     try:
         resp = rest_cmd(url, timeout=timeout, data=data, headers=headers,
-                        verify=False)
+                        verify=config.verify)
     except Exception as e:
         print e
         exit(1)

@@ -1,6 +1,5 @@
 """rest module."""
 import logging
-import time
 import wsme
 
 from orm.common.orm_common.utils import api_error_utils as err_utils
@@ -11,6 +10,7 @@ from orm.services.region_manager.rms.services import services as GroupService
 from orm.services.region_manager.rms.utils import authentication
 
 from pecan import request, rest
+
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose
 
@@ -24,8 +24,11 @@ class Groups(wtypes.DynamicBase):
     name = wsme.wsattr(wtypes.text, mandatory=True)
     description = wsme.wsattr(wtypes.text, mandatory=True)
     regions = wsme.wsattr([str], mandatory=True)
+    created = wsme.wsattr(wtypes.dt_types.__getitem__(0), mandatory=False, name="created")
+    modified = wsme.wsattr(wtypes.dt_types.__getitem__(0), mandatory=False, name="modified")
 
-    def __init__(self, id=None, name=None, description=None, regions=[]):
+    def __init__(self, id=None, name=None, description=None, regions=[],
+                 created=None, modified=None):
         """init function.
 
         :param regions:
@@ -35,6 +38,8 @@ class Groups(wtypes.DynamicBase):
         self.name = name
         self.description = description
         self.regions = regions
+        self.created = created
+        self.modified = modified
 
     def _to_python_obj(self):
         obj = PythonModel.Groups()
@@ -42,6 +47,8 @@ class Groups(wtypes.DynamicBase):
         obj.name = self.name
         obj.description = self.description
         obj.regions = self.regions
+        obj.created = self.created
+        obj.modified = self.modified
         return obj
 
 
@@ -63,20 +70,27 @@ class OutputResource(wtypes.DynamicBase):
 
     id = wsme.wsattr(wtypes.text, mandatory=True)
     name = wsme.wsattr(wtypes.text, mandatory=True)
-    created = wsme.wsattr(wtypes.text, mandatory=True)
+    description = wsme.wsattr(wtypes.text, mandatory=True)
     links = wsme.wsattr({str: str}, mandatory=True)
+    created = wsme.wsattr(wtypes.dt_types.__getitem__(0), mandatory=False, name="created")
+    modified = wsme.wsattr(wtypes.dt_types.__getitem__(0), mandatory=False, name="modified")
 
-    def __init__(self, id=None, name=None, created=None, links={}):
+    def __init__(self, id=None, name=None, description=None, links={},
+                 created=None, modified=None):
         """init function.
 
         :param id:
         :param created:
         :param links:
+        :param created
+        :param modified
         """
         self.id = id
         self.name = name
-        self.created = created
+        self.description = description
         self.links = links
+        self.created = created
+        self.modified = modified
 
 
 class Result(wtypes.DynamicBase):
@@ -159,19 +173,17 @@ class GroupsController(rest.RestController):
 
         try:
             # May raise an exception which will return status code 400
-            GroupService.create_group_in_db(group_input.id,
-                                            group_input.name,
-                                            group_input.description,
-                                            group_input.regions)
+            GroupService.create_group_in_db(group_input)
             logger.debug("Group created successfully in DB")
-
+            result = GroupService.get_groups_data(group_input.id)
             # Create the group output data with the correct timestamp and link
             group = OutputResource(group_input.id,
                                    group_input.name,
-                                   repr(int(time.time() * 1000)),
+                                   group_input.description,
                                    {'self': '{}/v2/orm/groups/{}'.format(
                                        request.application_url,
-                                       group_input.id)})
+                                       group_input.id)},
+                                   result.created, result.modified)
 
             event_details = 'Region group {} {} created with regions: {}'.format(
                 group_input.id, group_input.name, group_input.regions)
@@ -207,6 +219,13 @@ class GroupsController(rest.RestController):
                               request.headers, group_id,
                               event_details=event_details)
 
+        # issue NotFoundError for "delete group" when group_id not found
+        except error_base.NotFoundError as e:
+            logger.error("GroupsController - Group not found")
+            raise err_utils.get_error(request.transaction_id,
+                                      message="Cannot delete - " + e.message,
+                                      status_code=404)
+
         except Exception as exp:
 
             logger.exception("fail to delete group :- {}".format(exp))
@@ -225,13 +244,14 @@ class GroupsController(rest.RestController):
             logger.debug("update group - id {}".format(group_id))
             result = GroupService.update_group(group, group_id)
             logger.debug("group updated to :- {}".format(result))
-
+            result = GroupService.get_groups_data(group_id)
             # build result
             group_result = OutputResource(result.id, result.name,
-                                          repr(int(time.time() * 1000)), {
+                                          result.description, {
                                               'self': '{}/v2/orm/groups/{}'.format(
                                                   request.application_url,
-                                                  result.id)})
+                                                  result.id)},
+                                          result.created, result.modified)
 
             event_details = 'Region group {} {} updated with regions: {}'.format(
                 group_id, group.name, group.regions)

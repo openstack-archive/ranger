@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-from os.path import isfile, join
 import argparse
 import ast
 import json
 import os
+from os.path import isfile, join
 import re
 import subprocess
 import tempfile
@@ -29,7 +29,7 @@ def sh(cmd):
     start = time.time()
     output = ''
     errpat = re.compile('error', re.I)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    p = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)
     for line in iter(p.stdout.readline, b''):
         out = line.rstrip()
         print(">>> " + out)
@@ -74,7 +74,7 @@ os.close(fh)
 img_dict = {}
 # harg = '--orm-base-url %s' % args.host if args.host else ''
 res, output = sh(
-    '%s ims %s list_images test ' % (CLI_PATH, ''))
+    'python %s ims %s list_images test ' % (CLI_PATH, ''))
 if not res:
     images = ast.literal_eval(output)
     for img in images['images']:
@@ -90,9 +90,10 @@ if not res:
         if image_name in img_dict:
             image_id = img_dict[image_name]
             print 'image_id: ' + image_id
-            res, output = sh('%s ims add_regions test %s %s' % (
+            res, output = sh('python %s ims add_regions test %s %s' % (
                 CLI_PATH, image_id, file_name))
         else:
-            print 'image_name: {} does not exist. ignore.'.format(image_name)
+            print 'python image_name: {} does not exist. ' \
+                  'ignore.'.format(image_name)
 
 os.unlink(file_name)

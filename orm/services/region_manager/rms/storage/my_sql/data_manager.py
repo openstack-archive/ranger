@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from orm.services.region_manager.rms.model import model as PythonModels
@@ -68,7 +69,8 @@ class DataManager(BaseDataManager):
                                 location_type=location_type,
                                 vlcp_name=vlcp_name,
                                 clli=clli,
-                                description=description)
+                                description=description,
+                                created=datetime.datetime.now())
 
                 if end_point_list is not None:
                     for end_point in end_point_list:
@@ -174,6 +176,8 @@ class DataManager(BaseDataManager):
     def delete_region(self, region_id):
         # delete a region from `region` table and also the region's
         # entries from `region_meta_data` and `region_end_points` tables
+        # as well as the "group_region" table
+
         session = self._engine_facade.get_session()
         with session.begin():
             session.query(Region).filter_by(region_id=region_id).delete()
@@ -396,7 +400,8 @@ class DataManager(BaseDataManager):
             with session.begin():
                 session.add(Group(group_id=group_id,
                                   name=group_name,
-                                  description=group_description))
+                                  description=group_description,
+                                  created=datetime.datetime.now()))
 
                 session.flush()  # add the groupe if not rollback
 
@@ -408,7 +413,8 @@ class DataManager(BaseDataManager):
                     session.add_all(group_regions)
         except oslo_db.exception.DBReferenceError as e:
             logger.error("Reference error: {}".format(str(e)))
-            raise error_base.InputValueError("Reference error")
+            raise error_base.InputValueError(
+                message="One or more regions not found")
         except oslo_db.exception.DBDuplicateEntry as e:
             logger.error("Duplicate entry: {}".format(str(e)))
             raise error_base.ConflictError("Duplicate entry error")
@@ -429,6 +435,8 @@ class DataManager(BaseDataManager):
                 group_model.id = a_group.group_id
                 group_model.name = a_group.name
                 group_model.description = a_group.description
+                group_model.created = a_group.created
+                group_model.modified = a_group.modified
                 regions = []
                 group_regions = session.query(GroupRegion).\
                     filter_by(group_id=a_group.group_id)
@@ -484,7 +492,9 @@ class DataManager(BaseDataManager):
             if a_group is not None:
                 group_model = {"id": a_group.group_id,
                                "name": a_group.name,
-                               "description": a_group.description}
+                               "description": a_group.description,
+                               "created": a_group.created,
+                               "modified": a_group.modified}
                 regions = []
                 group_regions = session.query(GroupRegion). \
                     filter_by(group_id=a_group.group_id)

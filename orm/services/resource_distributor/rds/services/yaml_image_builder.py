@@ -1,9 +1,8 @@
 import logging
-import re
-
-import yaml
-
 from pecan import conf
+import re
+import uuid
+import yaml
 
 my_logger = logging.getLogger(__name__)
 
@@ -22,18 +21,23 @@ def _properties(alldata, region):
     public = True if alldata['visibility'] == "public" else False
     protected = {0: False, 1: True}[alldata['protected']]
     tenants = [tenant['customer_id'] for tenant in alldata['customers']]
-    return dict(
+    properties = dict(
         name=alldata['name'],
         container_format=alldata["container_format"],
         min_ram=alldata['min_ram'],
         disk_format=alldata['disk_format'],
         min_disk=alldata['min_disk'],
+        id=str(uuid.UUID(alldata['id'])),
         protected=protected,
         copy_from=alldata["url"],
         owner=alldata["owner"],
         is_public=public,
         tenants=str(tenants)
     )
+    if alldata['properties']:
+        properties['extra_properties'] = alldata['properties']
+
+    return properties
 
 
 def _glanceimage(alldata, region):

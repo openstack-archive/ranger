@@ -10,7 +10,7 @@ def _get_resource_file_path():
 
 def _find_file(resource_id):
     file_name = conf.file_name_format.format(resource_id)
-    folder_to_search = _get_resource_file_path(resource_id)
+    folder_to_search = _get_resource_file_path()
     matches = []
     for root, dirnames, filenames in os.walk(folder_to_search):
         for filename in fnmatch.filter(filenames, file_name):
