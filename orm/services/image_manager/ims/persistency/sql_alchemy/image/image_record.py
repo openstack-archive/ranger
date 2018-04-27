@@ -37,8 +37,9 @@ class ImageRecord(Record):
             raise
 
     def get_image(self, id):
+        """function to get image by name or id"""
         try:
-            query = self.session.query(Image).filter(Image.id == id)
+            query = self.session.query(Image).filter((Image.id == id) | (Image.name == id))
             return query.first()
         except Exception as exception:
             message = "Failed to read_image:  id: {0}".format(id)
@@ -92,6 +93,16 @@ class ImageRecord(Record):
             message = "Failed to get_images_by_name_count:  name: {0}".format(name)
             LOG.log_exception(message, exception)
             raise
+
+    def get_images_status_by_uuids(self, uuid_str):
+        results = self.session.connection().execute("SELECT resource_id, status from rds_resource_status_view"
+                                                    "  WHERE resource_id in ({})".format(uuid_str))
+        resource_status_dict = {}
+        if results:
+            resource_status_dict = dict((resource_id, status) for resource_id, status in results)
+
+            results.close()
+        return resource_status_dict
 
     def create_images_by_visibility_query(self, visibility):
         try:

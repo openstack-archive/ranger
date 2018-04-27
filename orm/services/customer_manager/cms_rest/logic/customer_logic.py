@@ -6,7 +6,7 @@ from orm.common.orm_common.utils import utils
 from orm.common.orm_common.utils.cross_api_utils import (get_regions_of_group,
                                                          set_utils_conf)
 from orm.services.customer_manager.cms_rest.data.data_manager import DataManager
-from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import CustomerMetadata, UserRole
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import CustomerMetadata
 from orm.services.customer_manager.cms_rest.logger import get_logger
 from orm.services.customer_manager.cms_rest.logic.error_base import (DuplicateEntryError, ErrorStatus,
                                                                      NotFound)
@@ -20,49 +20,35 @@ LOG = get_logger(__name__)
 
 class CustomerLogic(object):
     def build_full_customer(self, customer, uuid, datamanager):
+        if any(char in ":" for char in customer.name):
+            raise ErrorStatus(400, "Customer Name does not allow colon(:).")
+
+        if customer.name.strip() == '':
+            raise ErrorStatus(400, "Customer Name can not be blank.")
+
         sql_customer = datamanager.add_customer(customer, uuid)
 
         for key, value in customer.metadata.iteritems():
             metadata = CustomerMetadata(field_key=key, field_value=value)
             sql_customer.customer_metadata.append(metadata)
 
-        datamanager.add_customer_region(sql_customer.id, -1)
+        sql_customer_id = sql_customer.id
+        datamanager.add_customer_region(sql_customer_id, -1)
 
-        default_region_users = []
-        for user in customer.users:
-            sql_user = datamanager.add_user(user)
-            default_region_users.append(sql_user)
-            sql_user.sql_roles = []
-            for role in user.role:
-                sql_role = datamanager.add_role(role)
-                sql_user.sql_roles.append(sql_role)
+        default_users_requested = customer.users
 
+        default_region_users =\
+            self.add_default_user_db(datamanager, default_users_requested, [], sql_customer_id)
         default_quotas = []
         for quota in customer.defaultQuotas:
-            sql_quota = datamanager.add_quota(sql_customer.id, -1, quota)
+            sql_quota = datamanager.add_quota(sql_customer_id, -1, quota)
             default_quotas.append(sql_quota)
 
-        for sql_user in default_region_users:
-            for sql_role in sql_user.sql_roles:
-                datamanager.add_user_role(sql_user.id, sql_role.id,
-                                          sql_customer.id, -1)
-
-        self.add_regions_to_db(customer.regions, sql_customer.id, datamanager, customer.users)
+        self.add_regions_to_db(customer.regions, sql_customer_id, datamanager, default_region_users)
         return sql_customer
 
     def add_regions_to_db(self, regions, sql_customer_id, datamanager, default_users=[]):
         for region in regions:
-            users_roles = self.add_user_and_roles_to_db(region.users, default_users,
-                                                        datamanager)
-
-            # NOTE: if region has no users there is no need to update the
-            # default users in that region
-            # if len(region.users) == 0:
-            #     users_roles.extend(self.add_user_and_roles_to_db(
-            # customer.users, datamanager))
-            # else:
-            #     users_roles.extend(self.add_user_and_roles_to_db(
-            # region.users, datamanager))
 
             sql_region = datamanager.add_region(region)
             try:
@@ -73,9 +59,8 @@ class CustomerLogic(object):
                         'Error, duplicate entry, region ' + region.name + ' already associated with customer')
                 raise ex
 
-            for user_role in users_roles:
-                datamanager.add_user_role(user_role[0].id, user_role[1].id,
-                                          sql_customer_id, sql_region.id)
+            self.add_user_and_roles_to_db(region.users, default_users,
+                                          sql_customer_id, sql_region.id, datamanager)
 
             for quota in region.quotas:
                 datamanager.add_quota(sql_customer_id, sql_region.id, quota)
@@ -91,20 +76,76 @@ class CustomerLogic(object):
                 #         datamanager.add_quota(sql_customer_id,
                 # sql_region.id, quota)
 
-    def add_user_and_roles_to_db(self, users, default_users, datamanager):
-        users_roles = []
-        for user in users:
-            sql_user = datamanager.add_user(user)
-            for role in user.role:
-                sql_role = datamanager.add_role(role)
-                users_roles.append((sql_user, sql_role))
-        for default_user in default_users:
-            sql_user = datamanager.add_user(default_user)
-            for role in default_user.role:
-                sql_role = datamanager.add_role(role)
-                users_roles.append((sql_user, sql_role))
+    def add_default_user_db(self, datamanager, default_users_requested, existing_default_users_roles, sql_customer_id):
+        default_region_users = []
+        default_users_dic = {}
 
-        return users_roles
+        for sql_user in existing_default_users_roles:
+            default_users_dic[sql_user.name] = sql_user
+
+        for user in default_users_requested:
+            is_default_user_exist = user.id in default_users_dic.keys()
+            if not is_default_user_exist:
+                sql_user = datamanager.add_user(user)
+                default_region_users.append(sql_user)
+                sql_user.sql_roles = []
+                for role in user.role:
+                    sql_role = datamanager.add_role(role)
+                    sql_user.sql_roles.append(sql_role)
+            else:
+                sql_user = default_users_dic.get(user.id)
+                new_sql_roles = []
+                for role in user.role:
+                    role_match = False
+                    for sql_role in sql_user.sql_roles:
+                        if sql_role.name == role:
+                            role_match = True
+                            break
+                    if not role_match:
+                        sql_role = datamanager.add_role(role)
+                        new_sql_roles.append(sql_role)
+                if new_sql_roles:
+                    sql_user.sql_roles = new_sql_roles
+                    default_region_users.append(sql_user)
+
+        for sql_user in default_region_users:
+            for sql_role in sql_user.sql_roles:
+                datamanager.add_user_role(sql_user.id, sql_role.id,
+                                          sql_customer_id, -1)
+        return default_region_users
+
+    def add_user_and_roles_to_db(self, users, sql_default_users, sql_customer_id, sql_region_id, datamanager):
+        users_roles = []
+        default_users_dic = {}
+
+        for sql_user in sql_default_users:
+            default_users_dic[sql_user.name] = sql_user
+            for role in sql_user.sql_roles:
+                users_roles.append((sql_user, role))
+
+        # Default user will be given priority over region user
+        for user in users:
+            is_default_user_in_region = user.id in default_users_dic.keys()
+            if not is_default_user_in_region:
+                sql_user = datamanager.add_user(user)
+                for role in user.role:
+                    sql_role = datamanager.add_role(role)
+                    users_roles.append((sql_user, sql_role))
+            else:
+                sql_user = default_users_dic.get(user.id)
+                for role in user.role:
+                    role_match = False
+                    for sql_role in sql_user.sql_roles:
+                        if sql_role.name == role:
+                            role_match = True
+                            break
+                    if not role_match:
+                        sql_role = datamanager.add_role(role)
+                        users_roles.append((sql_user, sql_role))
+
+        for user_role in users_roles:
+            datamanager.add_user_role(user_role[0].id, user_role[1].id,
+                                      sql_customer_id, sql_region_id)
 
     def create_customer(self, customer, uuid, transaction_id):
         datamanager = DataManager()
@@ -113,7 +154,6 @@ class CustomerLogic(object):
             sql_customer = self.build_full_customer(customer, uuid, datamanager)
             customer_result_wrapper = build_response(uuid, transaction_id, 'create')
 
-            sql_customer = self.add_default_users_to_empty_regions(sql_customer)
             if sql_customer.customer_customer_regions and len(sql_customer.customer_customer_regions) > 1:
                 customer_dict = sql_customer.get_proxy_dict()
                 for region in customer_dict["regions"]:
@@ -150,7 +190,6 @@ class CustomerLogic(object):
 
             sql_customer = self.build_full_customer(customer, customer_uuid,
                                                     datamanager)
-            sql_customer = self.add_default_users_to_empty_regions(sql_customer)
             new_customer_dict = sql_customer.get_proxy_dict()
             new_customer_dict["regions"] = self.resolve_regions_actions(old_customer_dict["regions"],
                                                                         new_customer_dict["regions"])
@@ -202,11 +241,19 @@ class CustomerLogic(object):
             if region_id is None:
                 raise ErrorStatus(404, "region {} not found".format(region_name))
 
-            self.add_users_to_db(datamanager, customer_id, region_id, users, adding=True)
-
             customer_record = datamanager.get_record('customer')
             customer = customer_record.read_customer(customer_id)
+            defaultRegion = customer.get_default_customer_region()
+            default_users_roles = defaultRegion.customer_region_user_roles if defaultRegion else []
+            default_users = []
+            for default_user in default_users_roles:
+                if default_user.user not in default_users:
+                    default_users.append(default_user.user)
+                    default_user.user.sql_roles = []
+                default_user.user.sql_roles.append(default_user.role)
 
+            self.add_user_and_roles_to_db(users, default_users,
+                                          customer_id, region_id, datamanager)
             timestamp = utils.get_time_human()
             datamanager.flush()  # i want to get any exception created by this insert
             RdsProxy.send_customer(customer, transaction_id, "PUT")
@@ -256,29 +303,12 @@ class CustomerLogic(object):
             LOG.log_exception("Failed to replace_default_users", exception)
             raise
 
-    def add_users_to_db(self, datamanager, customer_id, region_id, users, adding=False):
-        try:
-            users_roles = []
-            for user in users:
-                sql_user = datamanager.add_user(user)
-                for role in user.role:
-                    sql_role = datamanager.add_role(role)
-                    users_roles.append((sql_user, sql_role))
-            for user_role in users_roles:
-                # TODO: change add_use_role to receive sqlalchemy model (UserRole)
-                datamanager.add_user_role(user_role[0].id, user_role[1].id,
-                                          customer_id, region_id, adding)
-            datamanager.flush()
-        except Exception as exception:
-            LOG.log_exception("Failed to add users", exception)
-            raise
-
     def delete_users(self, customer_uuid, region_id, user_id, transaction_id):
         datamanager = DataManager()
         try:
             user_role_record = datamanager.get_record('user_role')
 
-            customer = datamanager.get_cusomer_by_uuid(customer_uuid)
+            customer = datamanager.get_customer_by_uuid(customer_uuid)
             if customer is None:
                 raise ErrorStatus(404, "customer {} does not exist".format(customer_uuid))
 
@@ -286,13 +316,24 @@ class CustomerLogic(object):
                                                               region_id,
                                                               user_id)
             if result.rowcount == 0:
-                raise NotFound("user {} is not found".format(user_id))
+                '''when result.rowcount returns 0, this indicates that the region user marked
+                for deletion also exists - and has the same exact roles - in the default user
+                level.   Since default_user supersedes region user, use 'delete_default_user'
+                instead of 'delete_user' command.
+                '''
+                message = "Cannot use 'delete_user' as user '%s' exists and has " \
+                          "the exact same roles in both the default and '%s' "\
+                          "region levels for customer %s. "\
+                          "Use 'delete_default_user' instead." \
+                          % (user_id, region_id, customer_uuid)
+                raise ErrorStatus(400, message)
 
             RdsProxy.send_customer(customer, transaction_id, "PUT")
             datamanager.commit()
 
-            print "User {0} from region {1} in customer {2} deleted".format(
-                user_id, region_id, customer_uuid)
+            LOG.info("User {0} from region {1} in customer {2} deleted".
+                     format(user_id, region_id, customer_uuid))
+
         except NotFound as e:
             datamanager.rollback()
             LOG.log_exception("Failed to delete_users, user not found",
@@ -318,10 +359,25 @@ class CustomerLogic(object):
             if customer_id is None:
                 raise ErrorStatus(404, "customer {} does not exist".format(customer_uuid))
 
-            self.add_users_to_db(datamanager, customer_id, -1, users, adding=True)
-
             customer_record = datamanager.get_record('customer')
             customer = customer_record.read_customer(customer_id)
+            defaultRegion = customer.get_default_customer_region()
+            existing_default_users_roles = defaultRegion.customer_region_user_roles if defaultRegion else []
+            default_users = []
+            for default_user in existing_default_users_roles:
+                if default_user.user not in default_users:
+                    default_users.append(default_user.user)
+                    default_user.user.sql_roles = []
+                default_user.user.sql_roles.append(default_user.role)
+
+            default_region_users = \
+                self.add_default_user_db(datamanager, users, default_users, customer_id)
+
+            regions = customer.get_real_customer_regions()
+
+            for region in regions:
+                self.add_user_and_roles_to_db(users, default_region_users,
+                                              customer_id, region.region_id, datamanager)
 
             timestamp = utils.get_time_human()
             datamanager.flush()  # i want to get any exception created by this insert
@@ -374,7 +430,7 @@ class CustomerLogic(object):
     def delete_default_users(self, customer_uuid, user_id, transaction_id):
         datamanager = DataManager()
         try:
-            customer = datamanager.get_cusomer_by_uuid(customer_uuid)
+            customer = datamanager.get_customer_by_uuid(customer_uuid)
             if customer is None:
                 raise ErrorStatus(404, "customer {} does not exist".format(customer_uuid))
 
@@ -382,20 +438,23 @@ class CustomerLogic(object):
             result = user_role_record.delete_user_from_region(customer_uuid,
                                                               'DEFAULT',
                                                               user_id)
-
             if result.rowcount == 0:
-                raise NotFound("user {} is not found".format(user_id))
+                raise NotFound("user {} ".format(user_id))
+            datamanager.flush()
+
+            if len(customer.customer_customer_regions) > 1:
+                RdsProxy.send_customer(customer, transaction_id, "PUT")
 
             datamanager.commit()
 
-            print "User {0} from region {1} in customer {2} deleted".format(
-                user_id, 'DEFAULT', customer_uuid)
+            LOG.info("User {0} from region {1} in customer {2} deleted".
+                     format(user_id, 'DEFAULT', customer_uuid))
 
         except NotFound as e:
             datamanager.rollback()
             LOG.log_exception("Failed to delete_users, user not found",
                               e.message)
-            raise NotFound("Failed to delete users,  %s not found" %
+            raise NotFound("Failed to delete user(s),  %s not found" %
                            e.message)
 
         except Exception as exp:
@@ -412,11 +471,26 @@ class CustomerLogic(object):
                 raise ErrorStatus(404,
                                   "customer with id {} does not exist".format(
                                       customer_uuid))
-            self.add_regions_to_db(regions, customer_id, datamanager)
 
             sql_customer = customer_record.read_customer_by_uuid(customer_uuid)
 
-            sql_customer = self.add_default_users_to_empty_regions(sql_customer)
+            defaultRegion = sql_customer.get_default_customer_region()
+            existing_default_users_roles = defaultRegion.customer_region_user_roles if defaultRegion else []
+            default_users = []
+            for default_user in existing_default_users_roles:
+                if default_user.user not in default_users:
+                    default_users.append(default_user.user)
+                    default_user.user.sql_roles = []
+                default_user.user.sql_roles.append(default_user.role)
+
+            self.add_regions_to_db(regions, customer_id, datamanager, default_users)
+
+            datamanager.commit()
+
+            datamanager.session.expire(sql_customer)
+
+            sql_customer = datamanager.get_customer_by_id(customer_id)
+
             new_customer_dict = sql_customer.get_proxy_dict()
 
             for region in new_customer_dict["regions"]:
@@ -427,9 +501,7 @@ class CustomerLogic(object):
                     region["action"] = "modify"
 
             timestamp = utils.get_time_human()
-            datamanager.flush()  # i want to get any exception created by this insert
             RdsProxy.send_customer_dict(new_customer_dict, transaction_id, "POST")
-            datamanager.commit()
 
             base_link = '{0}{1}/'.format(conf.server.host_ip,
                                          pecan.request.path)
@@ -462,16 +534,23 @@ class CustomerLogic(object):
                                   "customer with id {} does not exist".format(
                                       customer_id))
             old_customer_dict = old_sql_customer.get_proxy_dict()
+            defaultRegion = old_sql_customer.get_default_customer_region()
+            existing_default_users_roles = defaultRegion.customer_region_user_roles if defaultRegion else []
+            default_users = []
+            for default_user in existing_default_users_roles:
+                if default_user.user not in default_users:
+                    default_users.append(default_user.user)
+                    default_user.user.sql_roles = []
+                default_user.user.sql_roles.append(default_user.role)
             datamanager.session.expire(old_sql_customer)
 
             customer_region.delete_all_regions_for_customer(customer_id)
 
-            self.add_regions_to_db(regions, customer_id, datamanager)
+            self.add_regions_to_db(regions, customer_id, datamanager, default_users)
             timestamp = utils.get_time_human()
 
-            new_sql_customer = datamanager.get_cusomer_by_id(customer_id)
+            new_sql_customer = datamanager.get_customer_by_id(customer_id)
 
-            new_sql_customer = self.add_default_users_to_empty_regions(new_sql_customer)
             new_customer_dict = new_sql_customer.get_proxy_dict()
 
             datamanager.flush()  # i want to get any exception created by this insert
@@ -496,12 +575,15 @@ class CustomerLogic(object):
             datamanager.rollback()
             raise exp
 
-    def delete_region(self, customer_id, region_id, transaction_id):
+    def delete_region(self, customer_id, region_id, transaction_id, on_success_by_rds,
+                      force_delete):
         datamanager = DataManager()
         try:
             customer_region = datamanager.get_record('customer_region')
 
-            sql_customer = datamanager.get_cusomer_by_uuid(customer_id)
+            sql_customer = datamanager.get_customer_by_uuid(customer_id)
+            if on_success_by_rds and sql_customer is None:
+                return
             if sql_customer is None:
                 raise ErrorStatus(404,
                                   "customer with id {} does not exist".format(
@@ -509,36 +591,42 @@ class CustomerLogic(object):
             customer_dict = sql_customer.get_proxy_dict()
 
             customer_region.delete_region_for_customer(customer_id, region_id)
-            datamanager.flush()  # i want to get any exception created by this insert
+            datamanager.flush()  # Get any exception created by this insert
 
-            # i want to get any exception created by this insert
-            datamanager.flush()
+            if on_success_by_rds:
+                datamanager.commit()
+                LOG.debug("Region {0} in customer {1} deleted".format(region_id,
+                                                                      customer_id))
+            else:
+                region = next((r.region for r in sql_customer.customer_customer_regions if r.region.name == region_id), None)
+                if region:
+                    if region.type == 'group':
+                        set_utils_conf(conf)
+                        regions = get_regions_of_group(region.name)
+                    else:
+                        regions = [region_id]
+                for region in customer_dict['regions']:
+                    if region['name'] in regions:
+                        region['action'] = 'delete'
 
-            region = next((r.region for r in sql_customer.customer_customer_regions if r.region.name == region_id), None)
-            if region:
-                if region.type == 'group':
-                    set_utils_conf(conf)
-                    regions = get_regions_of_group(region.name)
+                RdsProxy.send_customer_dict(customer_dict, transaction_id, "PUT")
+                if force_delete:
+                    datamanager.commit()
                 else:
-                    regions = [region_id]
-            for region in customer_dict['regions']:
-                if region['name'] in regions:
-                    region['action'] = 'delete'
+                    datamanager.rollback()
 
-            RdsProxy.send_customer_dict(customer_dict, transaction_id, "PUT")
-            datamanager.commit()
-
-            LOG.debug("Region {0} in customer {1} deleted".format(region_id,
-                                                                  customer_id))
         except Exception as exp:
             datamanager.rollback()
             raise
+
+        finally:
+            datamanager.close()
 
     def get_customer(self, customer):
 
         datamanager = DataManager()
 
-        sql_customer = datamanager.get_cusomer_by_uuid_or_name(customer)
+        sql_customer = datamanager.get_customer_by_uuid_or_name(customer)
 
         if not sql_customer:
             raise ErrorStatus(404, 'customer: {0} not found'.format(customer))
@@ -564,24 +652,28 @@ class CustomerLogic(object):
         return ret_customer
 
     def get_customer_list_by_criteria(self, region, user, starts_with, contains,
-                                      metadata):
+                                      metadata, start=0, limit=0):
         datamanager = DataManager()
         customer_record = datamanager.get_record('customer')
         sql_customers = customer_record.get_customers_by_criteria(region=region,
                                                                   user=user,
                                                                   starts_with=starts_with,
                                                                   contains=contains,
-                                                                  metadata=metadata)
-
+                                                                  metadata=metadata,
+                                                                  start=start,
+                                                                  limit=limit)
         response = CustomerSummaryResponse()
-        for sql_customer in sql_customers:
-            # get aggregate status for each customer
-            customer_status = RdsProxy.get_status(sql_customer.uuid)
-            customer = CustomerSummary.from_db_model(sql_customer)
-            if customer_status.status_code == 200:
-                customer.status = customer_status.json()['status']
-            response.customers.append(customer)
+        if sql_customers:
+            uuids = ','.join(str("\'" + sql_customer.uuid + "\'")
+                             for sql_customer in sql_customers if sql_customer and sql_customer.uuid)
+            resource_status_dict = customer_record.get_customers_status_by_uuids(uuids)
 
+            for sql_customer in sql_customers:
+                customer = CustomerSummary.from_db_model(sql_customer)
+                if sql_customer.uuid:
+                    status = resource_status_dict.get(sql_customer.uuid)
+                    customer.status = not status and 'no regions' or status
+                response.customers.append(customer)
         return response
 
     def enable(self, customer_uuid, enabled, transaction_id):
@@ -601,28 +693,13 @@ class CustomerLogic(object):
             datamanager.flush()  # get any exception created by this action
             datamanager.commit()
 
+            customer_result_wrapper = build_response(customer_uuid, transaction_id, 'update')
+
+            return customer_result_wrapper
+
         except Exception as exp:
             datamanager.rollback()
             raise exp
-
-    def add_default_users_to_empty_regions(self, sql_customer):
-        if len(sql_customer.customer_customer_regions) > 0:
-            for region in sql_customer.customer_customer_regions:
-                if region.region_id == -1:
-                    users = region.customer_region_user_roles[:]
-                    break
-
-            for region in sql_customer.customer_customer_regions:
-                if region.region_id != -1:
-                    for user in users:
-                        u = UserRole()
-                        u.customer_id = region.customer_id
-                        u.region_id = region.region_id
-                        u.user_id = user.user_id
-                        u.role_id = user.role_id
-                        region.customer_region_user_roles.append(u)
-
-        return sql_customer
 
     def delete_customer_by_uuid(self, customer_id):
         datamanager = DataManager()
@@ -633,9 +710,7 @@ class CustomerLogic(object):
 
             sql_customer = customer_record.read_customer_by_uuid(customer_id)
             if sql_customer is None:
-                # The customer does not exist, so the delete operation is
-                # considered successful
-                return
+                raise ErrorStatus(404, "Customer '{0}' not found".format(customer_id))
 
             real_regions = sql_customer.get_real_customer_regions()
             if len(real_regions) > 0:
@@ -706,7 +781,7 @@ def build_response(customer_uuid, transaction_id, context):
     link_elements = request.url.split('/')
     base_link = '/'.join(link_elements)
     if context == 'create':
-        base_link += customer_uuid
+        base_link = base_link + '/' + customer_uuid
 
     timestamp = utils.get_time_human()
     customer_result_wrapper = CustomerResultWrapper(

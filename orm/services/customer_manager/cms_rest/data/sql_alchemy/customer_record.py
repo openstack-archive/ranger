@@ -42,7 +42,7 @@ class CustomerRecord:
             raise
 
     def delete_by_primary_key(self, customer_id):
-        result = self.session.connection().execute("delete from customer where id = %d" % (customer_id))
+        result = self.session.connection().execute("delete from customer where id = {}".format(customer_id))
         return result
 
     def read_by_primary_key(self):
@@ -69,12 +69,22 @@ class CustomerRecord:
             raise
 
     def get_customer_id_from_uuid(self, uuid):
-        result = self.session.connection().scalar("SELECT id from customer WHERE uuid = \"%s\"" % uuid)
+        result = self.session.connection().scalar("SELECT id from customer WHERE uuid = \"{}\"".format(uuid))
 
         if result:
             return int(result)
         else:
             return None
+
+    def get_customers_status_by_uuids(self, uuid_str):
+        results = self.session.connection().execute("SELECT resource_id, status from rds_resource_status_view"
+                                                    "  WHERE resource_id in ({})".format(uuid_str))
+        resource_status_dict = {}
+        if results:
+            resource_status_dict = dict((resource_id, status) for resource_id, status in results)
+
+            results.close()
+        return resource_status_dict
 
     def delete_customer_by_uuid(self, uuid):
         try:
