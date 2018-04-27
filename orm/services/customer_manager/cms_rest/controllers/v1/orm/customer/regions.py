@@ -88,9 +88,16 @@ class RegionController(rest.RestController):
 
         return result
 
-    @wsexpose(None, str, str, status_code=204)
-    def delete(self, customer_id, region_id):
-        LOG.info("RegionController - Delete Region (delete) customer id {0} region_id: {1}".format(customer_id, region_id))
+    @wsexpose(None, str, str, str, status_code=204)
+    def delete(self, customer_id, region_id, force_delete='False'):
+
+        if force_delete == 'True':
+            force_delete = True
+        else:
+            force_delete = False
+        requester = request.headers.get('X-AIC-ORM-Requester')
+        is_rds_client_request = requester == 'rds_resource_service_proxy'
+        LOG.info("Delete Region (delete) customer id {0} region_id: {1} by RDS Proxy: {2} ".format(customer_id, region_id, is_rds_client_request))
         authentication.authorize(request, 'customers:delete_region')
         try:
             customer_logic = CustomerLogic()

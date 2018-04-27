@@ -1,5 +1,6 @@
-
-from orm.services.flavor_manager.fms_rest.data.sql_alchemy.db_models import (Flavor, FlavorRegion,
+from orm.services.flavor_manager.fms_rest.data.sql_alchemy.db_models import (Flavor,
+                                                                             FlavorRegion,
+                                                                             FlavorTag,
                                                                              FlavorTenant)
 from orm.services.flavor_manager.fms_rest.logger import get_logger
 
@@ -148,6 +149,16 @@ class FlavorRecord:
             LOG.log_exception(message, exception)
             raise
 
+    def get_flavors_status_by_uuids(self, uuid_str):
+        results = self.session.connection().execute("SELECT resource_id, status from rds_resource_status_view"
+                                                    "  WHERE resource_id in ({})".format(uuid_str))
+        resource_status_dict = {}
+        if results:
+            resource_status_dict = dict((resource_id, status) for resource_id, status in results)
+
+            results.close()
+        return resource_status_dict
+
     def get_flavors_by_criteria(self, **criteria):
         try:
 
@@ -156,6 +167,8 @@ class FlavorRecord:
             region = criteria['region'] if 'region' in criteria else None
             tenant = criteria['tenant'] if 'tenant' in criteria else None
             series = criteria['series'] if 'series' in criteria else None
+            vm_type = criteria['vm_type'] if 'vm_type' in criteria else None
+            vnf_name = criteria['vnf_name'] if 'vnf_name' in criteria else None
             starts_with = criteria['starts_with'] if 'starts_with' in criteria else None
             contains = criteria['contains'] if 'contains' in criteria else None
             alias = criteria['alias'] if 'alias' in criteria else None
@@ -177,7 +190,14 @@ class FlavorRecord:
             if tenant:
                 query = query.join(FlavorTenant).filter(FlavorTenant.flavor_internal_id == Flavor.internal_id,
                                                         FlavorTenant.tenant_id == tenant)
-
+            if vm_type:
+                query = query.join(FlavorTag).filter(FlavorTag.flavor_internal_id == Flavor.internal_id,
+                                                     FlavorTag.key_name == 'vm_type',
+                                                     FlavorTag.key_value == vm_type)
+            if vnf_name:
+                query = query.join(FlavorTag).filter(FlavorTag.flavor_internal_id == Flavor.internal_id,
+                                                     FlavorTag.key_name == 'vnf_name',
+                                                     FlavorTag.key_value == vnf_name)
             if visibility:
                 query = query.filter(Flavor.visibility == visibility)
 

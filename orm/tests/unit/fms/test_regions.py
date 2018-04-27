@@ -75,10 +75,9 @@ class TestRegionController(FunctionalTest):
         requests.delete = MagicMock(return_value=ResponseMock(204))
 
         # when
-        self.app.delete('/v1/orm/flavors/flavor_id/regions/region_id')
+        self.app.delete('/v1/orm/flavors/flavor_id/regions/region_id/False')
 
         # assert
-        assert utils_mock.audit_trail.called
         assert region_logic_mock.delete_region.called
 
     def test_delete_region_fail(self):
@@ -89,7 +88,7 @@ class TestRegionController(FunctionalTest):
         requests.delete = MagicMock()
 
         # when
-        response = self.app.delete('/v1/orm/flavors/flavor_id/regions/{region_id}', expect_errors=True)
+        response = self.app.delete('/v1/orm/flavors/flavor_id/regions/{region_id}/False', expect_errors=True)
 
         # assert
         self.assertEqual(response.status_int, 500)
@@ -102,7 +101,7 @@ class TestRegionController(FunctionalTest):
         requests.delete = MagicMock()
 
         # when
-        response = self.app.delete('/v1/orm/flavors/flavor_id/regions/{region_id}', expect_errors=True)
+        response = self.app.delete('/v1/orm/flavors/flavor_id/regions/{region_id}/False', expect_errors=True)
 
         # assert
         # self.assertEqual(response.status_int, 404)

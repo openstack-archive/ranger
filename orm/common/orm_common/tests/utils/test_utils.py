@@ -1,6 +1,6 @@
 import logging
 import mock
-from orm.common.orm_common.utils import utils
+from orm_common.utils import utils
 import pprint
 from testfixtures import log_capture
 from unittest import TestCase
@@ -23,14 +23,13 @@ class TestUtil(TestCase):
         uuid = utils.create_or_validate_uuid('', 'uuidtype')
         self.assertEqual(uuid, '987654321')
 
-    @log_capture('orm.common.orm_common.utils.utils', level=logging.INFO)
     @mock.patch('requests.post')
-    def test_make_uuid_offline(self, mock_post, log):
+    @log_capture('orm_common.utils.utils', level=logging.INFO)
+    def test_make_uuid_offline(self, mock_post, l):
         mock_post.side_effect = Exception('boom')
         uuid = utils.create_or_validate_uuid('', 'uuidtype')
         self.assertEqual(uuid, None)
-        log.check(('orm.common.orm_common.utils.utils',
-                   'INFO', 'Failed in make_uuid:boom'))
+        l.check(('orm_common.utils.utils', 'INFO', 'Failed in make_uuid:boom'))
 
     @mock.patch('requests.post')
     def test_make_transid(self, mock_post):
@@ -44,25 +43,25 @@ class TestUtil(TestCase):
         mock_post.side_effect = Exception('boom')
         uuid = utils.make_transid()
         self.assertEqual(uuid, None)
-        l.check(('orm_common.utils.utils',
-                 'INFO', 'Failed in make_transid:boom'))
+        l.check(
+            ('orm_common.utils.utils', 'INFO', 'Failed in make_transid:boom'))
 
-    @mock.patch('orm.common.client.audit.audit_client.api.audit.init')
-    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
+    @mock.patch('audit_client.api.audit.init')
+    @mock.patch('audit_client.api.audit.audit')
     def test_audit_trail(self, mock_init, mock_audit):
         resp = utils.audit_trail('create customer', '1234',
                                  {'X-AIC-ORM-Client': 'Fred'}, '5678')
         self.assertEqual(resp, 200)
 
-    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
+    @mock.patch('audit_client.api.audit.audit')
     def test_audit_trail_offline(self, mock_audit):
         mock_audit.side_effect = Exception('boom')
         resp = utils.audit_trail('create customer', '1234',
                                  {'X-AIC-ORM-Client': 'Fred'}, '5678')
         self.assertEqual(resp, None)
 
-    @mock.patch('orm.common.client.audit.audit_client.api.audit.init')
-    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
+    @mock.patch('audit_client.api.audit.init')
+    @mock.patch('audit_client.api.audit.audit')
     def test_audit_service_args_least(self, mock_audit, mock_init):
         resp = utils.audit_trail('create customer', '1234',
                                  {'X-AIC-ORM-Client': 'Fred'}, '5678')
@@ -78,8 +77,8 @@ class TestUtil(TestCase):
         self.assertEqual(mock_audit.call_args[0][9], '')  # event_details
         # self.assertEqual(mock_audit.call_args[0][10], 'Saved to DB')  # status
 
-    @mock.patch('orm.common.client.audit.audit_client.api.audit.init')
-    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
+    @mock.patch('audit_client.api.audit.init')
+    @mock.patch('audit_client.api.audit.audit')
     def test_audit_service_with_tracking(self, mock_audit, mock_init):
         utils.audit_trail('create customer', '1234',
                           {'X-AIC-ORM-Client': 'Fred',
@@ -96,8 +95,8 @@ class TestUtil(TestCase):
         self.assertEqual(mock_audit.call_args[0][9], '')  # event_details
         # self.assertEqual(mock_audit.call_args[0][10], 'Saved to DB')  # status
 
-    @mock.patch('orm.common.client.audit.audit_client.api.audit.init')
-    @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
+    @mock.patch('audit_client.api.audit.init')
+    @mock.patch('audit_client.api.audit.audit')
     def test_audit_service_with_requester(self, mock_audit, mock_init):
         resp = utils.audit_trail('create customer', '1234',
                                  {'X-AIC-ORM-Client': 'Fred',

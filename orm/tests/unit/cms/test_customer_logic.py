@@ -69,6 +69,7 @@ class TestCustomerLogic(FunctionalTest):
 
     def test_create_customer_success_with_regions(self):
         customer.regions = [models.Region(name="a")]
+        customer.name = 'Cust Name'
         logic = customer_logic.CustomerLogic()
         logic.create_customer(customer, 'some_uuid', 'some_trans_id')
 
@@ -86,6 +87,7 @@ class TestCustomerLogic(FunctionalTest):
         res = customer_logic.RdsProxy.send_customer.call_args_list
 
     def test_create_customer_add_all_default_users(self):
+        customer.name = 'Cust Name'
         logic = customer_logic.CustomerLogic()
         logic.create_customer(customer, 'some_uuid', 'some_trans_id')
 
@@ -95,11 +97,24 @@ class TestCustomerLogic(FunctionalTest):
         global mock_returns_error
         mock_returns_error = True
 
+        customer.name = 'Cust Name'
         logic = customer_logic.CustomerLogic()
 
         self.assertRaises(SystemError, logic.create_customer, customer, 'some_uuid', 'some_trans_id')
 
+    def test_create_customer_with_blank_name(self):
+        global mock_returns_error
+        mock_returns_error = True
+
+        customer.name = ''
+        logic = customer_logic.CustomerLogic()
+
+        self.assertRaises(customer_logic.ErrorStatus,
+                          logic.create_customer,
+                          customer, 'some_uuid', 'some_trans_id')
+
     def test_update_customer_success(self):
+        customer.name = 'Cust Name'
         logic = customer_logic.CustomerLogic()
         logic.update_customer(customer, 'some_uuid', 'some_trans_id')
 
@@ -158,6 +173,7 @@ class TestCustomerLogic(FunctionalTest):
 
         default_region = models.Region()
         customer.regions = [default_region]
+        customer.name = 'Cust Name'
 
         default_user = models.User()
         default_user.role = ['user', 'admin']
@@ -183,7 +199,7 @@ class TestCustomerLogic(FunctionalTest):
         assert data_manager_mock.add_role.call_count == 2
         assert data_manager_mock.commit.called
 
-    def test_delete_users_succes(self):
+    def test_delete_users_success(self):
         logic = customer_logic.CustomerLogic()
         logic.delete_users('customer_id', 'region_id', 'user_id', 'transaction_is')
 
@@ -195,7 +211,7 @@ class TestCustomerLogic(FunctionalTest):
         global rowcount
         rowcount = 0
         logic = customer_logic.CustomerLogic()
-        with self.assertRaises(customer_logic.NotFound):
+        with self.assertRaises(customer_logic.ErrorStatus):
             logic.delete_users('customer_id', 'region_id', 'user_id',
                                'transaction_is')
         rowcount = 1
@@ -273,7 +289,7 @@ class TestCustomerLogic(FunctionalTest):
         self.assertRaises(SystemError, logic.replace_default_users, 'id', users, 'trans_id')
         assert data_manager_mock.rollback.called
 
-    def test_delete_default_users_succes(self):
+    def test_delete_default_users_success(self):
         logic = customer_logic.CustomerLogic()
         logic.delete_default_users('customer_id', 'user_id', 'transaction_is')
 
@@ -338,13 +354,19 @@ class TestCustomerLogic(FunctionalTest):
         self.assertRaises(SystemError, logic.replace_regions, 'customer_uuid', regions, 'transaction_id')
         assert data_manager_mock.rollback.called
 
-    def test_delete_regions_succes(self):
+    def test_delete_regions_success(self):
         logic = customer_logic.CustomerLogic()
-        logic.delete_region('customer_id', 'region_id', 'transaction_is')
+        logic.delete_region('customer_id', 'region_id', 'transaction_is', True, False)
 
         assert record_mock.delete_region_for_customer.called
         assert data_manager_mock.commit.called
-        assert customer_logic.RdsProxy.send_customer_dict.called
+
+    def test_delete_regions_success_force_delete(self):
+        logic = customer_logic.CustomerLogic()
+        logic.delete_region('customer_id', 'region_id', 'transaction_is', True, True)
+
+        assert record_mock.delete_region_for_customer.called
+        assert data_manager_mock.commit.called
 
     def test_delete_regions_error(self):
         global mock_returns_error
@@ -352,7 +374,8 @@ class TestCustomerLogic(FunctionalTest):
 
         logic = customer_logic.CustomerLogic()
 
-        self.assertRaises(SystemError, logic.delete_region, 'customer_id', 'region_id', 'transaction_is')
+        self.assertRaises(SystemError, logic.delete_region, 'customer_id',
+                          'region_id', 'transaction_is', True, False)
         assert data_manager_mock.rollback.called
 
     def test_get_customer_list_by_criteria(self):
@@ -369,10 +392,15 @@ class TestCustomerLogic(FunctionalTest):
             status_code=404)
         logic.delete_customer_by_uuid('customer_id')
 
+    def test_delete_customer_by_uuid_not_found(self):
         global flow_type
         # Change the flow to "customer not found in CMS DB"
         flow_type = 1
-        logic.delete_customer_by_uuid('customer_id')
+        logic = customer_logic.CustomerLogic()
+
+        # test that ErrorStatus exception is raised when no customer found
+        with self.assertRaises(customer_logic.ErrorStatus):
+            logic.delete_customer_by_uuid('customer_id')
 
     def test_delete_customer_by_uuid_errors(self):
         global mock_returns_error
@@ -431,7 +459,7 @@ class TestCustomerLogic(FunctionalTest):
         customer_logic.requests.get = mock.MagicMock(return_value=get_mock)
         logic.get_customer('customer_id')
 
-        self.assertTrue(data_manager_mock.get_cusomer_by_uuid_or_name.called)
+        self.assertTrue(data_manager_mock.get_customer_by_uuid_or_name.called)
 
     def test_get_customer_not_found(self):
         global flow_type
@@ -519,13 +547,13 @@ def get_mock_datamanager():
         data_manager_mock.update_customer = _update_customer
         data_manager_mock.add_region = _add_region
         data_manager_mock.add_user.return_value = sql_models.CmsUser()
-        data_manager_mock.get_cusomer_by_uuid_or_name.return_value = _get_customer()
+        data_manager_mock.get_customer_by_uuid_or_name.return_value = _get_customer()
 
         record_mock.delete_region_for_customer.return_value = None
         record_mock.delete_customer_by_uuid.return_value = None
         if flow_type == 1:
             record_mock.read_customer_by_uuid.return_value = None
-            data_manager_mock.get_cusomer_by_uuid_or_name.return_value = None
+            data_manager_mock.get_customer_by_uuid_or_name.return_value = None
         elif flow_type == 2:
             q = mock.MagicMock()
             q.get_real_customer_regions.return_value = [mock.MagicMock()]
@@ -546,7 +574,7 @@ def get_mock_datamanager():
     data_manager_mock.add_user.return_value = sql_models.CmsUser()
     data_manager_mock.add_role.return_value = sql_models.CmsRole()
 
-    data_manager_mock.get_cusomer_by_id.return_value = sql_customer
+    data_manager_mock.get_customer_by_id.return_value = sql_customer
 
     return data_manager_mock
 

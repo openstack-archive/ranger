@@ -9,6 +9,7 @@ from orm.tests.unit.ims import FunctionalTest
 import mock
 from wsme.exc import ClientSideError
 
+
 utils_mock = None
 image_logic_mock = None
 
@@ -93,19 +94,23 @@ class TestRegionController(FunctionalTest):
                                      expect_errors=True)
         self.assertEqual(500, response.status_code)
 
-    def test_delete_success(self):
+    @mock.patch.object(regions, 'request')
+    def test_delete_success(self, request):
         global return_error
         return_error = 0
+        request.headers = {'X-AIC-ORM-Requester': "rds_resource_service_proxy"}
         injector.override_injected_dependency(('image_logic', get_logic_mock()))
 
         response = self.app.delete('/v1/orm/images/id/regions/1')
         self.assertEqual(response.status_int, 204)
 
     @mock.patch.object(regions, 'err_utils')
-    def test_delete_not_found_error(self, mock_err_utils):
+    @mock.patch.object(regions, 'request')
+    def test_delete_not_found_error(self, request, mock_err_utils):
         mock_err_utils.get_error = get_error
-
         global return_error
+        request.transaction_id = 'fake id'
+        request.headers = {'X-AIC-ORM-Requester': "rds_resource_service_proxy"}
         return_error = 2
         injector.override_injected_dependency(('image_logic', get_logic_mock()))
 
