@@ -24,7 +24,6 @@ LOG = logging.getLogger(__name__)
 
 # event handling
 def on_before_flush(session, flush_context, instances):
-    LOG.info("on_before_flush:", str(flush_context))
     for model in session.new:
         if hasattr(model, "validate"):
             model.validate("new")

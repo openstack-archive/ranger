@@ -1,5 +1,4 @@
 import json
-
 from orm.common.orm_common.utils import utils
 from wsme.exc import ClientSideError
 
@@ -40,7 +39,7 @@ error_message = {
     404: {'message': 'The specific transaction was not found', 'type': 'Not Found'},
     405: {'message': 'This method is not allowed', 'type': 'Method Not Allowed'},
     409: {'message': 'Current resource is busy', 'type': 'Conflict'},
-    409.1: {'message': 'Customer UUID already exists', 'type': 'Conflict'},
+    409.1: {'message': 'UUID already exists', 'type': 'Conflict'},
     409.2: {'message': 'Customer name already exists', 'type': 'Conflict'},
     500: {'message': 'Server error occurred', 'type': 'Internal Server Error'}
 }

@@ -219,7 +219,9 @@ import logging
 import os
 
 import _parser
+from orm.common.orm_common.utils import api_error_utils as err_utils
 from oslo_config import cfg
+
 from oslo_policy import _checks
 from oslo_policy._i18n import _
 from oslo_serialization import jsonutils
@@ -525,9 +527,6 @@ class Enforcer(object):
 
         # If it is False, raise the exception if requested
         if do_raise and not result:
-            if exc:
-                raise exc(*args, **kwargs)
-
-            raise PolicyNotAuthorized(rule, target, creds)
+            raise err_utils.get_error('N/A', status_code=403)
 
         return result

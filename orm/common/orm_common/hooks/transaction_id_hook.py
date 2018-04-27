@@ -11,7 +11,7 @@ class TransactionIdHook(PecanHook):
         except Exception as exc:
             abort(500, headers={'faultstring': exc.message})
 
-        tracking_id = state.request.headers['X-RANGER-Tracking-Id'] \
-            if 'X-RANGER-Tracking-Id' in state.request.headers else transaction_id
+        tracking_id = state.request.headers['X-AIC-ORM-Tracking-Id'] \
+            if 'X-AIC-ORM-Tracking-Id' in state.request.headers else transaction_id
         setattr(state.request, 'transaction_id', transaction_id)
         setattr(state.request, 'tracking_id', tracking_id)

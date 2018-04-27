@@ -31,9 +31,9 @@ class FMSBaseModel(models.ModelBase):
 
 
 class Flavor(Base, FMSBaseModel):
-    """DataObject containing all the fields defined in Flavor table record.
+    '''Flavor is a DataObject contains all the fields defined in Flavor table record.
     defined as SqlAlchemy model map to a table
-    """
+    '''
     __tablename__ = "flavor"
 
     internal_id = Column(BigInteger, primary_key=True)
@@ -187,7 +187,7 @@ class Flavor(Base, FMSBaseModel):
             self.add_tags(flavor_tags)
 
         except Exception as exception:
-            LOG.log_exception("Failed to add region {0} to flavor {1}".format(
+            LOG.log_exception("Failed to replace tags {0} to flavor {1}".format(
                 str(flavor_tags), str(self)), exception)
             raise
 
@@ -196,7 +196,7 @@ class Flavor(Base, FMSBaseModel):
             LOG.debug("remove all tags from flavor {}".format(str(self)))
             self.flavor_tags = []
         except Exception as exception:
-            LOG.log_exception("Failed to remove all tags from flavor {1}".format(str(self)), exception)
+            LOG.log_exception("Failed to remove all tags from flavor {}".format(str(self)), exception)
             raise
 
     def remove_tag(self, tag_name):
@@ -239,6 +239,7 @@ class Flavor(Base, FMSBaseModel):
             raise
 
     def remove_tenant(self, tenant_id):
+        deleted_flag = False
         assert isinstance(tenant_id, basestring)
         try:
             LOG.debug("remove tenants {0} from flavor {1}".format(tenant_id,
@@ -247,6 +248,12 @@ class Flavor(Base, FMSBaseModel):
             for tenant in reversed(self.flavor_tenants):
                 if tenant.tenant_id == tenant_id:
                     self.flavor_tenants.remove(tenant)
+                    deleted_flag = True
+
+            if not deleted_flag:
+                raise ErrorStatus(404,
+                                  "tenant {0} does not exist for flavor id {1}".format(
+                                      tenant_id, str(self.id)))
 
         except Exception as exception:
             LOG.log_exception(
@@ -292,10 +299,9 @@ class Flavor(Base, FMSBaseModel):
                     deleted_flag = True
 
             if not deleted_flag:
-                # no need to raise in delete not found
-                LOG.debug(
-                    "Failed to remove extra_spec {0} from flavor id {1}".format(
-                        extra_spec_key_name, str(self.id)))
+                raise ErrorStatus(404,
+                                  "extra spec {0} does not exist for flavor id {1}".format(
+                                      extra_spec_key_name, str(self.id)))
 
         except ErrorStatus as e:
             raise
@@ -303,66 +309,6 @@ class Flavor(Base, FMSBaseModel):
         except Exception as exception:
             LOG.log_exception(
                 "Failed to remove extra_spec {0} from flavor {1}".format(extra_spec_key_name, str(self)), exception)
-            raise
-
-    def add_tags(self, flavor_tags):
-        assert isinstance(flavor_tags, list) and all(isinstance(ft, FlavorTag) for ft in flavor_tags)
-        try:
-            LOG.debug("add tags {0} to flavor {1}".format(str(flavor_tags),
-                                                          str(self)))
-            for tag in flavor_tags:
-                self.flavor_tags.append(tag)
-
-        except Exception as exception:
-            LOG.log_exception("Failed to add region {0} to flavor {1}".format(
-                str(flavor_tags), str(self)), exception)
-            raise
-
-    def replace_tags(self, flavor_tags):
-        assert isinstance(flavor_tags, list) and all(isinstance(ft, FlavorTag) for ft in flavor_tags)
-        try:
-            LOG.debug("replace tags {0} for flavor {1}".format(str(flavor_tags),
-                                                               str(self)))
-            self.remove_all_tags()
-            self.add_tags(flavor_tags)
-
-        except Exception as exception:
-            LOG.log_exception("Failed to add region {0} to flavor {1}".format(
-                str(flavor_tags), str(self)), exception)
-            raise
-
-    def remove_all_tags(self):
-        try:
-            LOG.debug("remove all tags from flavor {}".format(str(self)))
-            self.flavor_tags = []
-        except Exception as exception:
-            LOG.log_exception("Failed to remove all tags from flavor {1}".format(str(self)), exception)
-            raise
-
-    def remove_tag(self, tag_name):
-        deleted_flag = False
-        assert isinstance(tag_name, basestring)
-        try:
-            LOG.debug("remove tag {0} from flavor {1}".format(tag_name,
-                                                              str(self)))
-
-            for tag in reversed(self.flavor_tags):
-                if tag.key_name == tag_name:
-                    self.flavor_tags.remove(tag)
-                    deleted_flag = True
-
-            if not deleted_flag:
-                raise ErrorStatus(404,
-                                  "Failed to remove tag {0} from flavor id {1}".format(
-                                      tag_name, str(self.id)))
-
-        except ErrorStatus as e:
-            raise
-
-        except Exception as exception:
-            LOG.log_exception(
-                "Failed to remove tag {0} from flavor {1}".format(
-                    tag_name, str(self)), exception)
             raise
 
     def validate(self, type):
@@ -456,8 +402,8 @@ class FlavorTag(Base, FMSBaseModel):
         )
 
     def __str__(self):
-        tag = "\"{0}\":\"{1}\"".format(self.key_name, self.key_value)
-        return tag
+        tags = "\"{0}\":\"{1}\"".format(self.key_name, self.key_value)
+        return tags
 
 
 '''

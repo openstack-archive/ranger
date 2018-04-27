@@ -1,5 +1,3 @@
-import uuid
-
 from orm.services.flavor_manager.fms_rest.data.sql_alchemy.db_models import FlavorRegion, FlavorTenant
 from orm.services.flavor_manager.fms_rest.data.wsme.models import (ExtraSpecsWrapper, Flavor,
                                                                    FlavorListFullResponse, FlavorWrapper,
@@ -8,6 +6,8 @@ from orm.services.flavor_manager.fms_rest.data.wsme.models import (ExtraSpecsWra
 from orm.services.flavor_manager.fms_rest.logger import get_logger
 from orm.services.flavor_manager.fms_rest.logic.error_base import ConflictError, ErrorStatus, NotFoundError
 from orm.common.orm_common.injector import injector
+
+from pecan import conf
 
 LOG = get_logger(__name__)
 
@@ -18,7 +18,6 @@ di = injector.get_di()
 def create_flavor(flavor, flavor_uuid, transaction_id):
     DataManager = di.resolver.unpack(create_flavor)
     datamanager = DataManager()
-
     try:
         flavor.flavor.handle_region_groups()
         flavor.flavor.validate_model("create")
@@ -120,9 +119,7 @@ def delete_flavor_by_uuid(flavor_uuid):  # , transaction_id):
 
         sql_flavor = flavor_rec.get_flavor_by_id(flavor_uuid)
         if sql_flavor is None:
-            # The flavor does not exist, so the delete operation is
-            # considered successful
-            return
+            raise NotFoundError(message="Flavor '{}' not found".format(flavor_uuid))
 
         existing_region_names = sql_flavor.get_existing_region_names()
         if len(existing_region_names) > 0:
@@ -228,33 +225,43 @@ def add_regions(flavor_uuid, regions, transaction_id):
 
 
 @di.dependsOn('data_manager')
-def delete_region(flavor_uuid, region_name, transaction_id):
+def delete_region(flavor_uuid, region_name, transaction_id, on_success_by_rds,
+                  force_delete):
     DataManager = di.resolver.unpack(delete_region)
     datamanager = DataManager()
 
     try:
         flavor_rec = datamanager.get_record('flavor')
         sql_flavor = flavor_rec.get_flavor_by_id(flavor_uuid)
+        if not sql_flavor and on_success_by_rds:
+            return
         if not sql_flavor:
             raise ErrorStatus(404, 'flavor id {0} not found'.format(flavor_uuid))
 
         existing_region_names = sql_flavor.get_existing_region_names()
-
         sql_flavor.remove_region(region_name)
 
-        datamanager.flush()  # i want to get any exception created by previous actions against the database
-        send_to_rds_if_needed(sql_flavor, existing_region_names, "put", transaction_id)
-
-        datamanager.commit()
+        datamanager.flush()  # Get any exception created by previous actions against the database
+        if on_success_by_rds:
+            datamanager.commit()
+        else:
+            send_to_rds_if_needed(sql_flavor, existing_region_names, "put",
+                                  transaction_id)
+            if force_delete:
+                datamanager.commit()
+            else:
+                datamanager.rollback()
 
     except ErrorStatus as exp:
         LOG.log_exception("FlavorLogic - Failed to update flavor", exp)
         datamanager.rollback()
         raise exp
+
     except Exception as exp:
         LOG.log_exception("FlavorLogic - Failed to delete region", exp)
         datamanager.rollback()
         raise exp
+
     finally:
         datamanager.close()
 
@@ -328,11 +335,18 @@ def delete_tenant(flavor_uuid, tenant_id, transaction_id):
         datamanager.flush()  # i want to get any exception created by previous actions against the database
         send_to_rds_if_needed(sql_flavor, existing_region_names, "put", transaction_id)
         datamanager.commit()
-
-    except ErrorStatus as exp:
-        LOG.log_exception("FlavorLogic - Failed to update flavor", exp)
+    except NotFoundError as exp:
         datamanager.rollback()
+        LOG.log_exception("FlavorLogic - Flavor not found", exp)
         raise
+    except ErrorStatus as exp:
+        datamanager.rollback()
+        if exp.status_code == 404:
+            LOG.log_exception("FlavorLogic - Tenant not found", exp)
+            raise
+        else:
+            LOG.log_exception("FlavorLogic - failed to delete tenant", exp)
+            raise
     except Exception as exp:
         LOG.log_exception("FlavorLogic - Failed to delete tenant", exp)
         datamanager.rollback()
@@ -424,8 +438,12 @@ def delete_extra_specs(flavor_id, transaction_id, extra_spec=None):
 
     except ErrorStatus as exp:
         datamanager.rollback()
-        LOG.log_exception("error in adding extra specs", exp)
-        raise
+        if exp.status_code == 404:
+            LOG.log_exception("FlavorLogic - extra specs not found", exp)
+            raise
+        else:
+            LOG.log_exception("FlavorLogic - failed to delete extra specs", exp)
+            raise
 
     except Exception as exp:
         datamanager.rollback()
@@ -487,8 +505,7 @@ def delete_tags(flavor_id, tag, transaction_id):
     except ErrorStatus as exp:
         if exp.status_code == 404:
             LOG.log_exception("FlavorLogic - Tag not found", exp)
-            # Do not raise an exception if the tag was not found
-            return
+            raise
         else:
             LOG.log_exception("FlavorLogic - failed to delete tags", exp)
             raise
@@ -702,7 +719,6 @@ def get_flavor_by_uuid_or_name(flavor_uuid_or_name):
     DataManager, rds_proxy = di.resolver.unpack(get_flavor_by_uuid)
 
     datamanager = DataManager()
-
     try:
 
         flavor_record = datamanager.get_record('flavor')
@@ -727,33 +743,46 @@ def get_flavor_by_uuid_or_name(flavor_uuid_or_name):
 @di.dependsOn('rds_proxy')
 def update_region_statuses(flavor, sql_flavor):
     rds_proxy = di.resolver.unpack(update_region_statuses)
-
     # remove the regions comes from database and return the regions which return from rds,
     # because there might be group region there (in the db) and in the response from the
     # rds we will have a list of all regions belong to this group
     flavor.regions[:] = []
     resp = rds_proxy.get_status(sql_flavor.id)
     if resp.status_code == 200:
-        status_resp = resp.json()
-        if sql_flavor.flavor_regions and len(sql_flavor.flavor_regions) > 0:
-            if 'regions' in status_resp.keys():
-                for region_status in status_resp['regions']:
-                    flavor.regions.append(
-                        Region(name=region_status['region'], type="single",
-                               status=region_status['status'],
-                               error_message=region_status['error_msg']))
+        rds_status_resp = resp.json()
+        # store all regions for the flavor in the flavor_regions_list
+        flavor_regions_list = []
+        for region_data in sql_flavor.flavor_regions:
+            flavor_regions_list.append(region_data.region_name)
 
-        if 'status' in status_resp.keys():
-            flavor.status = status_resp['status']
+        # get region status if region in flavor_regions_list
+        if flavor_regions_list and 'regions' in rds_status_resp.keys():
+            for rds_region_status in rds_status_resp['regions']:
+                # check that the region read from RDS is in the flavor_regions_list
+                if rds_region_status['region'] in flavor_regions_list:
+                    flavor.regions.append(
+                        Region(name=rds_region_status['region'], type="single",
+                               status=rds_region_status['status'],
+                               error_message=rds_region_status['error_msg']))
+
+        if 'status' in rds_status_resp.keys():
+            # if flavor not assigned to region set flavor.status to 'no regions'
+            if flavor_regions_list:
+                flavor.status = rds_status_resp['status']
+            else:
+                flavor.status = 'no regions'
+
     elif resp.status_code == 404:
-        flavor.status = "Success"
+        # flavor id not in rds resource_status table as no region is assigned
+        flavor.status = "no regions"
     else:
         flavor.status = "N/A"
 
 
 @di.dependsOn('data_manager')
 @di.dependsOn('rds_proxy')
-def get_flavor_list_by_params(visibility, region, tenant, series, starts_with, contains, alias):
+def get_flavor_list_by_params(visibility, region, tenant, series, vm_type,
+                              vnf_name, starts_with, contains, alias):
     DataManager, rds_proxy = di.resolver.unpack(get_flavor_list_by_params)
 
     datamanager = DataManager()
@@ -764,15 +793,25 @@ def get_flavor_list_by_params(visibility, region, tenant, series, starts_with, c
                                                             region=region,
                                                             tenant=tenant,
                                                             series=series,
+                                                            vm_type=vm_type,
+                                                            vnf_name=vnf_name,
                                                             starts_with=starts_with,
                                                             contains=contains,
                                                             alias=alias)
 
         response = FlavorListFullResponse()
-        for sql_flavor in sql_flavors:
-            flavor = Flavor.from_db_model(sql_flavor)
-            update_region_statuses(flavor, sql_flavor)
-            response.flavors.append(flavor)
+        if sql_flavors:
+            uuids = ','.join(str("\'" + sql_flavor.id + "\'")
+                             for sql_flavor in sql_flavors if sql_flavor and sql_flavor.id)
+            resource_status_dict = flavor_record.get_flavors_status_by_uuids(uuids)
+
+            for sql_flavor in sql_flavors:
+                flavor = Flavor.from_db_model(sql_flavor)
+                if sql_flavor.id:
+                    status = resource_status_dict.get(sql_flavor.id)
+                    flavor.status = not status and 'no regions' or status
+                response.flavors.append(flavor)
+
     except Exception as exp:
         LOG.log_exception("Fail to get_flavor_list_by_params", exp)
         raise
@@ -783,10 +822,18 @@ def get_flavor_list_by_params(visibility, region, tenant, series, starts_with, c
 
 
 def calculate_name(flavor):
+
+    valid_vnf_opts = conf.flavor_options.valid_vnf_opt_values[:]
+    valid_stor_opts = conf.flavor_options.valid_stor_opt_values[:]
+    valid_cpin_opts = conf.flavor_options.valid_cpin_opt_values[:]
+    valid_nd_vnf_opts = conf.flavor_options.valid_nd_vnf_values[:]
+    valid_numa_opts = conf.flavor_options.valid_numa_values[:]
+    valid_ss_vnf_opts = conf.flavor_options.valid_ss_vnf_values[:]
+
     name = "{0}.c{1}r{2}d{3}".format(flavor.flavor.series, flavor.flavor.vcpus,
                                      int(flavor.flavor.ram) / 1024,
                                      flavor.flavor.disk)
-
+    series = name[:2]
     swap = getattr(flavor.flavor, 'swap', 0)
     if swap and int(swap):
         name += '{}{}'.format('s', int(swap) / 1024)
@@ -796,9 +843,23 @@ def calculate_name(flavor):
         name += '{}{}'.format('e', ephemeral)
 
     if len(flavor.flavor.options) > 0:
-        name += '.'
         for key in sorted(flavor.flavor.options.iterkeys()):
-            name += key
+            # only include valid option parameters in flavor name
+            if ((series == 'nd' and key[0] == 'v' and key in valid_nd_vnf_opts) or
+                    (series == 'ns' and key[0] == 'v' and key in valid_vnf_opts) or
+                    (series == 'ss' and key[0] == 'v' and key in valid_ss_vnf_opts) or
+                    (key[0] == 'n' and key in valid_numa_opts) or
+                    (key[0] == 's' and key in valid_stor_opts) or
+                    (key[0] == 'c' and key in valid_cpin_opts)):
+
+                if name.count('.') < 2:
+                    name += '.'
+                name += key
+
+                if key == 'v5':
+                    for k in flavor.flavor.options.iterkeys():
+                        if k == 'i1':
+                            name += k
 
     return name
 
@@ -833,17 +894,3 @@ def region_name_exist_in_regions(region_name, regions):
 def set_regions_action(flavor_dict, action):
     for region in flavor_dict["regions"]:
         region["action"] = action
-
-
-def get_fixed_uuid(uuid_to_fix):
-    """Fix a version 4 UUID."""
-    try:
-        new_uuid = uuid.UUID(uuid_to_fix, version=4)
-        if (uuid_to_fix == new_uuid.hex) or (uuid_to_fix == str(new_uuid)):
-            # It is a version 4 UUID, remove its dashes
-            return new_uuid.hex
-    except ValueError:
-        # Not a UUID (of any version)
-        pass
-
-    raise ErrorStatus(400, 'Flavor ID must be a version 4 UUID!')

@@ -1,8 +1,7 @@
 """Get configuration module unittests."""
+from mock import patch
 from orm.services.region_manager.rms.controllers import configuration as root
 from orm.tests.unit.rms import FunctionalTest
-
-from mock import patch
 
 
 class TestGetConfiguration(FunctionalTest):

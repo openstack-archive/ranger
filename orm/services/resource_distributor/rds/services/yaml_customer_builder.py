@@ -1,7 +1,6 @@
 """yaml build build yaml from json input."""
 import logging
 import re
-
 import yaml
 
 from pecan import conf
@@ -10,26 +9,21 @@ logger = logging.getLogger(__name__)
 
 
 def get_users_quotas(data, region):
-    """get default or own region.
+    """get users and quotas from region
 
-    get users and quotas from default or actual region
     :param data:
     :param region:
     :return:
     """
-    users = region['users']
-    quotas = region['quotas']
-    if not users:
-        users = data['default_region']['users']
-    if not quotas:
-        quotas = data['default_region']['quotas']
+    users = region['users'] if region['users'] else data['default_region']['users']
+    quotas = region['quotas'] if region['quotas'] else data['default_region']['quotas']
     return users, quotas
 
 
-def creat_final_yaml(title, description, resources, outputs):
+def create_final_yaml(title, description, resources, outputs):
     """put all yaml strings together.
 
-    :param title: the version of yaml
+    :param title: ther version of yaml
     :param description: file description
     :param resources: body of the yaml file
     :param outputs: the output of the yaml
@@ -61,6 +55,12 @@ def _create_metadata_yaml(alldata):
     return metadata
 
 
+def _metadata_to_tags(metadata):
+
+    return '[' + ','.join(
+        str(k) + '=' + str(v) for i in metadata for k, v in i.iteritems()) + ']'
+
+
 def yamlbuilder(alldata, region):
     logger.info("building customer yaml")
     logger.debug("start building flavor yaml for region %s" % region['name'])
@@ -79,18 +79,29 @@ def yamlbuilder(alldata, region):
     description = {'description': 'yaml file for region - %s' % region['name']}
     jsondata = alldata
     project_name = jsondata['name']
-    project_description = jsondata['description']
+    # enclose project_description in double quotes to prevent yaml parsing issues
+    # when special characters are encountered
+    project_description = '"%s"' % (jsondata['description'])
     # TODO(amar): remove these lines when using objects instead of string json
     status = {"0": False, "1": True}[str(jsondata['enabled'])]
     outputs['outputs'] = {}
     resources['resources'] = {}
-    resources['resources']["%s" % alldata['uuid']] =\
-        {'type': 'OS::Keystone::Project2\n',
-         'properties': {'name': "%s" % project_name,
-                        'project_id': alldata['uuid'],
-                        'description': project_description,
-                        'enabled': status}}
-    # create the output
+
+    if region['rangerAgentVersion'] >= 4.0:
+        resources['resources']["%s" % alldata['uuid']] =\
+            {'type': 'OS::Keystone::Project\n',
+             'properties': {'name': "%s" % project_name,
+                            'description': project_description,
+                            'tags': _metadata_to_tags(alldata['metadata']),
+                            'enabled': status}}
+    else:
+        resources['resources']["%s" % alldata['uuid']] =\
+            {'type': 'OS::Keystone::Project2\n',
+             'properties': {'name': "%s" % project_name,
+                            'project_id': alldata['uuid'],
+                            'description': project_description,
+                            'enabled': status}}
+        # create the output
     outputs['outputs']["%s_id" % alldata['uuid']] =\
         {"value": {"get_resource": "%s" % alldata['uuid']}}
 
@@ -104,8 +115,11 @@ def yamlbuilder(alldata, region):
                 {"role": role_format % role,
                  'project': "{'get_resource': '%s'}" % alldata['uuid']}
             )
+    # create the output for roles
+    #  outputs['outputs']["%s_id" % role] =\
+    #       {"value": {"get_resource": "%s" % role}}
 
-        # no support for group when type is ldap
+    # no support for group when type is ldap
         if yaml_type != 'ldap':
             # create one group for user
             # not real group its only from heat to be able to delete the user
@@ -143,27 +157,65 @@ def yamlbuilder(alldata, region):
                "network": ["neutron_quota", "OS::Neutron::Quota\n"],
                "storage": ["cinder_quota", "OS::Cinder::Quota\n"]}
 
-    # create quotas if quotas
-    if conf.yaml_configs.customer_yaml.yaml_options.quotas:
-        quotas_keys = dict(conf.yaml_configs.customer_yaml.yaml_keys.quotas_keys)
-        for items in quotas:
-            for item in items:
+    adjust_quota_resource = CMSAdjustResource(region['rangerAgentVersion'])
+    adjust_quota_resource.fix_quota_resource_item(alldata['uuid'], quotas, resources, options)
 
-                # these lines added to check if got excpected keys if not they will be replaced
-                for ite in items[item].keys()[:]:
-                    if ite in quotas_keys:
-                        items[item][quotas_keys[ite]] = items[item][ite]
-                        del items[item][ite]
+    if region['rangerAgentVersion'] < 4.0:
+        metadata = _create_metadata_yaml(alldata)
+        resources['resources'].update(metadata)
 
-                # adding tenant to each quota
-                items[item]['tenant'] = \
-                    "{'get_resource': %s}" % alldata['uuid']
-                resources['resources'][options[item][0]] = \
-                    {"type": options[item][1], "properties": items[item]}
-    metadata = _create_metadata_yaml(alldata)
-    resources['resources'].update(metadata)
     # putting all parts together for full yaml
-    yamldata = creat_final_yaml(title, description, resources, outputs)
+    yamldata = create_final_yaml(title, description, resources, outputs)
     logger.debug(
         "done building customer yaml for region %s " % region['name'])
     return yamldata
+
+
+class CMSAdjustResource(object):
+    def __init__(self, aicVerion):
+        if aicVerion >= conf.yaml_configs.customer_yaml.cms_template_version.resource_v2.aic_version:
+            self.adjust_quota_parameters = CMSAdjustResourceV2().adjust_quota_parameters
+        else:
+            self.adjust_quota_parameters = CMSAdjustResourceV1().adjust_quota_parameters
+
+    def fix_quota_resource_item(self, uuid, quotas, resources, options):
+        if conf.yaml_configs.customer_yaml.yaml_options.quotas:
+            quotas_keys = dict(conf.yaml_configs.customer_yaml.yaml_keys.quotas_keys)
+            for items in quotas:
+                for item in items:
+
+                    # these lines added to check if got excpected keys if not they will be replaced
+                    for ite in items[item].keys()[:]:
+                        if ite in quotas_keys:
+                            items[item][quotas_keys[ite]] = items[item][ite]
+                            del items[item][ite]
+
+                        self.adjust_quota_parameters(ite, items[item])
+
+                    # adding tenant to each quota
+                    items[item]['tenant'] = \
+                        "{'get_resource': %s}" % uuid
+                    resources['resources'][options[item][0]] = \
+                        {"type": options[item][1], "properties": items[item]}
+
+
+class CMSAdjustResourceV1(object):
+
+    def __init__(self):
+        self.unsupported_params = conf.yaml_configs.customer_yaml.cms_template_version.resource_v1.quota_unsupported_params
+
+    def adjust_quota_parameters(self, key, item):
+        if key in self.unsupported_params:
+            del item[key]
+            logger.warning("Region does not support Quota Parameter {}."
+                           " removed from resource".format(key))
+
+
+class CMSAdjustResourceV2(object):
+
+    def __init__(self):
+        self.supported_new_params = conf.yaml_configs.customer_yaml.cms_template_version.resource_v1.quota_unsupported_params
+
+    def adjust_quota_parameters(self, key, item):
+        if key in self.supported_new_params:
+            logger.debug("New quota Parameter {} is added to quota resource".format(key))

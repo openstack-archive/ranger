@@ -27,7 +27,7 @@ class RegionRecord:
 
     @region.setter
     def region(self, region):
-        self.__regionn = region
+        self.__region = region
 
     def insert(self, region):
         try:
@@ -37,7 +37,7 @@ class RegionRecord:
             raise
 
     def get_region_id_from_name(self, region_name):
-        result = self.session.connection().scalar("SELECT id from region WHERE name = \"%s\"" % (region_name))
+        result = self.session.connection().scalar("SELECT id from region WHERE name = \"{}\"".format(region_name))
         if result is not None:
             return int(result)
         return result

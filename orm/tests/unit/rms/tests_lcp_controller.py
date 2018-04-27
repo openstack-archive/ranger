@@ -1,13 +1,16 @@
-import json
+from mock import patch, MagicMock
+from wsme.exc import ClientSideError
 
 from orm.services.region_manager.rms.controllers import lcp_controller
-from orm.services.region_manager.rms.model.model import EndPoint, RegionData, Regions
+from orm.services.region_manager.rms.model.model import RegionData, Regions, EndPoint
 from orm.services.region_manager.rms.services.error_base import NotFoundError
 from orm.services.region_manager.rms.services import services
+
+import json
+
+
 from orm.tests.unit.rms import FunctionalTest
 
-from mock import MagicMock, patch
-from wsme.exc import ClientSideError
 
 TEST_REGIONS_DATA = [
     {
@@ -16,7 +19,7 @@ TEST_REGIONS_DATA = [
         "ORD_EP": "http://ord1.com",
         "horizon_EP": "http://horizon1.com",
         "design_type": "n/a",
-        "AIC_version": "ranger_agent1.0",
+        "ranger_agent_version": "aic3.0",
         "id": "SNA1",
         "OS_version": "kilo",
         "keystone_EP": "http://identity1.com",
@@ -29,7 +32,7 @@ TEST_REGIONS_DATA = [
         "ORD_EP": "http://ord2.com",
         "horizon_EP": "http://horizon2.com",
         "design_type": "n/a",
-        "AIC_version": "ranger_agent1.5",
+        "ranger_agent_version": "aic3.5",
         "id": "SNA2",
         "OS_version": "kilo",
         "keystone_EP": "http://identity2.com",
@@ -55,15 +58,15 @@ end_points_1 = [end_point_ord_1, end_point_identity_1, end_point_horizon_1]
 end_points_2 = [end_point_ord_2, end_point_identity_2, end_point_horizon_2]
 
 region_data_sna1 = RegionData(status="functional", id="SNA1", name="SNA 1",
-                              clli="n/a", ranger_agent_version="ranger_agent1.0", design_type="n/a",
+                              clli="n/a", ranger_agent_version="aic3.0", design_type="n/a",
                               location_type="n/a", vlcp_name="n/a", open_stack_version="kilo",
                               endpoints=end_points_1)
 region_data_sna2 = RegionData(status="down", id="SNA2", name="SNA 2",
-                              clli="n/a", ranger_agent_version="ranger_agent1.5", design_type="n/a",
+                              clli="n/a", ranger_agent_version="aic3.5", design_type="n/a",
                               location_type="n/a", vlcp_name="n/a", open_stack_version="kilo",
                               endpoints=end_points_2)
 region_data_no_endpoints = RegionData(status="functional", id="SNA2", name="SNA 2",
-                                      clli="n/a", ranger_agent_version="ranger_agent1.5", design_type="n/a",
+                                      clli="n/a", ranger_agent_version="aic3.5", design_type="n/a",
                                       location_type="n/a", vlcp_name="n/a", open_stack_version="kilo")
 
 regions_mock = Regions([region_data_sna1, region_data_sna2])

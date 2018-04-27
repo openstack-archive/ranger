@@ -1,5 +1,4 @@
 import logging
-
 from pecan.hooks import PecanHook
 
 logger = logging.getLogger(__name__)

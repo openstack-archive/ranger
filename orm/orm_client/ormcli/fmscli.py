@@ -2,7 +2,6 @@
 import argparse
 import cli_common
 import config
-import orm.base_config as base_config
 import os
 import requests
 
@@ -42,7 +41,7 @@ def add_to_parser(service_sub):
     parser.add_argument('-v', '--verbose', help='show details',
                         action="store_true")
     parser.add_argument('-f', '--faceless',
-                        help='run without authentication',
+                        help=argparse.SUPPRESS,
                         default=False,
                         action="store_true")
     subparsers = parser.add_subparsers(dest='subcmd',
@@ -126,7 +125,7 @@ def add_to_parser(service_sub):
     h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
                   '<extra_spec key name>',)
     parser_delete_extra_spec = subparsers.add_parser('delete_extra_spec',
-                                                     help='%s%s%s' % (
+                                                     help='%s %s %s' % (
                                                          h1, h2, h3))
     parser_delete_extra_spec.add_argument('client',
                                           **cli_common.ORM_CLIENT_KWARGS)
@@ -136,7 +135,7 @@ def add_to_parser(service_sub):
     h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
                   '<datafile with extra_specs json>',)
     parser_add_extra_specs = subparsers.add_parser('add_extra_specs',
-                                                   help='%s%s%s' % (
+                                                   help='%s %s %s' % (
                                                        h1, h2, h3))
     parser_add_extra_specs.add_argument('client',
                                         **cli_common.ORM_CLIENT_KWARGS)
@@ -151,7 +150,7 @@ def add_to_parser(service_sub):
     parser_delete_flavor.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_flavor.add_argument('flavorid', type=str, help=h2)
 
-    h1, h2 = '[<"X-RANGER-Client" header>]', '<flavor id or flavor_name>'
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<flavor id or flavor name>'
     parser_get_flavor = subparsers.add_parser('get_flavor',
                                               help='%s %s' % (h1, h2))
     parser_get_flavor.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
@@ -159,7 +158,8 @@ def add_to_parser(service_sub):
 
     h1, h2 = ('[<"X-RANGER-Client" header>]',
               '[--visibility <public|private>] [--region <name>] [--tenant '
-              '<id>] [--series {gv,nv,ns,nd,ss}] [--alias <alias>]')
+              '<id>] [--series {gv,nv,ns,nd,ss}] [--alias <alias>] '
+              '[--vm_type <vm_type>] [--vnf_name <vnf_name>]')
     parser_list_flavor = subparsers.add_parser('list_flavors',
                                                help='%s %s' % (h1, h2))
     parser_list_flavor.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
@@ -174,6 +174,8 @@ def add_to_parser(service_sub):
     parser_list_flavor.add_argument('--series', type=str,
                                     choices=['gv', 'nv', 'ns', 'nd', 'ss'])
     parser_list_flavor.add_argument('--alias', type=str, help='flavor alias')
+    parser_list_flavor.add_argument('--vm_type', type=str, help='vm type')
+    parser_list_flavor.add_argument('--vnf_name', type=str, help='vnf name')
 
     # region for flavor
     h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
@@ -185,13 +187,17 @@ def add_to_parser(service_sub):
     parser_add_region.add_argument('datafile', type=argparse.FileType('r'),
                                    help=h3)
 
-    h1, h2, h3 = '[<"X-RANGER-Client" header>]', '<flavor id>', '<region id>'
+    h1, h2, h3 = '[<"X-RANGER-Client" header>] [--force_delete]', \
+                 '<flavor id>', '<region id>'
     parser_delete_region = subparsers.add_parser('delete_region',
                                                  help='%s %s %s' % (
                                                      h1, h2, h3))
     parser_delete_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_region.add_argument('flavorid', type=str, help=h2)
     parser_delete_region.add_argument('regionid', type=str, help=h3)
+    parser_delete_region.add_argument('--force_delete',
+                                      help='force delete region',
+                                      action="store_true")
 
     # tenant for flavor
     h1, h2, h3 = ('[<"X-RANGER-Client" header>]', '<flavor id>',
@@ -236,8 +242,8 @@ def cmd_details(args):
     elif args.subcmd == 'get_tags':
         return requests.get, '/%s/tags' % args.flavorid
     elif args.subcmd == 'delete_region':
-        return requests.delete, '/%s/regions/%s' % (
-            args.flavorid, args.regionid)
+        return requests.delete, '/%s/regions/%s/%s' % (
+            args.flavorid, args.regionid, args.force_delete)
     elif args.subcmd == 'add_tenant':
         return requests.post, '/%s/tenants' % args.flavorid
     elif args.subcmd == 'delete_tenant':
@@ -266,6 +272,10 @@ def cmd_details(args):
             param += '%stenant=%s' % (preparm(param), args.tenant)
         if args.series:
             param += '%sseries=%s' % (preparm(param), args.series)
+        if args.vm_type:
+            param += '%svm_type=%s' % (preparm(param), args.vm_type)
+        if args.vnf_name:
+            param += '%svnf_name=%s' % (preparm(param), args.vnf_name)
         if args.starts_with:
             param += '%sstarts_with=%s' % (preparm(param), args.starts_with)
         if args.contains:
@@ -300,12 +310,12 @@ def get_token(timeout, args, host):
                 globals()[argument] = configuration_value
             else:
                 message = ('ERROR: {} for token generation was not supplied. '
-                           'Please use its command-line '
-                           'argument or environment variable.'.format(argument))
+                           'Please use its command-line argument or '
+                           'environment variable.'.format(argument))
                 print message
                 raise cli_common.MissingArgumentError(message)
 
-    keystone_ep = cli_common.get_keystone_ep('{}:{}'.format(host, base_config.rms['port']),
+    keystone_ep = cli_common.get_keystone_ep('{}:8080'.format(host),
                                              auth_region)
     if keystone_ep is None:
         raise ConnectionError(
@@ -333,7 +343,7 @@ def get_token(timeout, args, host):
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
-    environment_variable = 'RANGER_{}'.format(
+    environment_variable = 'AIC_ORM_{}'.format(
         argument.replace('-', '_').upper())
 
     return os.environ.get(environment_variable)
@@ -341,7 +351,7 @@ def get_environment_variable(argument):
 
 def run(args):
     host = args.orm_base_url if args.orm_base_url else config.orm_base_url
-    port = args.port if args.port else base_config.fms['port']
+    port = args.port if args.port else 8082
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
 
@@ -375,7 +385,7 @@ def run(args):
                 timeout, data, headers, rest_cmd.__name__, url))
     try:
         resp = rest_cmd(url, timeout=timeout, data=data, headers=headers,
-                        verify=False)
+                        verify=config.verify)
     except Exception as e:
         print e
         exit(1)

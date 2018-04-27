@@ -23,6 +23,7 @@ import six
 from orm.common.orm_common.utils import api_error_utils as err_utils
 from orm.common.orm_common.utils import dictator
 
+
 logger = logging.getLogger(__name__)
 
 registered_checks = {}
@@ -214,22 +215,19 @@ class RoleCheck(Check):
     """Check that there is a matching role in the ``user`` object."""
 
     def __call__(self, target, user, enforcer):
-        try:
-            logger.debug('Checking role:{}'.format(self.match))
-            result = any(
-                [role['name'] == self.match for role in user.user['roles']])
-            logger.debug('Role check result: {}'.format(result))
-            if not result:
-                logger.info(
-                    'INFO|CON{}AUTH001|Not allowed to perform this operation,'
-                    ' user:{} does not have role:{}'.format(
-                        dictator.get('service_name', 'ORM'),
-                        user.user['name'], self.match))
-                raise err_utils.get_error('N/A', status_code=403)
-            return result
-        except Exception:
-            logger.debug('Invalid user, failing role check')
-            raise
+        logger.debug('Checking against policy role:{}'.format(self.match))
+
+        result = any(
+            [role['name'] == self.match for role in user.user['roles']])
+        logger.debug('Role check result: {}'.format(result))
+        if not result:
+            logger.info(
+                'INFO|CON{}AUTH001|Not allowed to perform this operation,'
+                ' user:{} does not have role:{}'.format(
+                    dictator.get('service_name', 'ORM'),
+                    user.user['name'], self.match))
+
+        return result
 
 
 @register('user')
