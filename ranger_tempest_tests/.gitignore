@@ -1,0 +1,11 @@
+*.pyc
+*.log
+.venv
+.testrepository
+.project
+.pydevproject
+build
+dist
+ranger_plugin.egg-info
+.settings/
+.tox/
