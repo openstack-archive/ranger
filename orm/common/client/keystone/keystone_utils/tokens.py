@@ -1,12 +1,13 @@
 """Token utility module."""
 import logging
-
 import requests
 
 from orm.common.client.keystone.mock_keystone.keystoneclient import exceptions
 from orm.common.client.keystone.mock_keystone.keystoneclient.v2_0 import client as v2_client
 from orm.common.client.keystone.mock_keystone.keystoneclient.v3 import client as v3_client
 from orm.common.orm_common.utils import dictator
+
+from pecan import request
 
 _verify = False
 
@@ -96,6 +97,10 @@ def get_token_user(token, conf, lcp_id=None, keystone_ep=None):
     try:
         token_info = keystone.tokens.validate(token)
         logger.debug('User token found in Keystone')
+        if not request.headers.get('X-RANGER-Requester'):
+            request.headers['X-RANGER-Requester'] = \
+                token_info.user['username']
+
         return TokenUser(token_info)
     # Other exceptions raised by validate() are critical errors,
     # so instead of returning False, we'll just let them propagate

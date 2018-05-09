@@ -1,29 +1,25 @@
 """python module."""
 
 import logging
-
-import requests
-
 from pecan import conf
+import requests
 
 logger = logging.getLogger(__name__)
 
 
-headers = {'content-type': 'application/json'}
-
-
-def get_regions():
-    logger.debug("get list of regions from rms")
-    logger.debug("rms server {0} path = {1}".format(conf.rms.base_url,
-                                                    conf.rms.all_regions_path))
-
-    response = requests.get(conf.rms.base_url + conf.rms.all_regions_path,
-                            headers=headers, verify=conf.verify)
-
-    if response.status_code != 200:
-        log_message = "not able to get regions {}".format(response)
-        log_message = log_message.replace('\n', '_').replace('\r', '_')
-        logger.error(log_message)
-        return
-
-    return response.json()
+def get_rms_region(region_name):
+    """ function to call rms api for region info
+        returns 200 for ok and None for error
+    """
+    try:
+        headers = {
+            'content-type': 'application/json',
+        }
+        rms_server_url = '%s%s/%s' % (
+            conf.rms.base_url, conf.rms.all_regions_path, region_name)
+        resp = requests.get(rms_server_url, headers=headers,
+                            verify=conf.verify).json()
+        return resp
+    except Exception as e:
+        logger.log_exception('Failed in get_rms_region', e)
+        return None

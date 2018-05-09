@@ -1,9 +1,8 @@
 """unittests create customer yaml module."""
+from mock import patch
 import unittest
-
 import yaml
 
-from mock import patch
 from orm.services.resource_distributor.rds.services import yaml_customer_builder as CustomerBuild
 
 alldata = {
@@ -45,6 +44,7 @@ alldata = {
 region_quotas = {'users':
                  [],
                  'name': 'regionnametest',
+                 'rangerAgentVersion': 3.0,
                  'quotas': [{'storage': {'gigabytes': '10',
                                          'volumes': '10', 'snapshots': '10'},
                              'compute': {'instances': '10', 'ram': '10',
@@ -58,11 +58,16 @@ region_quotas = {'users':
 
 region_users = {'users': [{'id': 'userId1', 'roles': ['admin', 'other']},
                           {'id': 'userId2', 'roles': ['storage']}],
-                'name': 'regionname', 'quotas': []}
+                'name': 'regionname', 'rangerAgentVersion': 3.0, 'quotas': []}
+
+region_users_v4 = {'users': [{'id': 'userId1', 'roles': ['admin', 'other']},
+                             {'id': 'userId2', 'roles': ['storage']}],
+                   'name': 'regionname', 'rangerAgentVersion': 4.0, 'quotas': []}
 
 full_region = {'users': [{'id': 'userId1', 'roles': ['admin', 'other']},
                          {'id': 'userId2', 'roles': ['storage']}],
                'name': 'regionnametest',
+               'rangerAgentVersion': 3.0,
                'quotas': [{'storage': {'gigabytes': '10',
                                        'volumes': '10', 'snapshots': '10'},
                            'compute': {'instances': '10', 'ram': '10',
@@ -237,9 +242,48 @@ full_yaml_ldap = 'heat_template_version: 2015-1-2\n\ndescription: yaml file' \
                  'value: {get_resource: userId2}\n  1e24981a-fa51-11e5-86aa-5e5517507c66_id:\n    ' \
                  'value: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n'
 
+fullyaml_aic4 = \
+    'heat_template_version: 2015-1-2\n\n'\
+    'description: yaml file for region - regionname\n\nresources:\n'\
+    '  1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n'\
+    '      description: "this is a description"\n      enabled: true\n'\
+    '      name: welcome_man\n      tags: [my_server_name=Apache1,ocx_cust=123456889]\n'\
+    '    type: OS::Keystone::Project\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group:\n'\
+    '    properties:\n      description: dummy\n      domain: default\n'\
+    '      name: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group\n      roles:\n'\
+    '      - project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n'\
+    '        role: {get_resource: other}\n    type: OS::Keystone::Group\n\n'\
+    '      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId2_group:\n    properties:\n'\
+    '      description: dummy\n      domain: default\n'\
+    '      name: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId2_group\n      roles:\n'\
+    '      - project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n'\
+    '        role: {get_resource: storage}\n    type: OS::Keystone::Group\n\n'\
+    '      \n  cinder_quota:\n    properties:\n      gigabytes: 111\n      snapshots: 111\n'\
+    '      tenant: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n      volumes: 111\n'\
+    '    type: OS::Cinder::Quota\n\n      \n  neutron_quota:\n    properties:\n'\
+    '      floatingip: 111\n      network: 111\n      port: 111\n      router: 111\n'\
+    '      subnet: 111\n      tenant: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n'\
+    '    type: OS::Neutron::Quota\n\n      \n  nova_quota:\n    properties:\n'\
+    '      injected_files: 111\n      instances: 111\n      keypairs: 111\n'\
+    '      ram: 111\n      tenant: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n'\
+    '    type: OS::Nova::Quota\n\n      \n  userId1:\n    properties:\n      groups:\n'\
+    '      - {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group}\n'\
+    '      name: userId1\n      roles:\n'\
+    '      - project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n'\
+    '        role: admin\n      - project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n'\
+    '        role: other\n    type: OS::Keystone::User\n\n      \n  userId2:\n    properties:\n'\
+    '      groups:\n      - {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId2_group}\n'\
+    '      name: userId2\n      roles:\n'\
+    '      - project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n'\
+    '        role: storage\n    type: OS::Keystone::User\n\n      \n\noutputs:\n'\
+    '  1e24981a-fa51-11e5-86aa-5e5517507c66_id:\n'\
+    '    value: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n  userId1_id:\n'\
+    '    value: {get_resource: userId1}\n  userId2_id:\n    value: {get_resource: userId2}\n'
+
 
 class CreateResource(unittest.TestCase):
     """class metohd."""
+    maxDiff = None
 
     @patch.object(CustomerBuild, 'conf')
     def test_create_customer_yaml_nousers(self, mock_conf):
@@ -247,9 +291,9 @@ class CreateResource(unittest.TestCase):
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-1'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = False
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_quotas)
-        yamlfile_as_json = yaml.load(yamlfile)
+        yamlfile_as_json = yaml.safe_load(yamlfile)
         self.assertEqual(yamlfile_as_json['heat_template_version'], ver)
-        self.assertEqual(yaml.load(yamlfile), yaml.load(fullyaml_no_users_quotasoff))
+        self.assertEqual(yaml.safe_load(yamlfile), yaml.safe_load(fullyaml_no_users_quotasoff))
 
     @patch.object(CustomerBuild, 'conf')
     def test_create_flavor_yaml_noquotas(self, mock_conf):
@@ -257,9 +301,9 @@ class CreateResource(unittest.TestCase):
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-2'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = False
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_users)
-        yamlfile_as_json = yaml.load(yamlfile)
+        yamlfile_as_json = yaml.safe_load(yamlfile)
         self.assertEqual(yamlfile_as_json['heat_template_version'], ver)
-        self.assertEqual(yaml.load(yamlfile), yaml.load(fullyaml_with_users_quotasoff))
+        self.assertEqual(yaml.safe_load(yamlfile), yaml.safe_load(fullyaml_with_users_quotasoff))
 
     @patch.object(CustomerBuild, 'conf')
     def test_create_customer_yaml_noquotas_on(self, mock_conf):
@@ -267,9 +311,9 @@ class CreateResource(unittest.TestCase):
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-1'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = True
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_users)
-        yamlfile_as_json = yaml.load(yamlfile)
+        yamlfile_as_json = yaml.safe_load(yamlfile)
         self.assertEqual(yamlfile_as_json['heat_template_version'], ver)
-        self.assertEqual(yaml.load(yamlfile), yaml.load(full_yaml_default_quotas))
+        self.assertEqual(yaml.safe_load(yamlfile), yaml.safe_load(full_yaml_default_quotas))
 
     @patch.object(CustomerBuild, 'conf')
     def test_create_customer_yaml_withquotas_on(self, mock_conf):
@@ -277,9 +321,9 @@ class CreateResource(unittest.TestCase):
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-1'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = True
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_quotas)
-        yamlfile_as_json = yaml.load(yamlfile)
+        yamlfile_as_json = yaml.safe_load(yamlfile)
         self.assertEqual(yamlfile_as_json['heat_template_version'], ver)
-        self.assertEqual(yaml.load(yamlfile), yaml.load(full_yaml_quotas))
+        self.assertEqual(yaml.safe_load(yamlfile), yaml.safe_load(full_yaml_quotas))
 
     @patch.object(CustomerBuild, 'conf')
     def test_create_flavor_yaml_ldap(self, mock_conf):
@@ -288,6 +332,15 @@ class CreateResource(unittest.TestCase):
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = False
         mock_conf.yaml_configs.customer_yaml.yaml_options.type = "ldap"
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_users)
-        yamlfile_as_json = yaml.load(yamlfile)
+        yamlfile_as_json = yaml.safe_load(yamlfile)
         self.assertEqual(yamlfile_as_json['heat_template_version'], ver)
-        self.assertEqual(yaml.load(yamlfile), yaml.load(full_yaml_ldap))
+        self.assertEqual(yaml.safe_load(yamlfile), yaml.safe_load(full_yaml_ldap))
+
+    @patch.object(CustomerBuild, 'conf')
+    def test_create_aicV4_customer_yaml(self, mock_conf):
+        ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-2'
+        mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = True
+        yamlfile = CustomerBuild.yamlbuilder(alldata, region_users_v4)
+        yamlfile_as_json = yaml.safe_load(yamlfile)
+        self.assertEqual(yamlfile_as_json['heat_template_version'], ver)
+        self.assertEqual(yaml.safe_load(yamlfile), yaml.safe_load(fullyaml_aic4))

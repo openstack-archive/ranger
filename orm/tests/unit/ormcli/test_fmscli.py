@@ -1,10 +1,12 @@
+from orm.orm_client.ormcli import fmscli
+from orm.orm_client.ormcli import ormcli
+
 from cStringIO import StringIO
 import json
 import mock
-from orm.orm_client.ormcli import fmscli
-from orm.orm_client.ormcli import ormcli
 import requests
 import sys
+
 from unittest import TestCase
 
 TJ = {'access': {'token': {'id': 'test'}}}
@@ -12,7 +14,8 @@ TJ = {'access': {'token': {'id': 'test'}}}
 
 class FmsTests(TestCase):
     def setUp(self):
-        out, sys.stdout, err, sys.stderr = sys.stdout, StringIO(), sys.stderr, StringIO()
+        out, sys.stdout, err, sys.stderr = sys.stdout, StringIO(), \
+            sys.stderr, StringIO()
         self.mock_response = mock.Mock()
 
     def respond(self, value, code, headers={}, oy=False):
@@ -41,7 +44,11 @@ class FmsTests(TestCase):
         args.starts_with = 'test_startswith'
         args.contains = 'test_contains'
         args.alias = 'test_alias'
+        args.vm_type = 'test_vm_type'
+        args.vnf_name = 'test_vnf_name'
+        args.force_delete is False
         list_flavors_url = '/?visibility=%s&region=%s&tenant=%s&series=%s' \
+                           '&vm_type=%s&vnf_name=%s' \
                            '&starts_with=%s&contains=%s&alias=%s'
         subcmd_to_result = {
             'create_flavor': (requests.post, '',),
@@ -54,8 +61,8 @@ class FmsTests(TestCase):
                 '/%s/tags/%s' % (args.flavorid, args.tagname),),
             'delete_all_tags': (requests.delete, '/%s/tags' % args.flavorid,),
             'get_tags': (requests.get, '/%s/tags' % args.flavorid,),
-            'delete_region': (requests.delete, '/%s/regions/%s' % (
-                args.flavorid, args.regionid),),
+            'delete_region': (requests.delete, '/%s/regions/%s/%s' % (
+                args.flavorid, args.regionid, args.force_delete),),
             'add_tenant': (requests.post, '/%s/tenants' % args.flavorid,),
             'delete_tenant': (requests.delete, '/%s/tenants/%s' % (
                 args.flavorid, args.tenantid),),
@@ -71,6 +78,7 @@ class FmsTests(TestCase):
             'list_flavors': (requests.get,
                              list_flavors_url % (args.visibility, args.region,
                                                  args.tenant, args.series,
+                                                 args.vm_type, args.vnf_name,
                                                  args.starts_with,
                                                  args.contains, args.alias))
         }

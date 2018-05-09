@@ -37,26 +37,6 @@ class TestFlavorLogic(FunctionalTest):
         error = None
         FunctionalTest.tearDown(self)
 
-    def test_get_fixed_uuid_valid_uuid(self):
-        # With dashes
-        test_uuid = 'f8391e94-b332-4d7f-956c-07c6096b9140'
-        expected_result = test_uuid.replace('-', '')
-        self.assertEqual(expected_result, flavor_logic.get_fixed_uuid(
-            test_uuid))
-
-        # Without dashes
-        test_uuid = 'f8391e94b3324d7f956c07c6096b9140'
-        self.assertEqual(test_uuid, flavor_logic.get_fixed_uuid(test_uuid))
-
-    def test_get_fixed_uuid_not_a_uuid(self):
-        self.assertRaises(flavor_logic.ErrorStatus,
-                          flavor_logic.get_fixed_uuid, 'test')
-
-    def test_get_fixed_uuid_not_a_version_4_uuid(self):
-        self.assertRaises(flavor_logic.ErrorStatus,
-                          flavor_logic.get_fixed_uuid,
-                          'f8391e94-b332-1d7f-956c-07c6096b9140')
-
     @patch.object(flavor_logic, 'FlavorWrapper')
     def test_create_flavor_duplicate_entry(self, mock_flavorwrapper):
         mock_flavorwrapper.from_db_model.return_value = get_flavor_mock()
@@ -333,8 +313,9 @@ class TestFlavorLogic(FunctionalTest):
                           'some_id', None, 'trans_id')
 
         error = 8
-        # This case should not raise an exception
-        flavor_logic.delete_tags('some_id', None, 'trans_id')
+        # assertRaise ErrorStatus on delete_tags when tag not found
+        with self.assertRaises(flavor_logic.ErrorStatus):
+            flavor_logic.delete_tags('some_id', None, 'trans_id')
 
     def test_delete_tags_error(self):
         global error
@@ -396,7 +377,9 @@ class TestFlavorLogic(FunctionalTest):
         injector.override_injected_dependency(
             ('data_manager', get_datamanager_mock))
 
-        flavor_logic.delete_flavor_by_uuid('some_id')
+        # assertRaises NotFoundError when deleting a flavor that doesn't exist
+        with self.assertRaises(flavor_logic.NotFoundError):
+            flavor_logic.delete_flavor_by_uuid('some_id')
 
     def test_delete_flavor_by_uuid_flavor_has_regions(self):
         global error
@@ -480,7 +463,7 @@ class TestFlavorLogic(FunctionalTest):
             ('rds_proxy', get_rds_proxy_mock()))
 
         res_regions = flavor_logic.delete_region('uuid', RegionWrapper(
-            [Region(name='test_region')]), 'transaction')
+            [Region(name='test_region')]), 'transaction', True, False)
 
     @patch.object(flavor_logic, 'send_to_rds_if_needed')
     @patch.object(flavor_logic, 'get_flavor_by_uuid')
@@ -494,13 +477,13 @@ class TestFlavorLogic(FunctionalTest):
         injector.override_injected_dependency(
             ('data_manager', get_datamanager_mock))
         self.assertRaises(flavor_logic.ErrorStatus, flavor_logic.delete_region,
-                          'uuid', 'test_region', 'transaction')
+                          'uuid', 'test_region', 'transaction', False, False)
 
         error = 2
         injector.override_injected_dependency(
             ('data_manager', get_datamanager_mock))
         self.assertRaises(SystemError, flavor_logic.delete_region,
-                          'uuid', 'test_region', 'transaction')
+                          'uuid', 'test_region', 'transaction', False, False)
 
     @patch.object(flavor_logic, 'send_to_rds_if_needed')
     @patch.object(flavor_logic, 'get_flavor_by_uuid')

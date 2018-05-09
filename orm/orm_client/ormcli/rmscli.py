@@ -2,7 +2,6 @@
 import argparse
 import cli_common
 import config
-import orm.base_config as base_config
 import os
 import requests
 
@@ -35,50 +34,61 @@ def add_to_parser(service_sub):
     parser.add_argument('--orm-base-url', type=str, help='ORM base URL',
                         default=get_environment_variable('orm-base-url'))
     parser.add_argument('--tracking_id', type=str, help='tracking id')
-    parser.add_argument('--port', type=int, help='port number of IMS server')
+    parser.add_argument('--port', type=int, help='port number of RMS server')
     parser.add_argument('--timeout', type=int,
                         help='request timeout in seconds (default: 10)')
     parser.add_argument('-v', '--verbose', help='show details',
                         action="store_true")
     parser.add_argument('-f', '--faceless',
-                        help='run without authentication',
+                        help=argparse.SUPPRESS,
                         default=False,
                         action="store_true")
     subparsers = parser.add_subparsers(dest='subcmd',
                                        metavar='<subcommand> [-h] <args>')
 
+    clnt_hdr = '[<"X-RANGER-Client" header>] '
+
     # get group
     h1 = '<group_id>'
     parser_get_group = subparsers.add_parser('get_group', help=h1)
-    parser_get_group.add_argument('group_id', help=h1)
+    parser_get_group.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_get_group.add_argument('group_id', type=str, help=h1)
 
     # get all groups
     parser_list_groups = subparsers.add_parser('list_groups', help="")
+    parser_list_groups.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
 
     # create group
-    h1 = '<group json file>'
-    parser_create_group = subparsers.add_parser('create_group', help=h1)
+    h1 = '<data file group json file>'
+    parser_create_group = subparsers.add_parser('create_group',
+                                                help='%s %s' % (clnt_hdr, h1))
+    parser_create_group.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_create_group.add_argument('datafile', type=argparse.FileType('r'),
-                                     help=h1)
+                                     help='<data file with new group JSON>')
 
     # update group
-    h1, h2 = '<group json file>', '<group_id>'
+    h1, h2 = '<group_id>', '<group json file>'
     parser_update_group = subparsers.add_parser('update_group',
-                                                help="%s %s" % (h2, h1))
+                                                help="%s %s %s" % (clnt_hdr,
+                                                                   h1, h2))
+    parser_update_group.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_update_group.add_argument('group_id', help=h2)
     parser_update_group.add_argument('datafile', type=argparse.FileType('r'),
-                                     help=h1)
+                                     help='<data file with updated group '
+                                          'JSON>')
 
     # delete group
     h1 = '<group id>'
     parser_delete_group = subparsers.add_parser('delete_group',
-                                                help='%s' % (h1))
+                                                help='%s %s' % (clnt_hdr, h1))
+    parser_delete_group.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_group.add_argument('group_id', type=str, help=h1)
 
     # get region
     h1, h2 = '<region_name_or_id>', '[--use_version <api version>]'
     parser_get_region = subparsers.add_parser('get_region',
                                               help='%s %s' % (h1, h2))
+    parser_get_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_get_region.add_argument('--use_version', type=int,
                                    help='<api version to use (1 or 2)>')
     parser_get_region.add_argument('region_name_or_id', type=str, help=h1)
@@ -86,32 +96,39 @@ def add_to_parser(service_sub):
     # update region
     h1, h2 = '<region_id>', '<full region json file>'
     parser_update_region = subparsers.add_parser('update_region',
-                                                 help='%s %s' % (h1, h2))
+                                                 help='%s %s %s' % (clnt_hdr,
+                                                                    h1, h2))
+    parser_update_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_update_region.add_argument('region_id', type=str, help=h1)
     parser_update_region.add_argument('datafile', type=argparse.FileType('r'),
-                                      help=h2)
+                                      help='<data file with updated region '
+                                      'JSON>')
 
     # create region
     h1 = '<full region json file>'
     parser_create_region = subparsers.add_parser('create_region',
-                                                 help='%s' % (h1))
+                                                 help='%s %s' % (clnt_hdr, h1))
+    parser_create_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_create_region.add_argument('datafile', type=argparse.FileType('r'),
-                                      help=h2)
+                                      help='<data file with new region JSON>')
 
     # delete region
     h1 = '<region id>'
     parser_delete_region = subparsers.add_parser('delete_region',
-                                                 help='%s' % (h1))
+                                                 help='%s %s' % (clnt_hdr, h1))
+    parser_delete_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_region.add_argument('region_id', type=str, help=h1)
 
     # list regions
     parser_list_region = subparsers.add_parser('list_regions',
                                                help='\
-[--use_version <api version>] [--type <type>] [--status <status>]\
+[--use_version <api version>] [--type <type>][--status <status>]\
 [--metadata <metadata>] [--aicversion <aicversion>][--clli <clli>]\
-[--regionname <regionname>] [--osversion <osversion>] [--valet <valet>]\
+[--regionname <regionname>] [--osversion <osversion>]\
+[--location_type <location_type>]\
 [--state <state>] [--country <country>] [--city <city>] [--street <street>]\
 [--zip <zip>] [--vlcp_name <vlcp_name>]')
+    parser_list_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_list_region.add_argument('--use_version', type=int,
                                     help='<api version to use>')
     parser_list_region.add_argument('--type', type=str, help='<type>')
@@ -125,7 +142,8 @@ def add_to_parser(service_sub):
                                     help='<regionname>')
     parser_list_region.add_argument('--osversion', type=str,
                                     help='<osversion>')
-    parser_list_region.add_argument('--valet', type=str, help='<valet>')
+    parser_list_region.add_argument('--location_type', type=str,
+                                    help='<location_type>')
     parser_list_region.add_argument('--state', type=str, help='<state>')
     parser_list_region.add_argument('--country', type=str, help='<country>')
     parser_list_region.add_argument('--city', type=str, help='<city>')
@@ -137,7 +155,9 @@ def add_to_parser(service_sub):
     # add metadata to region
     h1, h2 = '<region_id>', '<metadata json file>'
     parser_add_metadata = subparsers.add_parser('add_metadata',
-                                                help='%s %s' % (h1, h2))
+                                                help='%s %s %s' % (clnt_hdr,
+                                                                   h1, h2))
+    parser_add_metadata.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_add_metadata.add_argument('region_id', type=str, help=h1)
     parser_add_metadata.add_argument('datafile', type=argparse.FileType('r'),
                                      help=h2)
@@ -145,7 +165,10 @@ def add_to_parser(service_sub):
     # update region's metadata
     h1, h2 = '<region_id>', '<metadata json file>'
     parser_update_metadata = subparsers.add_parser('update_metadata',
-                                                   help='%s %s' % (h1, h2))
+                                                   help='%s %s %s' % (clnt_hdr,
+                                                                      h1, h2))
+    parser_update_metadata.add_argument('client',
+                                        **cli_common.ORM_CLIENT_KWARGS)
     parser_update_metadata.add_argument('region_id', type=str, help=h1)
     parser_update_metadata.add_argument('datafile',
                                         type=argparse.FileType('r'),
@@ -153,7 +176,10 @@ def add_to_parser(service_sub):
     # delete metadata key from region
     h1, h2 = '<region id>', '<metadata key>'
     parser_delete_metadata = subparsers.add_parser('delete_metadata',
-                                                   help='%s %s' % (h1, h2))
+                                                   help='%s %s %s' % (clnt_hdr,
+                                                                      h1, h2))
+    parser_delete_metadata.add_argument('client',
+                                        **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_metadata.add_argument('region_id', type=str, help=h1)
     parser_delete_metadata.add_argument('metadata_key', type=str, help=h2)
 
@@ -161,12 +187,15 @@ def add_to_parser(service_sub):
     h1 = '<region id>'
     parser_get_metadata = subparsers.add_parser('get_metadata',
                                                 help='%s' % (h1))
+    parser_get_metadata.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_get_metadata.add_argument('region_id', type=str, help=h1)
 
     # update region's status
     h1, h2 = '<region_id>', '<status>'
     parser_update_status = subparsers.add_parser('update_status',
-                                                 help='%s %s' % (h1, h2))
+                                                 help='%s %s %s' % (clnt_hdr,
+                                                                    h1, h2))
+    parser_update_status.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_update_status.add_argument('region_id', type=str, help=h1)
     parser_update_status.add_argument('status', type=str, help=h2)
 
@@ -198,12 +227,12 @@ def get_token(timeout, args, host):
                 globals()[argument] = configuration_value
             else:
                 message = ('ERROR: {} for token generation was not supplied. '
-                           'Please use its command-line '
-                           'argument or environment variable.'.format(argument))
+                           'Please use its command-line argument or '
+                           'environment variable.'.format(argument))
                 print message
                 raise cli_common.MissingArgumentError(message)
 
-    keystone_ep = cli_common.get_keystone_ep('{}:{}'.format(host, base_config.rms['port']),
+    keystone_ep = cli_common.get_keystone_ep('{}:8080'.format(host),
                                              auth_region)
     if keystone_ep is None:
         raise ConnectionError(
@@ -259,8 +288,9 @@ def cmd_details(args):
             param += '%sregionname=%s' % (preparm(param), args.regionname)
         if args.osversion:
             param += '%sosversion=%s' % (preparm(param), args.osversion)
-        if args.valet:
-            param += '%svalet=%s' % (preparm(param), args.valet)
+        if args.location_type:
+            param += '%slocation_type=%s' % (preparm(param),
+                                             args.location_type)
         if args.state:
             param += '%sstate=%s' % (preparm(param), args.state)
         if args.country:
@@ -306,7 +336,7 @@ def get_path(args):
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
-    environment_variable = 'RANGER_{}'.format(
+    environment_variable = 'AIC_ORM_{}'.format(
         argument.replace('-', '_').upper())
 
     return os.environ.get(environment_variable)
@@ -315,12 +345,16 @@ def get_environment_variable(argument):
 def run(args):
     url_path = get_path(args)
     host = args.orm_base_url if args.orm_base_url else config.orm_base_url
-    port = args.port if args.port else base_config.rms['port']
+    port = args.port if args.port else 8080
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
     rest_cmd, cmd_url = cmd_details(args)
     url = '%s:%d/%s' % (host, port, url_path) + cmd_url
-    if args.faceless:
+    if args.faceless or \
+            args.subcmd == 'get_region' or \
+            args.subcmd == 'list_regions' or \
+            args.subcmd == 'list_groups' or \
+            args.subcmd == 'get_group':
         auth_token = auth_region = requester = client = ''
     else:
         try:
@@ -361,7 +395,7 @@ def run(args):
                                                    url))
     try:
         resp = rest_cmd(url, data=data, timeout=timeout, headers=headers,
-                        verify=False)
+                        verify=config.verify)
     except Exception as e:
         print e
         exit(1)
