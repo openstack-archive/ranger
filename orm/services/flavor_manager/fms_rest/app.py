@@ -1,10 +1,11 @@
+import os
+
 from orm.common.orm_common.policy import policy
 from orm.services.flavor_manager.fms_rest.data import wsme
 from orm.services.flavor_manager.fms_rest.logger import get_logger
 from orm.services.flavor_manager.fms_rest.utils import authentication
 
 from pecan.commands import CommandRunner
-
 from pecan import make_app
 
 logger = get_logger(__name__)
@@ -26,8 +27,8 @@ def setup_app(config):
 
 
 def main():
+    dir_name = os.path.dirname(__file__)
+    drive, path_and_file = os.path.splitdrive(dir_name)
+    path, filename = os.path.split(path_and_file)
     runner = CommandRunner()
-    runner.run(['serve', '../config.py'])
-
-if __name__ == "__main__":
-    main()
+    runner.run(['serve', path + '/config.py'])
