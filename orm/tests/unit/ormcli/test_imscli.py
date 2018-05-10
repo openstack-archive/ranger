@@ -77,7 +77,7 @@ class ImsTests(TestCase):
             'update_customers': (requests.put, '/%s/customers'
                                  % args.imageid,),
             'delete_customer': (requests.delete, '/%s/customers/%s' % (
-                                args.imageid, args.customer),),
+                                args.imageid, args.customerid),),
             'get_image': (requests.get, '/%s' % args.imageid,),
             'list_images': (requests.get, list_images_url
                             % (args.visibility, args.region,

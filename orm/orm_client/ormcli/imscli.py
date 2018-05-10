@@ -267,7 +267,7 @@ def cmd_details(args):
         return requests.put, '/%s/customers' % args.imageid
     elif args.subcmd == 'delete_customer':
         return requests.delete, '/%s/customers/%s' % (args.imageid,
-                                                      args.customer)
+                                                      args.customerid)
 
     # list images
     elif args.subcmd == 'get_image':
