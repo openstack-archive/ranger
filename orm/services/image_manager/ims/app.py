@@ -1,3 +1,5 @@
+import os
+
 from orm.common.orm_common.policy import policy
 from orm.common.orm_common.utils.utils import set_utils_conf
 from orm.services.image_manager.ims.logger import get_logger
@@ -27,8 +29,8 @@ def setup_app(config):
 
 
 def main():
+    dir_name = os.path.dirname(__file__)
+    drive, path_and_file = os.path.splitdrive(dir_name)
+    path, filename = os.path.split(path_and_file)
     runner = CommandRunner()
-    runner.run(['serve', '../config.py'])
-
-if __name__ == "__main__":
-    main()
+    runner.run(['serve', path + '/config.py'])
