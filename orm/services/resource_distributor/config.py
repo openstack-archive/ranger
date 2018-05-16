@@ -50,7 +50,7 @@ rms = {
 }
 
 ordupdate = {
-    'discovery_url': 'http://127.0.0.1',
+    'discovery_url': 'http://' + config.orm_host,
     'discovery_port': config.rms['port'],
     'template_type': 'hot',
     # This flag should be false only in case the ord does not support https.
@@ -77,6 +77,17 @@ yaml_configs = {
                 'router': 'routers',
                 'subnet': 'subnets',
                 'floatingip': 'floating_ips'
+            }
+        },
+        'cms_template_version': {
+            'resource_v1': {
+                'ranger_agent_version': 3.0,
+                'quota_unsupported_params': ['vips', 'members', 'pools', 'nat_instances', 'route_tables',
+                                             'health_monitors']
+            },
+            'resource_v2': {
+                'ranger_agent_version': 3.6,
+                'quota_unsupported_params': []
             }
         }
     },
@@ -123,6 +134,12 @@ region_resource_id_status = {
         'customer',
         'image',
         'flavor'
+    },
+    'allowed_ranger_agent_resource_version':
+    {
+        'customer': '3.0',
+        'image': '3.6',
+        'flavor': '3.0'
     }
 }
 
