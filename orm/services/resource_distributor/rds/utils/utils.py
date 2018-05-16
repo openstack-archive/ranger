@@ -63,24 +63,24 @@ def _validate_version(region, supported_resource_version):
 def add_rms_status_to_regions(resource_regions, resource_type):
     rms_regions = {}
     all_regions = _get_all_rms_regions()
-    supported_versions = conf.region_resource_id_status.allowed_aic_resource_version
+    supported_versions = conf.region_resource_id_status.allowed_ranger_agent_resource_version
 
     supported_resource_version = [value for key, value in supported_versions if key == resource_type]
 
     # iterate through rms regions and gett regions status and version
     for region in all_regions['regions']:
         rms_regions[region['name']] = {'status': region['status'],
-                                       'version': region['aicVersion']}
+                                       'version': region['rangerAgentVersion']}
 
     # iterate through resource regions and add to them rms status
     for region in resource_regions:
         if region['name'] in rms_regions:
             # check if version valid
-            region['aicVersion'] = _validate_version(rms_regions[region['name']],
+            region['rangerAgentVersion'] = _validate_version(rms_regions[region['name']],
                                                      supported_resource_version)
-            if not region['aicVersion']:
+            if not region['rangerAgentVersion']:
                 raise ErrorMessage(
-                    message="aic version for region {} must be >={} ".format(
+                    message="ranger agent version for region {} must be >={} ".format(
                         region['name'], supported_resource_version[0] if supported_resource_version else '0'))
 
             region['rms_status'] = rms_regions[region['name']]['status']
