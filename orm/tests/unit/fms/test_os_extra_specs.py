@@ -153,7 +153,7 @@ class TestOsExtraSpecsController(FunctionalTest):
         response = self.app.delete('/v1/orm/flavors/123/os_extra_specs',
                                    flavor_extra_specs_json,
                                    expect_errors=True)
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
 
     @patch.object(es, 'di')
     def test_delete_os_flavor_specs_flavor_not_found(self, mock_di):
