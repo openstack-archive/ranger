@@ -2,6 +2,7 @@
 import argparse
 import cli_common
 import config
+import orm.base_config as base_config
 import os
 import requests
 
@@ -315,7 +316,7 @@ def get_token(timeout, args, host):
                 print message
                 raise cli_common.MissingArgumentError(message)
 
-    keystone_ep = cli_common.get_keystone_ep('{}:8080'.format(host),
+        keystone_ep = cli_common.get_keystone_ep('{}:{}'.format(host, base_config.rms['port']),
                                              auth_region)
     if keystone_ep is None:
         raise ConnectionError(
@@ -343,7 +344,7 @@ def get_token(timeout, args, host):
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
-    environment_variable = 'AIC_ORM_{}'.format(
+    environment_variable = 'RANGER_{}'.format(
         argument.replace('-', '_').upper())
 
     return os.environ.get(environment_variable)
