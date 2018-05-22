@@ -9,7 +9,6 @@ from orm.tests.unit.fms import test_utils
 
 from mock import MagicMock, patch
 
-utils_mock = None
 region_logic_mock = None
 
 return_error = 0
@@ -20,7 +19,6 @@ class TestRegionController(FunctionalTest):
         FunctionalTest.setUp(self)
 
         injector.override_injected_dependency(('flavor_logic', get_region_logic_mock()))
-        injector.override_injected_dependency(('utils', get_utils_mock()))
 
     def tearDown(self):
         FunctionalTest.tearDown(self)
@@ -36,7 +34,6 @@ class TestRegionController(FunctionalTest):
         response = self.app.post_json('/v1/orm/flavors/flavor_id/regions', REGION_JSON)
 
         # assert
-        assert utils_mock.audit_trail.called
         assert region_logic_mock.add_regions.called
 
     def test_add_regions_fail(self):
@@ -127,17 +124,6 @@ def get_region_logic_mock():
         region_logic_mock.delete_region.side_effect = ErrorStatus(status_code=404)
 
     return region_logic_mock
-
-
-def get_utils_mock():
-    global utils_mock
-    utils_mock = MagicMock()
-
-    utils_mock.make_transid.return_value = 'some_trans_id'
-    utils_mock.audit_trail.return_value = None
-    utils_mock.make_uuid.return_value = 'some_uuid'
-
-    return utils_mock
 
 
 REGION_JSON = {

@@ -2,6 +2,7 @@
 import unittest
 
 from mock import patch
+from orm.common.orm_common.utils import utils
 from orm.services.resource_distributor.rds.services import resource as ResourceService
 from orm.services.resource_distributor.rds.services.model.region_resource_id_status import (Model,
                                                                                             ResourceMetaData,
@@ -88,7 +89,7 @@ class CreateResource(unittest.TestCase):
     @patch.object(ResourceService, '_create_data_to_sot', return_value=[1, 2])
     @patch.object(ResourceService.regionResourceIdStatus,
                   'get_regions_by_status_resource_id', return_value=None)
-    @patch.object(ResourceService.uuid_utils, 'get_random_uuid',
+    @patch.object(utils, 'make_transid',
                   side_effect=Exception("uuid general exception"))
     def test_create_customer_not_valid_uuid_gen(self, tranid, result, sotdata,
                                                 sotupload, database):
@@ -162,7 +163,7 @@ class CreateResource(unittest.TestCase):
     @patch.object(ResourceService.sot_factory, 'get_sot', return_value=SoT())
     @patch.object(ResourceService.regionResourceIdStatus,
                   'get_regions_by_status_resource_id', return_value=None)
-    @patch.object(ResourceService.uuid_utils, 'get_random_uuid',
+    @patch.object(utils, 'make_transid',
                   return_value='uuid-gen-123456')
     def test_create_flavor_sot_data_check(self, tranid, result, sotupload,
                                           yamlbuilder, database):
@@ -194,7 +195,7 @@ class CreateResource(unittest.TestCase):
     @patch.object(ResourceService, '_create_data_to_sot', return_value=[1, 2])
     @patch.object(ResourceService.regionResourceIdStatus,
                   'get_regions_by_status_resource_id', return_value=None)
-    @patch.object(ResourceService.uuid_utils, 'get_random_uuid',
+    @patch.object(utils, 'make_transid',
                   side_effect=Exception("uuid general exception"))
     def test_delete_flavor_not_valid_uuid_gen(self, tranid, result, sotdata,
                                               sotupload, database):

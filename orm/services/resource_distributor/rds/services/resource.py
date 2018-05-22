@@ -2,13 +2,14 @@
 import logging
 import time
 
+from orm.common.orm_common.utils import utils
 from orm.services.resource_distributor.rds.services import region_resource_id_status as regionResourceIdStatus
 from orm.services.resource_distributor.rds.services import (yaml_customer_builder, yaml_flavor_bulder,
                                                             yaml_image_builder)
 from orm.services.resource_distributor.rds.services.base import ConflictValue, ErrorMessage
 from orm.services.resource_distributor.rds.services.model.resource_input import ResourceData as InputData
 from orm.services.resource_distributor.rds.sot import sot_factory
-from orm.services.resource_distributor.rds.utils import utils, uuid_utils
+from orm.services.resource_distributor.rds.utils import utils as rds_utils
 
 
 from pecan import conf, request
@@ -162,10 +163,10 @@ def main(jsondata, external_transaction_id, resource_type, operation):
         my_logger.debug("iterate through the regions see if none in submitted")
         _check_resource_status(input_data)
         my_logger.debug("get uuid from uuid generator")
-        input_data.transaction_id = uuid_utils.get_random_uuid()
+        input_data.transaction_id = utils.make_transid()
         my_logger.debug("uuid ={}".format(input_data.transaction_id))
         # add regions status from rms (to check if it down)
-        input_data.targets = utils.add_rms_status_to_regions(
+        input_data.targets = rds_utils.add_rms_status_to_regions(
             input_data.targets, input_data.resource_type)
         update_sot(input_data)
     except ConflictValue:
