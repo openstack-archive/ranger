@@ -24,20 +24,20 @@ class TestTagsController(FunctionalTest):
     def tearDown(self):
         FunctionalTest.tearDown(self)
 
-    def test_create_tags_success(self):
-        # given
-        requests.post = MagicMock(return_value=ResponseMock(201, "created"))
-
-        global return_error
-        return_error = 0
-        injector.override_injected_dependency(
-            ('flavor_logic', get_flavor_logic_mock()))
-
-        # when
-        response = self.app.post_json('/v1/orm/flavors/test/tags', FLAVOR_JSON)
-
-        # assert
-        self.assertEqual(response.status_int, 201)
+#    def test_create_tags_success(self):
+#        # given
+#        requests.post = MagicMock(return_value=ResponseMock(201, "created"))
+#
+#        global return_error
+#        return_error = 0
+#        injector.override_injected_dependency(
+#            ('flavor_logic', get_flavor_logic_mock()))
+#
+#        # when
+#        response = self.app.post_json('/v1/orm/flavors/test/tags', FLAVOR_JSON)
+#
+#        # assert
+#        self.assertEqual(response.status_int, 201)
 
     def test_create_tags_exception_raised(self):
         # given

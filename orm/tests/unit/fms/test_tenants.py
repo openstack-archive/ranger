@@ -7,7 +7,6 @@ from orm.tests.unit.fms import FunctionalTest
 
 from mock import MagicMock
 
-utils_mock = None
 tenant_logic_mock = None
 
 return_error = 0
@@ -18,7 +17,6 @@ class TestTenantController(FunctionalTest):
         FunctionalTest.setUp(self)
 
         injector.override_injected_dependency(('flavor_logic', get_tenant_logic_mock()))
-        injector.override_injected_dependency(('utils', get_utils_mock()))
 
     def tearDown(self):
         FunctionalTest.tearDown(self)
@@ -34,7 +32,6 @@ class TestTenantController(FunctionalTest):
         response = self.app.post_json('/v1/orm/flavors/flavor_id/tenants', TENANT_JSON)
 
         # assert
-        assert utils_mock.audit_trail.called
         assert tenant_logic_mock.add_tenants.called
 
     def test_add_tenants_fail(self):
@@ -74,7 +71,6 @@ class TestTenantController(FunctionalTest):
         self.app.delete('/v1/orm/flavors/flavor_id/tenants/tenant_id')
 
         # assert
-        assert utils_mock.audit_trail.called
         assert tenant_logic_mock.delete_tenant.called
 
     def test_delete_tenant_fail(self):
@@ -124,18 +120,6 @@ def get_tenant_logic_mock():
         tenant_logic_mock.delete_tenant.side_effect = ErrorStatus(status_code=404)
 
     return tenant_logic_mock
-
-
-def get_utils_mock():
-    global utils_mock
-    utils_mock = MagicMock()
-
-    utils_mock.make_transid.return_value = 'some_trans_id'
-    utils_mock.audit_trail.return_value = None
-    utils_mock.make_uuid.return_value = 'some_uuid'
-
-    return utils_mock
-
 
 TENANT_JSON = {
     "tenants": [

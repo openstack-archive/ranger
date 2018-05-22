@@ -1,8 +1,6 @@
-import logging
 import mock
 from orm.common.orm_common.utils import utils
 import pprint
-from testfixtures import log_capture
 from unittest import TestCase
 
 
@@ -17,35 +15,19 @@ class TestUtil(TestCase):
         self.mock_response.status_code = code
         return self.mock_response
 
-    @mock.patch('requests.post')
-    def test_make_uuid(self, mock_post):
-        mock_post.return_value = self.respond({'uuid': '987654321'}, 200)
+    @mock.patch('orm.common.orm_common.utils.utils.uuid.uuid4')
+    @mock.patch('orm.common.orm_common.utils.utils.DBManager')
+    def test_make_uuid(self, mock_db, mock_uuid):
+        mock_uuid.return_value.hex = '987654321'
         uuid = utils.create_or_validate_uuid('', 'uuidtype')
         self.assertEqual(uuid, '987654321')
 
-    @log_capture('orm.common.orm_common.utils.utils', level=logging.INFO)
-    @mock.patch('requests.post')
-    def test_make_uuid_offline(self, mock_post, log):
-        mock_post.side_effect = Exception('boom')
-        uuid = utils.create_or_validate_uuid('', 'uuidtype')
-        self.assertEqual(uuid, None)
-        log.check(('orm.common.orm_common.utils.utils',
-                   'INFO', 'Failed in make_uuid:boom'))
-
-    @mock.patch('requests.post')
-    def test_make_transid(self, mock_post):
-        mock_post.return_value = self.respond({'uuid': '987654321'}, 200)
+    @mock.patch('orm.common.orm_common.utils.utils.uuid.uuid4')
+    @mock.patch('orm.common.orm_common.utils.utils.DBManager')
+    def test_make_transid(self, mock_db, mock_uuid):
+        mock_uuid.return_value.hex = '987654321'
         uuid = utils.make_transid()
         self.assertEqual(uuid, '987654321')
-
-    @mock.patch('requests.post')
-    @log_capture('orm_common.utils.utils', level=logging.INFO)
-    def test_make_transid_offline(self, mock_post, l):
-        mock_post.side_effect = Exception('boom')
-        uuid = utils.make_transid()
-        self.assertEqual(uuid, None)
-        l.check(('orm_common.utils.utils',
-                 'INFO', 'Failed in make_transid:boom'))
 
     @mock.patch('orm.common.client.audit.audit_client.api.audit.init')
     @mock.patch('orm.common.client.audit.audit_client.api.audit.audit')
@@ -121,29 +103,10 @@ class TestUtil(TestCase):
         utils.set_utils_conf(None)
         self.assertRaises(AssertionError, utils._check_conf_initialization)
 
-    @mock.patch('requests.post')
+    @mock.patch('orm.common.orm_common.utils.utils.DBManager')
     def test_create_existing_uuid(self, mock_post):
-        uuid = '987654321'
-        uuid_type = 'testtype'
-        mock_post.return_value = self.respond(
-            {'uuid': uuid, 'uuid_type': uuid_type}, 200)
-        returned_uuid = utils.create_or_validate_uuid(uuid, uuid_type)
-        self.assertEqual(returned_uuid, uuid)
-
-    @mock.patch('requests.post')
-    def test_create_existing_uuid_with_exception(self, mock_post):
-        mock_post.side_effect = Exception('boom')
-        uuid = '987654321'
-        uuid_type = 'testtype'
-        returned_uuid = utils.create_or_validate_uuid(uuid, uuid_type)
-        self.assertEqual(returned_uuid, None)
-
-    @mock.patch('requests.post')
-    def test_create_existing_uuid_with_400(self, mock_post):
-        uuid = '987654321'
-        uuid_type = 'testId'
-        mock_post.return_value = self.respond({'uuid': uuid, 'uuid_type': uuid_type}, 409)
-        self.assertRaises(TypeError, utils.create_or_validate_uuid(uuid, uuid_type))
+        uuid = utils.create_or_validate_uuid('987654321', 'test_type')
+        self.assertEqual(uuid, '987654321')
 
     @mock.patch('pecan.conf')
     def test_report_config(self, mock_conf):

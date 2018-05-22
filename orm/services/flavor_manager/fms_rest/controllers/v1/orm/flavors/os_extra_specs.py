@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from orm.common.orm_common.injector import injector
 from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.utils import utils
 from orm.services.flavor_manager.fms_rest.data.wsme.models import ExtraSpecsWrapper
 from orm.services.flavor_manager.fms_rest.logger import get_logger
 from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
@@ -16,7 +17,6 @@ di = injector.get_di()
 
 
 @di.dependsOn('flavor_logic')
-@di.dependsOn('utils')
 class OsExtraSpecsController(rest.RestController):
     """main class."""
 
@@ -37,7 +37,7 @@ class OsExtraSpecsController(rest.RestController):
     @wsexpose(ExtraSpecsWrapper, str, rest_content_types='json',
               status_code=200)
     def get(self, flavor_id):
-        flavor_logic, utils = di.resolver.unpack(OsExtraSpecsController)
+        flavor_logic = di.resolver.unpack(OsExtraSpecsController)
 
         LOG.info(
             "OsExtraSpecsController - get all extra specs for flavor: {} ".format(
@@ -68,7 +68,7 @@ class OsExtraSpecsController(rest.RestController):
 
     @wsexpose(ExtraSpecsWrapper, str, body=ExtraSpecsWrapper, rest_content_types='json', status_code=201)
     def post(self, flavor_id, extra_specs_wrapper):
-        flavor_logic, utils = di.resolver.unpack(OsExtraSpecsController)
+        flavor_logic = di.resolver.unpack(OsExtraSpecsController)
         LOG.info("OsExtraSpecsController - add extra specs: " + str(
             extra_specs_wrapper.os_extra_specs))
         authentication.authorize(request, 'flavor:add_flavor_extra_specs')
@@ -102,7 +102,7 @@ class OsExtraSpecsController(rest.RestController):
 
     @wsexpose(None, str, str, rest_content_types='json', status_code=204)
     def delete(self, flavor_id, extra_spec=None):
-        flavor_logic, utils = di.resolver.unpack(OsExtraSpecsController)
+        flavor_logic = di.resolver.unpack(OsExtraSpecsController)
         LOG.info(
             "OsExtraSpecsController - delete flavor {} extra spec".format(
                 flavor_id))
@@ -136,7 +136,7 @@ class OsExtraSpecsController(rest.RestController):
               status_code=200)
     def put(self, flavor_id, extra_specs_wrapper):
         LOG.info("OsExtraSpecsController -  update extra specs of flavor {}".format(flavor_id))
-        flavor_logic, utils = di.resolver.unpack(OsExtraSpecsController)
+        flavor_logic = di.resolver.unpack(OsExtraSpecsController)
         LOG.info(
             "OsExtraSpecsController - update extra specs with {} ".format(
                 extra_specs_wrapper.os_extra_specs))

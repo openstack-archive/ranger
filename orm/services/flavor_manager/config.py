@@ -1,8 +1,8 @@
 import orm.base_config as config
 from orm.common.orm_common.hooks.api_error_hook import APIErrorHook
 from orm.common.orm_common.hooks.security_headers_hook import SecurityHeadersHook
-from orm.services.flavor_manager.fms_rest.hooks.service_hooks import TransIdHook
-global TransIdHook
+from orm.common.orm_common.hooks.transaction_id_hook import TransactionIdHook
+global TransactionIdHook
 global APIErrorHook
 global SecurityHeadersHook
 
@@ -20,7 +20,7 @@ app = {
     'root': 'orm.services.flavor_manager.fms_rest.controllers.root.RootController',
     'modules': ['orm.services.flavor_manager.fms_rest'],
     'debug': True,
-    'hooks': lambda: [TransIdHook(), APIErrorHook(), SecurityHeadersHook()]
+    'hooks': lambda: [TransactionIdHook(), APIErrorHook(), SecurityHeadersHook()]
 }
 
 logging = {
