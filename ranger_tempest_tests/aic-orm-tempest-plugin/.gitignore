@@ -1,0 +1,11 @@
+*.pyc
+*.log
+.venv
+.testrepository
+.project
+.pydevproject
+build
+dist
+aic_orm_plugin.egg-info
+.settings/
+.tox/
