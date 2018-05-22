@@ -1,8 +1,8 @@
 import logging
 
-from orm.services.id_generator.uuidgen.db.uuid_db import UUID
+from orm import base_config
+from orm.common.orm_common.db.uuid_db import UUID
 from oslo_db.sqlalchemy import session as db_session
-from pecan import conf
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +11,7 @@ class DBManager(object):
 
     def __init__(self, connection_string=None):
         if not connection_string:
-            connection_string = conf.database.connection_string
+            connection_string = base_config.db_url + 'orm'
 
         self._engine_facade = db_session.EngineFacade(connection_string, autocommit=False)
         self._session = None

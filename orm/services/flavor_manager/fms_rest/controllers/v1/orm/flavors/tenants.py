@@ -1,5 +1,6 @@
 from orm.common.orm_common.injector import injector
 from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.utils import utils
 from orm.services.flavor_manager.fms_rest.data.wsme.models import TenantWrapper
 from orm.services.flavor_manager.fms_rest.logger import get_logger
 from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
@@ -14,12 +15,11 @@ di = injector.get_di()
 
 
 @di.dependsOn('flavor_logic')
-@di.dependsOn('utils')
 class TenantController(rest.RestController):
 
     @wsexpose(TenantWrapper, str, body=TenantWrapper, rest_content_types='json', status_code=201)
     def post(self, flavor_id, tenant_wrapper):
-        flavor_logic, utils = di.resolver.unpack(TenantController)
+        flavor_logic = di.resolver.unpack(TenantController)
         LOG.info("TenantController - add tenants: " + str(tenant_wrapper))
         authentication.authorize(request, 'flavor:add_flavor_tenants')
 
@@ -55,7 +55,7 @@ class TenantController(rest.RestController):
 
     @wsexpose(None, str, str, rest_content_types='json', status_code=204)
     def delete(self, flavor_id, tenant_id):
-        flavor_logic, utils = di.resolver.unpack(TenantController)
+        flavor_logic = di.resolver.unpack(TenantController)
         LOG.info("TenantController - delete tenant: " + str(tenant_id))
         authentication.authorize(request, 'flavor:delete_flavor_tenant')
 
