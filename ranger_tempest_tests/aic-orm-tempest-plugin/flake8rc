@@ -1,0 +1,18 @@
+[flake8]
+ignore = E125,E123,E129
+show-source = False
+exclude =
+    .git,
+    .venv,
+    .tox,
+    dist,
+    doc,
+    *egg,
+    *.pyc,
+    *.egg-info,
+    .cache,
+    .eggs
+enable-extensions = H106,H203,H904
+import-order-style = google
+filename = *.py
+
