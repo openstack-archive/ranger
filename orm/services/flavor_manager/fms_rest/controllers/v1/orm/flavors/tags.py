@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from orm.common.orm_common.injector import injector
 from orm.common.orm_common.utils import api_error_utils as err_utils
+from orm.common.orm_common.utils import utils
 from orm.services.flavor_manager.fms_rest.data.wsme.models import TagsWrapper
 from orm.services.flavor_manager.fms_rest.logger import get_logger
 from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
@@ -16,11 +17,10 @@ di = injector.get_di()
 
 
 @di.dependsOn('flavor_logic')
-@di.dependsOn('utils')
 class TagsController(rest.RestController):
     @wsexpose(TagsWrapper, str, body=TagsWrapper, rest_content_types='json', status_code=201)
     def post(self, flavor_id, tags_wrapper):
-        flavor_logic, utils = di.resolver.unpack(TagsController)
+        flavor_logic = di.resolver.unpack(TagsController)
         LOG.info("TagsController - add tags: " + str(
             tags_wrapper.tags))
 
@@ -48,7 +48,7 @@ class TagsController(rest.RestController):
 
     @wsexpose(None, str, str, rest_content_types='json', status_code=204)
     def delete(self, flavor_id, tag_to_delete=None):
-        flavor_logic, utils = di.resolver.unpack(TagsController)
+        flavor_logic = di.resolver.unpack(TagsController)
         LOG.info(
             "TagsController - delete flavor {} tags".format(
                 flavor_id))
@@ -86,7 +86,7 @@ class TagsController(rest.RestController):
               status_code=200)
     def put(self, flavor_id, tags_wrapper):
         LOG.info("TagsController - update tags of flavor {}".format(flavor_id))
-        flavor_logic, utils = di.resolver.unpack(TagsController)
+        flavor_logic = di.resolver.unpack(TagsController)
         LOG.info("TagsController - update tags with {} ".format(tags_wrapper.tags))
         authentication.authorize(request, 'flavor:replace_flavor_tags')
 
@@ -110,7 +110,7 @@ class TagsController(rest.RestController):
 
     @wsexpose(TagsWrapper, str, rest_content_types='json', status_code=200)
     def get(self, flavor_id):
-        flavor_logic, utils = di.resolver.unpack(TagsController)
+        flavor_logic = di.resolver.unpack(TagsController)
         LOG.info("TagsController - get tags of flavor {}".format(flavor_id))
         authentication.authorize(request, 'flavor:get_flavor_tags')
 

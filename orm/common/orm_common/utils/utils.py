@@ -3,8 +3,11 @@ import pprint
 import time
 
 import requests
+import uuid
 
 from orm.common.client.audit.audit_client.api import audit
+from orm.common.orm_common.db.db_manager import DBManager
+
 from pecan import conf
 
 # from cms_rest.logger import get_logger
@@ -34,67 +37,34 @@ def _check_conf_initialization():
             'pass pecan coniguration')
 
 
-def create_or_validate_uuid(uuid, uuid_type):
+def create_or_validate_uuid(id, uuid_type):
     """ function to:
-            1) request new uuid from uuid_generator rest service
+            1) request new uuid
             2) validate a uuid if one is being set
         returns uuid string
     """
-    _check_conf_initialization()
-    url = conf.api.uuid_server.base + conf.api.uuid_server.uuids
-
-    if not uuid:
-        logger.debug('Requesting new UUID from URL: {}'.format(url))
-    else:
-        logger.debug('Creating UUID: {}, using URL: {}'.format(uuid, url))
+    if not id or id == 'Unset':
+        id = uuid.uuid4().hex
 
     try:
-        resp = requests.post(url, data={'uuid': uuid, 'uuid_type': uuid_type},
-                             verify=conf.verify)
-    except requests.exceptions.ConnectionError as exp:
-        nagios = 'CON{}UUIDGEN001'.format(conf.server.name.upper())
-        logger.critical(
-            'CRITICAL|{}|Failed in make_uuid: connection error: {}'.format(
-                nagios, str(exp)))
-        exp.message = 'connection error: Failed to get uuid: unable to connect to server'
-        raise
+        db_manager = DBManager()
+        db_manager.create_uuid(id, uuid_type)
+        return id
     except Exception as e:
-        logger.info('Failed in make_uuid:' + str(e))
-        return None
-
-    if resp.status_code == 400:
-        logger.debug('Duplicate key for uuid: {}'.format(uuid))
-        raise TypeError('Duplicate key for uuid: ' + str(uuid))
-
-    resp = resp.json()
-    return resp['uuid']
+        # ignore case of uuid already exist, this can append when creating customer with specific uuid,
+        # we just need to save it in the database that we will not give this value in the future requests
+        # but we don't need to throw exception if already exist, this is not our responsible
+        # if it is duplicate uuid it will fail in the service which uses this uuid (cms, fms)
+        if e.inner_exception.orig[0] == 1062:
+            LOG.info("Duplicate UUID=" + uuid)
+        else:
+            LOG.error(str(messageToReturn) + "Exception: " + str(e))
+            raise ResponseError('Database Error')
+    return id
 
 
 def make_transid():
-    """ function to request new uuid of transaction type from uuid_generator
-    rest service
-        returns uuid string
-    """
-    _check_conf_initialization()
-    url = conf.api.uuid_server.base + conf.api.uuid_server.uuids
-
-    try:
-        logger.debug('Requesting transaction ID from: {}'.format(url))
-        resp = requests.post(url, data={'uuid_type': 'transaction'}, verify=conf.verify)
-    except requests.exceptions.ConnectionError as exp:
-        nagios = 'CON{}UUIDGEN001'.format(conf.server.name.upper())
-        logger.critical('CRITICAL|{}|Failed in make_transid: connection error: {}'.format(nagios, str(exp)))
-        exp.message = 'connection error: Failed to get uuid: unable to connect to server'
-        raise
-    except Exception as e:
-        logger.info('Failed in make_transid:' + str(e))
-        return None
-
-    resp = resp.json()
-    if 'uuid' in resp:
-        return resp['uuid']
-    else:
-        return None
+    return create_or_validate_uuid(None, 'transaction')
 
 
 audit_setup = False

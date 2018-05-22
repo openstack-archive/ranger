@@ -1,5 +1,0 @@
-- move db connection string to config
-- choose better name for Uuid database class
-
-future refactoring?
-- lose class for database, just use module level functions - so we can connect once. need to test resetting database server
