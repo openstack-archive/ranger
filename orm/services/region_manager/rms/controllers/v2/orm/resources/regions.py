@@ -177,7 +177,6 @@ class RegionsController(rest.RestController):
         """ function to check if any resource (flavor, customer, or image) is
             assigned to the region_id
         """
-        _check_conf_initialization()
         try:
             resources = {
                 'flavors': [conf.api.fms_server.base,

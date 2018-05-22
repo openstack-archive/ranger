@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from orm.common.orm_common.injector import injector
 from orm.common.orm_common.utils import api_error_utils as err_utils
-from orm.common.orm_common.utils import utils as common_utils
+from orm.common.orm_common.utils import utils
 from orm.services.flavor_manager.fms_rest.controllers.v1.orm.flavors.os_extra_specs import OsExtraSpecsController
 from orm.services.flavor_manager.fms_rest.controllers.v1.orm.flavors.regions import RegionController
 from orm.services.flavor_manager.fms_rest.controllers.v1.orm.flavors.tags import TagsController
@@ -20,7 +20,6 @@ LOG = get_logger(__name__)
 
 
 @di.dependsOn('flavor_logic')
-@di.dependsOn('utils')
 class FlavorController(rest.RestController):
 
     regions = RegionController()
@@ -31,15 +30,15 @@ class FlavorController(rest.RestController):
 
     @wsexpose(FlavorWrapper, body=FlavorWrapper, rest_content_types='json', status_code=201)
     def post(self, flavors):
-        flavor_logic, utils = di.resolver.unpack(FlavorController)
+        flavor_logic = di.resolver.unpack(FlavorController)
         uuid = ""
         LOG.info("FlavorController - Createflavor: " + str(flavors))
         authentication.authorize(request, 'flavor:create')
-        common_utils.set_utils_conf(conf)
+        utils.set_utils_conf(conf)
 
         try:
             try:
-                uuid = common_utils.create_or_validate_uuid(flavors.flavor.id, 'fmsId')
+                uuid = utils.create_or_validate_uuid(flavors.flavor.id, 'fmsId')
             except TypeError:
                 LOG.error("UUID already exists")
                 raise ErrorStatus(409, 'UUID already exists')
@@ -82,7 +81,7 @@ class FlavorController(rest.RestController):
 
     @wsexpose(FlavorWrapper, str, rest_content_types='json')
     def get(self, flavor_uuid_or_name):
-        flavor_logic, utils = di.resolver.unpack(FlavorController)
+        flavor_logic = di.resolver.unpack(FlavorController)
         LOG.info("FlavorController - GetFlavorDetails: uuid or name is " + flavor_uuid_or_name)
         authentication.authorize(request, 'flavor:get_one')
 
@@ -108,7 +107,7 @@ class FlavorController(rest.RestController):
     def get_all(self, visibility=None, region=None, tenant=None, series=None,
                 vm_type=None, vnf_name=None, starts_with=None, contains=None,
                 alias=None):
-        flavor_logic, utils = di.resolver.unpack(FlavorController)
+        flavor_logic = di.resolver.unpack(FlavorController)
         LOG.info("FlavorController - GetFlavorlist")
         authentication.authorize(request, 'flavor:get_all')
 
@@ -133,7 +132,7 @@ class FlavorController(rest.RestController):
     @wsexpose(None, str, rest_content_types='json', status_code=204)
     def delete(self, flavor_uuid=None):
         authentication.authorize(request, 'flavor:delete')
-        flavor_logic, utils = di.resolver.unpack(FlavorController)
+        flavor_logic = di.resolver.unpack(FlavorController)
 
         try:
             LOG.info("FlavorController - delete: uuid is " + flavor_uuid)
