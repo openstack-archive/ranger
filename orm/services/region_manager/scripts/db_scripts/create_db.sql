@@ -7,7 +7,10 @@ create table if not exists rms_groups
 	group_id varchar(64) not null,
 	name varchar(64) not null,
 	description varchar(255) not null,
-	primary key (id),
+	created TIMESTAMP not null DEFAULT 0,
+	modified TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	primary key (id,group_id),
+        unique grp_namex (name),
 	unique group_idx (group_id));
 
 
@@ -29,7 +32,10 @@ create table if not exists region
 	vlcp_name varchar(64) not null,
 	clli varchar(64) not null,
 	description varchar(255) not null,
-	primary key (id),
+  created TIMESTAMP not null DEFAULT 0,
+  modified TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	primary key (id,region_id,name),
+        unique region_namex (name),
 	unique region_idx (region_id));
 
 

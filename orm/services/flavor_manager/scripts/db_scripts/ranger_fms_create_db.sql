@@ -51,7 +51,7 @@ create table if not exists flavor_region
 	(
 		flavor_internal_id bigint not null,
 		region_name varchar(64) not null,
-		region_type varchar(32) not null,
+		region_type varchar(32) not null DEFAULT 'single',
 		foreign key (flavor_internal_id) references flavor(internal_id) ON DELETE CASCADE ON UPDATE NO ACTION,
 		primary key (flavor_internal_id,region_name)
 	);
@@ -100,3 +100,12 @@ create table if not exists flavor_option
 	);
 #
 
+
+#*****
+#* MySql script for Creating View rds_resource_status_view
+#*****
+
+create or replace view rds_resource_status_view AS
+    (
+      SELECT ID, RESOURCE_ID, REGION,STATUS,
+      ERR_CODE,OPERATION from orm_rds.resource_status);

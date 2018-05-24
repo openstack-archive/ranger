@@ -84,13 +84,7 @@ DROP PROCEDURE IF EXISTS add_region_type ;;
 CREATE PROCEDURE add_region_type()
 BEGIN
 
-	-- add a column safely
-	IF NOT EXISTS( (SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE()
-			AND COLUMN_NAME='type' AND TABLE_NAME='region') ) THEN
-		ALTER TABLE region ADD type varchar(64) NOT NULL DEFAULT 'single';
-  ELSE
-    UPDATE region set type = "single" where id = -1;
-	END IF;
+  UPDATE region set type = "single" where id = -1;
 
 	IF NOT EXISTS( SELECT * FROM region WHERE id=-1) THEN
   	insert ignore into region(id,name,type) values(-1, "DEFAULT", "single");
@@ -101,4 +95,3 @@ END ;;
 CALL add_region_type() ;;
 
 DELIMITER ;
-

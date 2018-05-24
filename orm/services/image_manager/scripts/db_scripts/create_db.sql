@@ -84,3 +84,12 @@ create table if not exists image_customer
 	 foreign key (image_id) references image(id) ON DELETE CASCADE ON UPDATE NO ACTION
    );
 #
+
+#*****
+#* MySql script for Creating View rds_resource_status_view
+#*****
+
+create or replace view rds_resource_status_view AS
+    (
+      SELECT ID, RESOURCE_ID, REGION,STATUS,
+      ERR_CODE,OPERATION from orm_rds.resource_status);

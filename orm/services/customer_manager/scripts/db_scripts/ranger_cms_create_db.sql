@@ -18,7 +18,7 @@ create table if not exists region
    (
 	 id integer auto_increment not null,
 	 name varchar(64) not null,
-	 type varchar(64) not null,
+	 type varchar(64) not null DEFAULT 'single',
 	 primary key (id),
 	 unique name_idx (name));
 
@@ -89,7 +89,7 @@ create table if not exists user_role
 	 index region_id (region_id),
 	 index user_id (user_id));
 
-CREATE OR REPLACE VIEW  rds_resource_status_view AS
+create or replace view rds_resource_status_view AS
     (
-        SELECT ID, RESOURCE_ID, REGION,STATUS,
-        ERR_CODE,OPERATION from orm_rds.resource_status);
+        SELECT id, resource_id, region, status,
+        err_code, operation from orm_rds.resource_status);
