@@ -13,11 +13,11 @@ DELIMITER $$
 CREATE PROCEDURE Rename_group_table()
 BEGIN
     DECLARE _table_exist INT;
--- Check if table 'group' exists even if no rows in table
+-- Check if table rms_groups exists, if not then need to rename 'group' table
     SET _table_exist = (  SELECT COUNT(*)
                           FROM information_schema.tables
                           WHERE table_schema = 'orm_rms_db'
-                          AND table_name like 'group');
+                          AND table_name = 'rms_groups');
     IF _table_exist > 0 THEN
         RENAME TABLE `group` TO rms_groups;
     END IF;
@@ -77,4 +77,64 @@ END $$
 DELIMITER ;
 
 CALL Upgrade_Region_Meta_Data;
+
+
+# PROCEDURE Upgrade_Region_and_Rms_Groups_column_key;
+# The following defines and then calls a stored procedure that does the following for the region and rms_groups tables:
+#     1. region_id and name column  as primary key and add name column a unique constraint  in region table
+#     2. group_id column  as primary key and add name column a unique constrain in rms_group table
+#     3. Add a new columns to the region table named 'created_at' and 'modified_at'.
+
+DROP PROCEDURE IF EXISTS Upgrade_Region_and_Rms_Groups_column_key;
+
+DELIMITER $$
+CREATE PROCEDURE Upgrade_Region_and_Rms_Groups_column_key()
+BEGIN
+    DECLARE _count INT;
+    SET _count = (  SELECT COUNT(*)
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE   TABLE_NAME = 'region' AND
+                            COLUMN_NAME in ('region_id', 'name')
+                            AND COLUMN_KEY= 'PRI');
+    IF _count = 0 THEN
+        UPDATE region SET name = region_id;
+        ALTER TABLE region DROP PRIMARY KEY, ADD PRIMARY KEY(id,region_id,name);
+        ALTER TABLE region add unique region_namex (name);
+    END IF;
+
+    SET _count = (  SELECT COUNT(*)
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE   TABLE_NAME = 'region' AND
+                            COLUMN_NAME in('created', 'modified'));
+    IF _count = 0 THEN
+        ALTER TABLE region ADD `created` TIMESTAMP NOT NULL DEFAULT 0;
+        UPDATE region SET created = CURRENT_TIMESTAMP where created = 0;
+        ALTER TABLE region ADD `modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+    END IF;
+
+    SET _count = (  SELECT COUNT(*)
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE   TABLE_NAME = 'rms_groups' AND
+                            COLUMN_NAME = 'group_id' AND
+                            COLUMN_KEY= 'PRI');
+    IF _count = 0 THEN
+        UPDATE rms_groups SET name = group_id;
+        ALTER TABLE rms_groups DROP PRIMARY KEY, ADD PRIMARY KEY(id,group_id);
+        ALTER TABLE rms_groups add unique grp_namex (name);
+    END IF;
+
+    SET _count = (  SELECT COUNT(*)
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE   TABLE_NAME = 'rms_groups' AND
+                           COLUMN_NAME in('created', 'modified'));
+
+    IF _count = 0 THEN
+	    ALTER TABLE rms_groups ADD `created` TIMESTAMP NOT NULL DEFAULT 0;
+	    UPDATE rms_groups SET created = CURRENT_TIMESTAMP where created = 0;
+	    ALTER TABLE rms_groups ADD `modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+    END IF;
+END $$
+DELIMITER ;
+
+CALL Upgrade_Region_and_Rms_Groups_column_key;
 

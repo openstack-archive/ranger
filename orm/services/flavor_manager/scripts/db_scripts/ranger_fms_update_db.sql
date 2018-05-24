@@ -2,8 +2,8 @@ USE orm_fms_db;
 
 DELIMITER ;;
 
-DROP PROCEDURE IF EXISTS add_regoion_type ;;
-CREATE PROCEDURE add_regoion_type()
+DROP PROCEDURE IF EXISTS add_region_type ;;
+CREATE PROCEDURE add_region_type()
 BEGIN
 
 	-- add a column safely
@@ -19,8 +19,7 @@ BEGIN
 
 END ;;
 
-CALL add_regoion_type() ;;
-ALTER TABLE `flavor`  CHANGE COLUMN `name` `name` VARCHAR(250) NOT NULL;;
+CALL add_region_type() ;;
 
 DELIMITER ;
 
