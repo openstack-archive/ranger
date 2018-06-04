@@ -188,19 +188,19 @@ class RegionsController(rest.RestController):
                            conf.api.ims_server.images]
             }
 
-            empty = True
-
             keystone_ep = authentication.get_keystone_ep(
                 request.headers['X-Auth-Region'])
 
-            request.headers['Keystone-Endpoint'] = keystone_ep
+            headers = {'Keystone-Endpoint': keystone_ep,
+                       'X-Auth-Region': request.headers['X-Auth-Region'],
+                       'X-Auth-Token': request.headers['X-Auth-Token']}
 
             for resource in resources:
                 resource_get_url = '%s%s/?region=%s' % (
                     resources[resource][0],
                     resources[resource][1], region_id)
                 resp = requests.get(resource_get_url,
-                                    headers=request.headers,
+                                    headers=headers,
                                     verify=conf.verify)
                 resp_dict = resp.json()
 
