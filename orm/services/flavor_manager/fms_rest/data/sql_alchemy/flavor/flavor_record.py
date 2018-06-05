@@ -150,14 +150,22 @@ class FlavorRecord:
             raise
 
     def get_flavors_status_by_uuids(self, uuid_str):
-        results = self.session.connection().execute("SELECT resource_id, status from rds_resource_status_view"
-                                                    "  WHERE resource_id in ({})".format(uuid_str))
-        resource_status_dict = {}
+        results = self.session.connection().execute("SELECT id, resource_id, region, status"
+                                                    "  FROM rds_resource_status_view WHERE resource_id IN ({})".format(uuid_str))
+
+        flvr_region_dict = {}
+
         if results:
-            resource_status_dict = dict((resource_id, status) for resource_id, status in results)
+            resource_status_dict = dict((id, (resource_id, region, status)) for id, resource_id, region, status in results)
+            # using resource_status_dict, create flvr_region_dict with resource_id as key and (region, status) as value
+            for v in resource_status_dict.values():
+                if v[0] in flvr_region_dict:
+                    flvr_region_dict[v[0]].append(v[1:])
+                else:
+                    flvr_region_dict[v[0]] = [v[1:]]
 
             results.close()
-        return resource_status_dict
+        return flvr_region_dict
 
     def get_flavors_by_criteria(self, **criteria):
         try:

@@ -511,8 +511,27 @@ def get_image_list_by_params(visibility, region, Customer):
             for sql_image in sql_images:
                 image = ImageSummary.from_db_model(sql_image)
                 if sql_image.id:
-                    status = resource_status_dict.get(sql_image.id)
-                    image.status = not status and 'no regions' or status
+                    # rds_region_list contains tuples - each containing the regions associated with the image
+                    # along with the region status
+                    rds_region_list = resource_status_dict.get(sql_image.id)
+
+                    if rds_region_list and image.regions:
+                        # set image.status to 'error' if any of the regions has an 'Error' status'
+                        # else, if any region status shows 'Submitted' then set image status to 'Pending'
+                        # otherwise image status is 'Success'
+                        error_status = [item for item in rds_region_list if item[1] == 'Error']
+                        submitted_status = [item for item in rds_region_list if item[1] == 'Submitted']
+                        success_status = [item for item in rds_region_list if item[1] == 'Success']
+
+                        if len(error_status) > 0:
+                            image.status = 'Error'
+                        elif len(submitted_status) > 0:
+                            image.status = 'Pending'
+                        elif len(success_status) > 0:
+                            image.status = 'Success'
+                    else:
+                        image.status = 'no regions'
+
                 response.images.append(image)
         return response
 

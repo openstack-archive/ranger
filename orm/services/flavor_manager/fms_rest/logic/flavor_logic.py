@@ -808,8 +808,34 @@ def get_flavor_list_by_params(visibility, region, tenant, series, vm_type,
             for sql_flavor in sql_flavors:
                 flavor = Flavor.from_db_model(sql_flavor)
                 if sql_flavor.id:
-                    status = resource_status_dict.get(sql_flavor.id)
-                    flavor.status = not status and 'no regions' or status
+                    # rds_region_list contains tuples - each containing the region associated
+                    # with the flavor along with the region status
+                    rds_region_list = resource_status_dict.get(sql_flavor.id)
+
+                    # determine flavor overall status by checking its region statuses:
+                    if rds_region_list and flavor.regions:
+                        # set image.status to 'error' if any of the regions has an 'Error' status'
+                        # else, if any region status shows 'Submitted' then set image status to 'Pending'
+                        # otherwise image status = 'Success'
+                        error_status = [item for item in rds_region_list if item[1] == 'Error']
+                        submitted_status = [item for item in rds_region_list if item[1] == 'Submitted']
+                        success_status = [item for item in rds_region_list if item[1] == 'Success']
+
+                        if len(error_status) > 0:
+                            flavor.status = 'Error'
+                        elif len(submitted_status) > 0:
+                            flavor.status = 'Pending'
+                        elif len(success_status) > 0:
+                            flavor.status = 'Success'
+
+                        # use rds_region_list to format the regions' statuses in flavor record
+                        for rgn in flavor.regions:
+                            for rds_row_items in rds_region_list:
+                                if rgn.name == rds_row_items[0]:
+                                    rgn.status = rds_row_items[1]
+                    else:
+                        flavor.status = 'no regions'
+
                 response.flavors.append(flavor)
 
     except Exception as exp:

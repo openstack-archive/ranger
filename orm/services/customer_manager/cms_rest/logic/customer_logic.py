@@ -671,8 +671,27 @@ class CustomerLogic(object):
             for sql_customer in sql_customers:
                 customer = CustomerSummary.from_db_model(sql_customer)
                 if sql_customer.uuid:
-                    status = resource_status_dict.get(sql_customer.uuid)
-                    customer.status = not status and 'no regions' or status
+                    # rds_region_list contains tuples - each containing the region associated
+                    # with the customer along with the region status
+                    rds_region_list = resource_status_dict.get(sql_customer.uuid)
+
+                    if rds_region_list and customer.regions:
+                        # set customer.status to 'error' if any of the regions has an 'Error' status'
+                        # else, if any region status shows 'Submitted' then set customer status to 'Pending'
+                        # otherwise customer status is 'Success'
+                        error_status = [item for item in rds_region_list if item[1] == 'Error']
+                        submitted_status = [item for item in rds_region_list if item[1] == 'Submitted']
+                        success_status = [item for item in rds_region_list if item[1] == 'Success']
+
+                        if len(error_status) > 0:
+                            customer.status = 'Error'
+                        elif len(submitted_status) > 0:
+                            customer.status = 'Pending'
+                        elif len(success_status) > 0:
+                            customer.status = 'Success'
+                    else:
+                        customer.status = 'no regions'
+
                 response.customers.append(customer)
         return response
 
