@@ -172,8 +172,8 @@ def yamlbuilder(alldata, region):
 
 
 class CMSAdjustResource(object):
-    def __init__(self, aicVerion):
-        if aicVerion >= conf.yaml_configs.customer_yaml.cms_template_version.resource_v2.aic_version:
+    def __init__(self, rangerAgentVersion):
+        if rangerAgentVersion >= conf.yaml_configs.customer_yaml.cms_template_version.resource_v2.ranger_agent_version:
             self.adjust_quota_parameters = CMSAdjustResourceV2().adjust_quota_parameters
         else:
             self.adjust_quota_parameters = CMSAdjustResourceV1().adjust_quota_parameters
