@@ -93,6 +93,18 @@ endpoints = {
     'lcp': config.rms['base_url'] + 'lcp'
 }
 
+verify = config.ssl_verify
+
+authentication = {
+    "enabled": config.token_auth_enabled,
+    "mech_id": config.token_auth_user,
+    "mech_pass": config.token_auth_pass,
+    "tenant_name": config.token_auth_tenant,
+    # The Keystone version currently in use.  Can be either "2.0" or "3"
+    "keystone_version": "2.0",
+    "policy_file": config.rms['policy_file']
+}
+
 api = {
     'uuid_server': {
         'base': config.uuid['base_url'],
@@ -101,17 +113,18 @@ api = {
     'audit_server': {
         'base': config.audit_server['base_url'],
         'trans': 'v1/audit/transaction'
+    },
+    'fms_server': {
+        'base': config.fms['base_url'],
+        'flavors': 'v1/orm/flavors'
+    },
+    'cms_server': {
+        'base': config.cms['base_url'],
+        'customers': 'v1/orm/customers'
+    },
+    'ims_server': {
+        'base': config.ims['base_url'],
+        'images': 'v1/orm/images'
     }
 }
 
-verify = config.ssl_verify
-
-authentication = {
-    "enabled": config.token_auth_enabled,
-    "mech_id": config.token_auth_user,
-    "mech_pass": config.token_auth_pass,
-    "tenant_name": config.token_auth_tenant,
-    # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "2.0",
-    "policy_file": config.rms['policy_file']
-}
