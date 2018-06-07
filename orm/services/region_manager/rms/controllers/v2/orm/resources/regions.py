@@ -12,6 +12,7 @@ from orm.services.region_manager.rms.services import services as RegionService
 from orm.services.region_manager.rms.utils import authentication
 
 from pecan import conf, request, rest
+import requests
 import wsme
 from wsme import types as wtypes
 from wsmeext.pecan import wsexpose
