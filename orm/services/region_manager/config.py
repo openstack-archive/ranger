@@ -93,17 +93,6 @@ endpoints = {
     'lcp': config.rms['base_url'] + 'lcp'
 }
 
-api = {
-    'uuid_server': {
-        'base': config.uuid['base_url'],
-        'uuids': 'v1/uuids'
-    },
-    'audit_server': {
-        'base': config.audit_server['base_url'],
-        'trans': 'v1/audit/transaction'
-    }
-}
-
 verify = config.ssl_verify
 
 authentication = {
@@ -115,3 +104,27 @@ authentication = {
     "keystone_version": "2.0",
     "policy_file": config.rms['policy_file']
 }
+
+api = {
+    'uuid_server': {
+        'base': config.uuid['base_url'],
+        'uuids': 'v1/uuids'
+    },
+    'audit_server': {
+        'base': config.audit_server['base_url'],
+        'trans': 'v1/audit/transaction'
+    },
+    'fms_server': {
+        'base': config.fms['base_url'],
+        'flavors': 'v1/orm/flavors'
+    },
+    'cms_server': {
+        'base': config.cms['base_url'],
+        'customers': 'v1/orm/customers'
+    },
+    'ims_server': {
+        'base': config.ims['base_url'],
+        'images': 'v1/orm/images'
+    }
+}
+
