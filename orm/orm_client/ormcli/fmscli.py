@@ -160,6 +160,7 @@ def add_to_parser(service_sub):
     h1, h2 = ('[<"X-RANGER-Client" header>]',
               '[--visibility <public|private>] [--region <name>] [--tenant '
               '<id>] [--series {gv,nv,ns,nd,ss}] [--alias <alias>] '
+              '[--starts_with <name>] [--contains <name>] '
               '[--vm_type <vm_type>] [--vnf_name <vnf_name>]')
     parser_list_flavor = subparsers.add_parser('list_flavors',
                                                help='%s %s' % (h1, h2))
