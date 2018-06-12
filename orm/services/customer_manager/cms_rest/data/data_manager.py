@@ -265,8 +265,8 @@ class DataManager(object):
             'storage': ['gigabytes', 'snapshots', 'volumes'],
             'network': ['floating_ips', 'networks', 'ports', 'routers',
                         'subnets', 'security_groups', 'security_group_rules',
-                        'health_monitor', 'member', 'nat_instance', 'pool',
-                        'route_table', 'vip'
+                        'health_monitors', 'members', 'nat_instance', 'pools',
+                        'route_table', 'vips'
                         ]
         }
 

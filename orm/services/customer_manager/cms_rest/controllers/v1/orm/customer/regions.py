@@ -88,7 +88,7 @@ class RegionController(rest.RestController):
 
         return result
 
-    @wsexpose(None, str, str, str, status_code=204)
+    @wsexpose(None, str, str, str, str, status_code=204)
     def delete(self, customer_id, region_id, force_delete='False'):
 
         if force_delete == 'True':
@@ -101,7 +101,8 @@ class RegionController(rest.RestController):
         authentication.authorize(request, 'customers:delete_region')
         try:
             customer_logic = CustomerLogic()
-            customer_logic.delete_region(customer_id, region_id, request.transaction_id)
+            customer_logic.delete_region(customer_id, region_id, request.transaction_id,
+                                         is_rds_client_request, force_delete)
             LOG.info("RegionController - Delete Region (delete) finished well")
 
             event_details = 'Customer {} region: {} deleted'.format(
