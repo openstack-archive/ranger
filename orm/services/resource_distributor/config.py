@@ -39,6 +39,16 @@ audit = {
     'time_wait_between_retries': 1
 }
 
+cms = {
+    'base_url': config.cms['base_url'],
+    'delete_region': 'v1/orm/customers/{0}/regions/{1}'
+}
+
+fms = {
+    'base_url': config.fms['base_url'],
+    'delete_region': 'v1/orm/flavors/{0}/regions/{1}'
+}
+
 ims = {
     'base_url': config.ims['base_url'],
     'metadata_path': 'v1/orm/images/{0}/regions/{1}/metadata'
@@ -54,9 +64,9 @@ ordupdate = {
     'discovery_port': config.rms['port'],
     'template_type': 'hot',
     # This flag should be false only in case the ord does not support https.
-    'https_enabled': True,
+    'https_enabled': False,
     # ORD supports HTTPS and you don't need a certificate? set 'cert_path': ''
-    'cert_path': '../resources/ord.crt'
+    'cert_path': ''
 }
 
 UUID_URL = config.uuid['base_url'] + 'v1/uuids'
@@ -82,8 +92,10 @@ yaml_configs = {
         'cms_template_version': {
             'resource_v1': {
                 'ranger_agent_version': 3.0,
-                'quota_unsupported_params': ['vips', 'members', 'pools', 'nat_instances', 'route_tables',
-                                             'health_monitors']
+                'quota_unsupported_params': ['vips', 'members', 'pools',
+                                             'nat_instance', 'route_table',
+                                             'health_monitors', 'loadbalancer',
+                                             'listener']
             },
             'resource_v2': {
                 'ranger_agent_version': 3.6,
@@ -108,7 +120,6 @@ block_by_status = "Submitted"
 # this tells which values to allow resource submit the region
 allow_region_statuses = ['functional']
 
-# region_resource_id_status configurations
 region_resource_id_status = {
     # interval_time_validation in minutes
     'max_interval_time': {
@@ -138,7 +149,7 @@ region_resource_id_status = {
     'allowed_ranger_agent_resource_version':
     {
         'customer': '3.0',
-        'image': '3.6',
+        'image': '3.0',
         'flavor': '3.0'
     }
 }
