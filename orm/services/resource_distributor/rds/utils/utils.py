@@ -3,7 +3,7 @@ import logging
 import re
 import requests
 
-from orm.services.resource_distributor.rds.proxies import ims_proxy
+from orm.services.resource_distributor.rds.proxies import rds_resource_service_proxy
 from orm.services.resource_distributor.rds.services.base import ErrorMessage
 
 from pecan import conf
@@ -16,7 +16,7 @@ def post_data_to_image(data):
         logger.debug("send metadata {} to ims :- {} for region {}".format(
             data['resource_extra_metadata'], data['resource_id'], data['region']))
 
-        ims_proxy.send_image_metadata(
+        rds_resource_service_proxy.send_image_metadata(
             meta_data=data['resource_extra_metadata'],
             resource_id=data['resource_id'], region=data['region'])
 
@@ -25,7 +25,7 @@ def post_data_to_image(data):
 
 def invoke_delete_region(data):
     if data['resource_operation'] == 'delete' and (data['status'] == 'Success' or data['error_code'] == 'ORD_012'):
-        ims_proxy.invoke_resources_region_delete(
+        rds_resource_service_proxy.invoke_resources_region_delete(
             resource_type=data['resource_type'],
             resource_id=data['resource_id'], region=data['region'])
 
