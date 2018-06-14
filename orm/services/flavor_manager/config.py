@@ -169,3 +169,17 @@ flavor_options = {
     'valid_nd_vnf_values': ['v8'],
     'valid_ss_vnf_values': ['v3']
 }
+
+flavor_limits = {
+    # All flavor limits will be converted to integers, and must not
+    # have any non-numeric values.
+    # Root disk, block storage and object storage don't have limits
+    # in ORM, but may be limited via SSP
+    "vcpu_limit": "64",
+    # vram_limit is in MB and must be a multiple of 1024
+    "vram_limit": "393216",
+    # swap_file_limit is in MB and must be a multiple of 1024
+    "swap_file_limit": "393216",
+    # ephemeral_limit is in GB
+    "ephemeral_limit": "10000",
+}
