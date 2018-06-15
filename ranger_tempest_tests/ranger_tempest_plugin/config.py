@@ -42,7 +42,7 @@ OrmGroup = [
                default='8082',
                help="fms port of the orm url."),
     cfg.StrOpt("region_port",
-               default='8080',
+               default='7003',
                help="region port of the orm url."),
     cfg.BoolOpt("alt_region_available",
                 default=None,
