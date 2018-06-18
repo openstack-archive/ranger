@@ -871,8 +871,7 @@ def calculate_name(flavor):
     if len(flavor.flavor.options) > 0:
         for key in sorted(flavor.flavor.options.iterkeys()):
             # only include valid option parameters in flavor name
-            if ((series == 'nd' and key[0] == 'v' and key in valid_nd_vnf_opts) or
-                    (series == 'ns' and key[0] == 'v' and key in valid_vnf_opts) or
+            if ((series == 'ns' and key[0] == 'v' and key in valid_vnf_opts) or
                     (series == 'ss' and key[0] == 'v' and key in valid_ss_vnf_opts) or
                     (key[0] == 'n' and key in valid_numa_opts) or
                     (key[0] == 's' and key in valid_stor_opts) or
@@ -881,12 +880,18 @@ def calculate_name(flavor):
                 if name.count('.') < 2:
                     name += '.'
                 name += key
-
-                if key == 'v5':
-                    for k in flavor.flavor.options.iterkeys():
-                        if k == 'i1':
-                            name += k
-
+        if {'v5', 'i1'}.issubset(flavor.flavor.options.keys()) and series in ('ns') and \
+                not {'i2'}.issubset(flavor.flavor.options.keys()):
+            name += 'i1'
+        if {'i2'}.issubset(flavor.flavor.options.keys()) and series in ('ns') and \
+                not {'i1'}.issubset(flavor.flavor.options.keys()):
+            name += 'i2'
+        if {'up'}.issubset(flavor.flavor.options.keys()) and series in ('ns') and \
+                not {'tp'}.issubset(flavor.flavor.options.keys()):
+            name += '.up'
+        if {'tp'}.issubset(flavor.flavor.options.keys()) and series in ('ns') and \
+                not {'up'}.issubset(flavor.flavor.options.keys()):
+            name += '.tp'
     return name
 
 
