@@ -51,7 +51,8 @@ fms = {
 
 ims = {
     'base_url': config.ims['base_url'],
-    'metadata_path': 'v1/orm/images/{0}/regions/{1}/metadata'
+    'metadata_path': 'v1/orm/images/{0}/regions/{1}/metadata',
+    'delete_region': 'v1/orm/images/{0}/regions/{1}'
 }
 
 rms = {

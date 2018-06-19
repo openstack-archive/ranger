@@ -107,7 +107,7 @@ class ImageRecord(Record):
                 else:
                     img_region_dict[v[0]] = [v[1:]]
             results.close()
-        return resource_status_dict
+        return img_region_dict
 
     def create_images_by_visibility_query(self, visibility):
         try:
