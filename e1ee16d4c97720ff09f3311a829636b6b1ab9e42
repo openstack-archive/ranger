@@ -1,0 +1,8 @@
+Code-Review+2: Nicholas Jones <nj762h@att.com>
+Workflow+1: Nicholas Jones <nj762h@att.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 19 Jun 2018 13:37:13 +0000
+Reviewed-on: https://review.openstack.org/576281
+Project: openstack/ranger
+Branch: refs/heads/master
