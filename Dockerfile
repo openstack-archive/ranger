@@ -23,6 +23,7 @@ gcc \
 g++ \
 libffi-dev \
 libssl-dev --no-install-recommends \
+libmysqlclient-dev \
 && apt-get clean \
 && rm -rf \
      /var/lib/apt/lists/* \
