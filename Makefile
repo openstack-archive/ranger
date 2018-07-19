@@ -18,6 +18,9 @@ IMAGE_PREFIX               ?= attcomdev
 IMAGE_TAG                  ?= ocata
 HELM                       ?= helm
 LABEL                      ?= commit-id
+PROXY                      ?= http://proxy.foo.com:8000
+NO_PROXY                   ?= localhost,127.0.0.1,.svc.cluster.local
+USE_PROXY                  ?= false
 
 IMAGE := ${DOCKER_REGISTRY}/${IMAGE_PREFIX}/${IMAGE_NAME}:${IMAGE_TAG}
 
@@ -43,7 +46,18 @@ dry-run: clean
 # Make targets intended for use by the primary targets above.
 .PHONY: build_$(IMAGE_NAME)
 build_$(IMAGE_NAME):
-	docker build -t $(IMAGE) --label $(LABEL) -f Dockerfile .
+
+ifeq ($(USE_PROXY), true)
+	docker build --network host -t $(IMAGE) --label $(LABEL) -f Dockerfile \
+		--build-arg http_proxy=$(PROXY) \
+		--build-arg https_proxy=$(PROXY) \
+		--build-arg HTTP_PROXY=$(PROXY) \
+		--build-arg HTTPS_PROXY=$(PROXY) \
+		--build-arg no_proxy=$(NO_PROXY) \
+		--build-arg NO_PROXY=$(NO_PROXY) .
+else
+	docker build --network host -t $(IMAGE) --label $(LABEL) -f Dockerfile .
+endif
 
 .PHONY: clean
 clean:
