@@ -1,0 +1,8 @@
+Code-Review+2: STEW TY <st3wty@att.com>
+Workflow+1: STEW TY <st3wty@att.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 30 Jul 2018 23:39:21 +0000
+Reviewed-on: https://review.openstack.org/587100
+Project: openstack/ranger
+Branch: refs/heads/master
