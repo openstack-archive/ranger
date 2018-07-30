@@ -1,7 +1,7 @@
 {
     "default": "!",
 
-    "admin": "role:admin and tenant:admin or role:admin and tenant:services",
+    "admin": "role:admin and tenant:admin or role:admin and tenant:services or role:admin_image and tenant:admin or role:admin_image and tenant:services",
     "admin_support": "role:admin_support and tenant:admin or role:admin_support and tenant:services",
     "admin_viewer": "role:admin_viewer and tenant:admin or role:admin_viewer and tenant:services",
 
@@ -13,7 +13,7 @@
     "image:get_one": "rule:admin_or_support_or_viewer",
     "image:update": "rule:admin",
     "image:delete": "rule:admin",
-    "image:enable": "rule:admin",
+    "image:enable": "rule:admin_or_support",
 
     "region:create": "rule:admin_or_support",
     "region:update": "rule:admin",

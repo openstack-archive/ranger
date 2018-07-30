@@ -4,19 +4,25 @@
     "admin": "role:admin and tenant:admin or role:admin and tenant:services",
     "admin_support": "role:admin_support and tenant:admin or role:admin_support and tenant:services",
     "admin_viewer": "role:admin_viewer and tenant:admin or role:admin_viewer and tenant:services",
+    "creator": "role:ranger_customer_creator and tenant:admin or role:ranger_customer_creator and tenant:services",
+
+    "admin_or_creator": "rule:admin or rule:creator",
 
     "admin_or_support": "rule:admin or rule:admin_support",
-    "admin_or_support_or_viewer": "rule:admin or rule:admin_support or rule:admin_viewer",
+    "admin_or_support_or_creator": "rule:admin or rule:admin_support or rule:creator",
 
-    "customers:get_one": "rule:admin_or_support_or_viewer",
-    "customers:get_all": "rule:admin_or_support_or_viewer",
-    "customers:create": "rule:admin_or_support",
-    "customers:update": "rule:admin",
+    "admin_or_support_or_viewer": "rule:admin or rule:admin_support or rule:admin_viewer",
+    "admin_or_support_or_viewer_or_creator": "rule:admin or rule:admin_support or rule:admin_viewer or rule:creator",
+
+    "customers:get_one": "rule:admin_or_support_or_viewer_or_creator",
+    "customers:get_all": "rule:admin_or_support_or_viewer_or_creator",
+    "customers:create": "rule:admin_or_support_or_creator",
+    "customers:update": "rule:admin_or_creator",
     "customers:delete": "rule:admin",
 
-    "customers:add_region": "rule:admin_or_support",
-    "customers:update_region": "rule:admin",
-    "customers:delete_region": "rule:admin",
+    "customers:add_region": "rule:admin_or_support_or_creator",
+    "customers:update_region": "rule:admin_or_creator",
+    "customers:delete_region": "rule:admin_or_creator",
 
     "customers:add_region_user": "rule:admin_or_support",
     "customers:update_region_user": "rule:admin",
@@ -26,8 +32,8 @@
     "customers:update_default_user": "rule:admin",
     "customers:delete_default_user": "rule:admin",
 
-    "customers:add_metadata": "rule:admin_or_support",
-    "customers:update_metadata": "rule:admin",
+    "customers:add_metadata": "rule:admin_or_support_or_creator",
+    "customers:update_metadata": "rule:admin_or_creator",
 
-    "customers:enable": "rule:admin"
+    "customers:enable": "rule:admin_or_support_or_creator"
 }
