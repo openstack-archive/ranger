@@ -24,25 +24,29 @@ app = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'ims': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'],
-                'propagate': False},
-        'audit_client': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'],
-                         'propagate': False},
-        'orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'],
-                       'propagate': False},
-        'pecan': {'level': 'DEBUG', 'handlers': ['console'],
+        'orm.services.image_manager.ims': {'level': config.debug_level,
+                                           'handlers': ['console', 'Logfile'],
+                                           'propagate': False},
+        'orm.common.client.audit.audit_client': {
+            'level': config.debug_level,
+            'handlers': ['console', 'Logfile'],
+            'propagate': False},
+        'orm.common.orm_common': {'level': config.debug_level,
+                                  'handlers': ['console', 'Logfile'],
+                                  'propagate': False},
+        'pecan': {'level': config.debug_level, 'handlers': ['console'],
                   'propagate': False},
         'py.warnings': {'handlers': ['console']},
         '__force_dict__': True
     },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
+            'level': config.debug_level,
             'class': 'logging.StreamHandler',
             'formatter': 'color'
         },
         'Logfile': {
-            'level': 'DEBUG',
+            'level': config.debug_level,
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 50000000,
             'backupCount': 10,
