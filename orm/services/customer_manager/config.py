@@ -26,13 +26,16 @@ app = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'cms_rest': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'keystone_utils': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.services.customer_manager.cms_rest': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.common.orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'],
+                                  'propagate': False},
+        'orm.common.client.keystone.keystone_utils': {'level': 'DEBUG',
+                                                      'handlers': ['console','Logfile'],
+                                                      'propagate': False},
         'pecan': {'level': 'DEBUG', 'handlers': ['console'], 'propagate': False},
-        'orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'keystone_utils': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'audit_client': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.common.client.audit.audit_client': {'level': 'DEBUG',
+                                                 'handlers': ['console', 'Logfile'],
+                                                 'propagate': False},
         'py.warnings': {'handlers': ['console']},
         '__force_dict__': True
     },
