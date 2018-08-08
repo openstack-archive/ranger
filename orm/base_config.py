@@ -34,6 +34,9 @@ OrmOpts = [
     cfg.StrOpt('log_location',
                default='/var/log/ranger',
                help='Orm log directory.')
+    cfg.StrOpt('debug_level',
+               default='DEBUG',
+               help='logging debug level')
 ]
 
 CONF.register_opts(OrmOpts)
@@ -225,6 +228,7 @@ CONF.register_opts(OrmCliGroup, orm_cli_group)
 # referenced to them.
 ################################################################
 
+debug_level = CONF.debug_level
 protocol = CONF.protocol
 orm_host = CONF.orm_host
 ranger_base = CONF.ranger_base

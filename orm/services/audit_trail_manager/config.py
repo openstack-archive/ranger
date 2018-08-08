@@ -23,21 +23,24 @@ app = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'audit_server': {'level': 'DEBUG', 'handlers': ['console', 'logfile'],
-                         'propagate': False},
-        'pecan': {'level': 'DEBUG', 'handlers': ['console'],
+        'orm.services.audit_trail_manager.audit_server': {
+            'level': config.debug_level,
+            'handlers': ['console', 'logfile'],
+            'propagate': False
+        },
+        'pecan': {'level': config.debug_level, 'handlers': ['console'],
                   'propagate': False},
         'py.warnings': {'handlers': ['console']},
         '__force_dict__': True
     },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
+            'level': config.debug_level,
             'class': 'logging.StreamHandler',
             'formatter': 'color'
         },
         'logfile': {
-            'level': 'DEBUG',
+            'level': config.debug_level,
             'class': 'logging.FileHandler',
             'formatter': 'color',
             'filename': config.audit_server['log']
