@@ -24,7 +24,7 @@ app = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'rms': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'],
+        'orm.services.region_manager.rms': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'],
                 'propagate': False},
         'pecan': {'level': 'DEBUG', 'handlers': ['console'],
                   'propagate': False},

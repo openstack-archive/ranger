@@ -24,7 +24,7 @@ app = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'ims': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'],
+        'orm.services.image_manager.ims': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'],
                 'propagate': False},
         'audit_client': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'],
                          'propagate': False},
