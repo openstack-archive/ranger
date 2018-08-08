@@ -158,9 +158,9 @@ region_resource_id_status = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'rds': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'audit_client': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.services.resource_distributor.rds': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.common.orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.common.client.audit.audit_client': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
         'pecan': {'level': 'DEBUG', 'handlers': ['console'], 'propagate': False},
         'py.warnings': {'handlers': ['console']},
         '__force_dict__': True
