@@ -27,8 +27,8 @@ git = {
     'file_name_format': 's_{}.yml',
     'relative_path_format': '/{}/hot/{}/{}',
     'commit_message_format': 'File was added to repository: {}',
-    'commit_user': config.rds['repo_user'],
-    'commit_email': config.rds['repo_email'],
+    'commit_user': 'stewie925',
+    'commit_email': 'st3wty@att.com',
     'git_server_url': config.rds['repo_remote_location'],
     'git_cmd_timeout': 45
 }
@@ -51,7 +51,8 @@ fms = {
 
 ims = {
     'base_url': config.ims['base_url'],
-    'metadata_path': 'v1/orm/images/{0}/regions/{1}/metadata'
+    'metadata_path': 'v1/orm/images/{0}/regions/{1}/metadata',
+    'delete_region': 'v1/orm/images/{0}/regions/{1}'
 }
 
 rms = {
@@ -157,9 +158,9 @@ region_resource_id_status = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'rds': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'audit_client': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.services.resource_distributor.rds': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.common.orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.common.client.audit.audit_client': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
         'pecan': {'level': 'DEBUG', 'handlers': ['console'], 'propagate': False},
         'py.warnings': {'handlers': ['console']},
         '__force_dict__': True

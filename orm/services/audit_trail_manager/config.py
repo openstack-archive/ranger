@@ -23,7 +23,7 @@ app = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'audit_server': {'level': 'DEBUG', 'handlers': ['console', 'logfile'],
+        'orm.services.audit_trail_manager.audit_server': {'level': 'DEBUG', 'handlers': ['console', 'logfile'],
                          'propagate': False},
         'pecan': {'level': 'DEBUG', 'handlers': ['console'],
                   'propagate': False},
