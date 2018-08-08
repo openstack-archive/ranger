@@ -26,7 +26,7 @@ app = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'fms_rest': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.services.flavor_manager.fms_rest': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
         'pecan': {'level': 'DEBUG', 'handlers': ['console'], 'propagate': False},
         'orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
         'keystone_utils': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
