@@ -51,7 +51,8 @@ fms = {
 
 ims = {
     'base_url': config.ims['base_url'],
-    'metadata_path': 'v1/orm/images/{0}/regions/{1}/metadata'
+    'metadata_path': 'v1/orm/images/{0}/regions/{1}/metadata',
+    'delete_region': 'v1/orm/images/{0}/regions/{1}'
 }
 
 rms = {
@@ -157,9 +158,9 @@ region_resource_id_status = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'rds': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
-        'audit_client': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.services.resource_distributor.rds': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.common.orm_common': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
+        'orm.common.client.audit.audit_client': {'level': 'DEBUG', 'handlers': ['console', 'Logfile'], 'propagate': False},
         'pecan': {'level': 'DEBUG', 'handlers': ['console'], 'propagate': False},
         'py.warnings': {'handlers': ['console']},
         '__force_dict__': True
