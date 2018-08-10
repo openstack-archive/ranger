@@ -1,5 +1,7 @@
 import os
+import sys
 
+from oslo_config import cfg
 from oslo_log import log as logging
 
 from pecan.commands import CommandRunner
@@ -18,7 +20,11 @@ def setup_app(config):
     return app
 
 
-def main():
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv
+    cfg.CONF(argv[1:], project='ranger', validate_default_values=True)
+
     dir_name = os.path.dirname(__file__)
     drive, path_and_file = os.path.splitdrive(dir_name)
     path, filename = os.path.split(path_and_file)

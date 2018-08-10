@@ -1,10 +1,13 @@
 import logging
 import os
+import sys
 
 from orm.common.orm_common.policy import policy
 from orm.common.orm_common.utils import utils
 from orm.services.region_manager.rms import model
 from orm.services.region_manager.rms.utils import authentication
+
+from oslo_config import cfg
 
 from pecan.commands import CommandRunner
 from pecan import make_app
@@ -30,7 +33,11 @@ def setup_app(config):
     return app
 
 
-def main():
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv
+    cfg.CONF(argv[1:], project='ranger', validate_default_values=True)
+
     dir_name = os.path.dirname(__file__)
     drive, path_and_file = os.path.splitdrive(dir_name)
     path, filename = os.path.split(path_and_file)
