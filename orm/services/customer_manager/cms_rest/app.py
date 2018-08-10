@@ -8,6 +8,8 @@ from orm.services.customer_manager.cms_rest.logger import get_logger
 from orm.services.customer_manager.cms_rest import model
 from orm.services.customer_manager.cms_rest.utils import authentication
 
+from oslo_config import cfg
+
 logger = get_logger(__name__)
 
 
@@ -30,6 +32,10 @@ def setup_app(config):
 
 
 def main():
+    config_file = '/etc/ranger/ranger.conf'
+    if os.path.isfile(config_file):
+        cfg.CONF(['--config-file', config_file])
+
     dir_name = os.path.dirname(__file__)
     drive, path_and_file = os.path.splitdrive(dir_name)
     path, filename = os.path.split(path_and_file)

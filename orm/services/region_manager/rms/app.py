@@ -6,6 +6,8 @@ from orm.common.orm_common.utils import utils
 from orm.services.region_manager.rms import model
 from orm.services.region_manager.rms.utils import authentication
 
+from oslo_config import cfg
+
 from pecan.commands import CommandRunner
 from pecan import make_app
 
@@ -31,6 +33,10 @@ def setup_app(config):
 
 
 def main():
+    config_file = '/etc/ranger/ranger.conf'
+    if os.path.isfile(config_file):
+        cfg.CONF(['--config-file', config_file])
+
     dir_name = os.path.dirname(__file__)
     drive, path_and_file = os.path.splitdrive(dir_name)
     path, filename = os.path.split(path_and_file)

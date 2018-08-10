@@ -12,15 +12,8 @@
 #  License for the specific language governing permissions and limitations
 #  under the License.
 
-from oslo_config import cfg
-
-from orm.common import config
 from orm.services.id_generator.uuidgen import app
 
 
-CONF = cfg.CONF
-
-
 def main():
-    config.parse_args()
     app.main()
