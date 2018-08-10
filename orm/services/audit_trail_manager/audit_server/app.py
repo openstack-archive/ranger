@@ -5,6 +5,8 @@ import os
 from orm.services.audit_trail_manager.audit_server import model
 from orm.services.audit_trail_manager.audit_server.storage import factory
 
+from oslo_config import cfg
+
 from pecan.commands import CommandRunner
 from pecan import make_app
 
@@ -29,6 +31,10 @@ def setup_app(config):
 
 
 def main():
+    config_file = '/etc/ranger/ranger.conf'
+    if os.path.isfile(config_file):
+        CONF(['--config-file', config_file])
+
     dir_name = os.path.dirname(__file__)
     drive, path_and_file = os.path.splitdrive(dir_name)
     path, filename = os.path.split(path_and_file)
