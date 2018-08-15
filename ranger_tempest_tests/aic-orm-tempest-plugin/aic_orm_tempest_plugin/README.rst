@@ -6,10 +6,10 @@ This directory contains Tempest tests to cover the ORM project, as well
 as a plugin to automatically load these tests into tempest.
 
 See the tempest plugin docs for information on using it:
-http://docs.openstack.org/developer/tempest/plugin.html#using-plugins
+https://docs.openstack.org/tempest/latest/#using-plugins
 
 See the tempest docs for information on writing new tests etc:
-http://docs.openstack.org/developer/tempest/
+https://docs.openstack.org/tempest/latest/
 
 Quickstart
 ----------
