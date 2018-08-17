@@ -124,11 +124,11 @@ allow_region_statuses = ['functional']
 region_resource_id_status = {
     # interval_time_validation in minutes
     'max_interval_time': {
-        'images': 60,
-        'tenants': 60,
-        'flavors': 60,
-        'users': 60,
-        'default': 60
+        'images': 2,
+        'tenants': 2,
+        'flavors': 2,
+        'users': 2,
+        'default': 2
     },
     'allowed_status_values': {
         'Success',
@@ -203,5 +203,5 @@ authentication = {
     "tenant_name": config.token_auth_tenant,
     "token_role": config.token_auth_user_role,
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "2.0"
+    "keystone_version": "3"
 }
