@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV container docker
@@ -57,7 +57,4 @@ RUN chown -R ranger: /home/ranger \
 # Set work directory
 USER root
 WORKDIR /opt/app/ranger
-
-ENTRYPOINT tools/start_services.sh \
- && /bin/bash
 
