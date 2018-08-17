@@ -16,13 +16,13 @@
 
 import os
 
-from aic_orm_tempest_plugin import config as project_config
+from ranger_tempest_plugin import config as project_config
 
 from tempest import config
 from tempest.test_discover import plugins
 
 
-class OrmPlugin(plugins.TempestPlugin):
+class RangerPlugin(plugins.TempestPlugin):
     def get_opt_lists(self):
         return [(
             project_config.orm_group.name,
@@ -31,7 +31,7 @@ class OrmPlugin(plugins.TempestPlugin):
     def load_tests(self):
         base_path = os.path.split(os.path.dirname(
             os.path.abspath(__file__)))[0]
-        test_dir = "aic_orm_tempest_plugin/tests"
+        test_dir = "ranger_tempest_plugin/tests"
         full_test_dir = os.path.join(base_path, test_dir)
         return full_test_dir, base_path
 

@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV container docker
@@ -18,6 +18,7 @@ python-dateutil \
 ca-certificates \
 openstack-pkg-tools \
 apache2 \
+libmysqlclient-dev \
 gcc \
 g++ \
 libffi-dev \
@@ -30,7 +31,7 @@ libssl-dev --no-install-recommends \
      /usr/share/man \
      /usr/share/doc \
      /usr/share/doc-base
-RUN pip install -U pip setuptools --user
+RUN pip install -U setuptools --user
 RUN pip install wheel --user
 # RUN pip install virtualenv
 
@@ -39,10 +40,11 @@ RUN pip install wheel --user
 ### aic-orm-tempest-plugin  setup
 ##########################################################################
 WORKDIR /
-COPY  aic-orm-tempest-plugin/. ranger-tempest-plugin/
-### create egg-info for ranger-tempest-plugin (uncomment two lines below when ready)
+# COPY  ranger-tempest-plugin/. ranger-tempest-plugin/
+COPY . ranger-tempest-plugin/
+
 WORKDIR /ranger-tempest-plugin/
-RUN python /ranger-tempest-plugin/setup.py develop
+RUN python setup.py develop
 
 ##########################################################################
 ### END OF ranger-tempest-plugin setup 
@@ -62,7 +64,7 @@ RUN git clone https://git.openstack.org/openstack/tempest
 RUN sed -i 's/paramiko>=.*/paramiko<2.1.3,>=2.0/g' \
     /tempest/requirements.txt
 # if os-testr exists, replace os-testr line else insert after PrettyTable line
-RUN grep -q 'os-testr.*' /tempest/tempest/requirements.txt \
+RUN grep -q 'os-testr.*' /tempest/requirements.txt \
     && sed -i 's/os-testr.*/os-testr==0.8.0/' /tempest/requirements.txt \
     || sed -i '/PrettyTable.*/a os-testr==0.8.0' /tempest/requirements.txt
 
@@ -92,5 +94,12 @@ COPY tempest_setup/tempest.conf  /tempest/etc
 ### create egg-info for tempest
 WORKDIR /tempest/
 RUN python /tempest/setup.py develop
-ENTRYPOINT ostestr run aic_orm_tempest_plugin.tests.api.test_regions \
-    && /bin/bash
+#ENTRYPOINT ostestr run ranger_tempest_plugin.tests.api.test_regions \
+#   && /bin/bash
+#ENTRYPOINT ostestr run ranger_tempest_plugin.tests.api.test_flavors/ \
+#   && /bin/bash
+#ENTRYPOINT ostestr run ranger_tempest_plugin.tests.api.test_customers/ \
+#   && /bin/bash
+#ENTRYPOINT ostestr run ranger_tempest_plugin.tests.api.test_images/ \
+#   && /bin/bash
+

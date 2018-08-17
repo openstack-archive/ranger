@@ -1,2 +1,0 @@
-# An empty requirements file indicates the requirements are satisfied by
-# openstack/tempest project's master branch on gerrit.mtn5.cci.att.com
