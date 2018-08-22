@@ -7,7 +7,7 @@ except ImportError:
     from setuptools import setup, find_packages
 
 setup(
-    name='orm',
+    name='ranger',
     version='0.1',
     description='',
     author='',
@@ -15,7 +15,7 @@ setup(
     install_requires=[
         "pecan",
     ],
-    test_suite='orm',
+    test_suite='ranger',
     zip_safe=False,
     packages=find_packages(),
     include_package_data=True,

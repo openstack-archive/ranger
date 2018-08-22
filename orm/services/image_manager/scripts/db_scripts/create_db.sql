@@ -1,3 +1,5 @@
+SET sql_notes=0;
+
 create database if not exists orm_ims_db DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
 use orm_ims_db;
 

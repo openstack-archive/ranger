@@ -1,3 +1,5 @@
+SET sql_notes=0;
+
 create database if not exists orm_audit;
 
 use orm_audit;
