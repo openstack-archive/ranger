@@ -48,13 +48,14 @@ RUN useradd -u 1000 -ms /bin/bash ranger
 
 # Change permissions
 RUN chown -R ranger: /home/ranger \
+    && mkdir -p /etc/ranger \
+    && chown -R ranger: /etc/ranger \
     && mkdir /var/log/ranger \
     && mkdir -p /opt/app \
-    && mkdir /opt/app/git_repo \
+    && mkdir /home/ranger/git_repo \
     && chown -R ranger: /var/log/ranger \
-    && mv /tmp/ranger /opt/app/ranger
+    && mv /tmp/ranger /home/ranger/ranger
 
 # Set work directory
-USER root
-WORKDIR /opt/app/ranger
-
+USER ranger
+WORKDIR /home/ranger
