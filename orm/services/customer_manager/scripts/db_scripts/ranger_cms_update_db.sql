@@ -1,3 +1,5 @@
+SET sql_notes=0;
+
 USE orm_cms_db;
 DROP PROCEDURE IF EXISTS MoveKeyToQuota;
 DELIMITER ;;
@@ -74,7 +76,7 @@ CALL MoveKeyToQuota('security_group_rules', 'network');
 SELECT "LIST OF ALL Security Items" as "";
 SELECT "==========================" as "";
 SELECT q.*, qfd.* FROM quota_field_detail qfd
-	left join quota q on (q.id = qfd.quota_id) where qfd.field_key like "security%";
+	left join quota q on (q.id = qfd.quota_id) where qfd.field_key like "security%%";
 
 DELIMITER ;;
 

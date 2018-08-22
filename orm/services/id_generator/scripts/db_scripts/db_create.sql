@@ -1,3 +1,5 @@
+SET sql_notes=0;
+
 CREATE DATABASE if not exists orm;
 USE orm;
 
