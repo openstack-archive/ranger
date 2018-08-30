@@ -42,7 +42,7 @@ OrmOpts = [
 CONF.register_opts(OrmOpts)
 
 #  Keystone config options in [keystone_autotoken] group
-orm_token_group = cfg.OptGroup(name='token',
+orm_token_group = cfg.OptGroup(name='keystone_authtoken',
                                title='Orm Keystone Token Options')
 
 OrmAuthGroup = [
@@ -58,6 +58,12 @@ OrmAuthGroup = [
     cfg.StrOpt('region',
                default='local',
                help='Region.'),
+    cfg.BoolOpt('auth_enabled',
+                default=False,
+                help='Auth token Enabled/Disabled.'),
+    cfg.StrOpt('version',
+               default='2.0',
+               help='Keystone version number.'),  
     cfg.StrOpt('project_domain_name',
                default='default',
                help='Project domain name.'),
@@ -236,13 +242,14 @@ db_user = 'root'
 db_pass = 'devstack'
 db_host = '127.0.0.1'
 ssl_verify = CONF.ssl_verify
-token_auth_enabled = False
-token_auth_user = CONF.token.username
-token_auth_pass = CONF.token.password
-token_auth_tenant = CONF.token.project_name
+token_auth_enabled = CONF.keystone_authtoken.auth_enabled
+token_auth_user = CONF.keystone_authtoken.username
+token_auth_pass = CONF.keystone_authtoken.password
+token_auth_tenant = CONF.keystone_authtoken.project_name
+token_keystone_version = CONF.keystone_authtoken.version
 token_auth_user_role = 'admin'
-
-db_url = 'mysql://{}:{}@{}:3306/'.format(db_user, db_pass, db_host)
+db_connection = CONF.database.connection
+db_url = db_connection.replace("mysql+pymysql", "mysql")
 
 uuid = {'port': CONF.uuid.port,
         'base_url': '{}://{}:{}/'.
