@@ -93,7 +93,7 @@ fullyaml_with_users_quotasoff = \
     '- project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n        role: storage\n' \
     '    type: OS::Keystone::User\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n      ' \
     'description: this is a description\n      enabled: true\n      ' \
-    'name: welcome_man\n      project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    type: OS::Keystone::Project2\n\n      ' \
+    'name: welcome_man\n      project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    type: OS::Keystone::Project\n\n      ' \
     '\n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group:\n    properties:\n      description: dummy\n      ' \
     'domain: default\n      name: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group\n      roles:\n      - ' \
     'project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n        role: {get_resource: other}\n    ' \
@@ -122,7 +122,7 @@ fullyaml_no_users_quotasoff = \
     '        role: storagezzzzz\n    type: OS::Keystone::User\n\n      ' \
     '\n  1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n      description: this is a description\n' \
     '      enabled: true\n      name: welcome_man\n    ' \
-    '  project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    type: OS::Keystone::Project2\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1zzzz_group:\n    ' \
+    '  project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    type: OS::Keystone::Project\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1zzzz_group:\n    ' \
     'properties:\n      description: dummy\n      domain: default\n      ' \
     'name: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId1zzzz_group\n      roles:\n      - project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n' \
     '        role: {get_resource: otherzzzzz}\n    type: OS::Keystone::Group\n\n' \
@@ -161,7 +161,7 @@ full_yaml_default_quotas = 'heat_template_version: 2015-1-1\n\ndescription: yaml
                            '\n  1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n      description: this is a description\n' \
                            '      enabled: true\n      name: welcome_man\n' \
                            '      project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    ' \
-                           'type: OS::Keystone::Project2\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group:\n' \
+                           'type: OS::Keystone::Project\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group:\n' \
                            '    properties:\n      description: dummy\n      domain: default\n' \
                            '      name: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group\n      roles:\n' \
                            '      - project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n        ' \
@@ -203,7 +203,7 @@ full_yaml_quotas = 'heat_template_version: 2015-1-1\n\ndescription: yaml file fo
                    'description: this is a description\n      ' \
                    'enabled: true\n      name: welcome_man\n      ' \
                    'project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    ' \
-                   'type: OS::Keystone::Project2\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1zzzz_group:\n' \
+                   'type: OS::Keystone::Project\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1zzzz_group:\n' \
                    '    properties:\n      description: dummy\n      ' \
                    'domain: default\n      name: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId1zzzz_group\n      roles:\n      ' \
                    '- project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n        ' \
@@ -236,7 +236,7 @@ full_yaml_ldap = 'heat_template_version: 2015-1-2\n\ndescription: yaml file' \
                  'description: this is a description\n      ' \
                  'enabled: true\n      name: welcome_man\n      ' \
                  'project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    ' \
-                 'type: OS::Keystone::Project2\n\n      \n\noutputs:\n  ' \
+                 'type: OS::Keystone::Project\n\n      \n\noutputs:\n  ' \
                  'userId1_id:\n    ' \
                  'value: {get_resource: userId1}\n  userId2_id:\n    ' \
                  'value: {get_resource: userId2}\n  1e24981a-fa51-11e5-86aa-5e5517507c66_id:\n    ' \
