@@ -87,21 +87,15 @@ def yamlbuilder(alldata, region):
     outputs['outputs'] = {}
     resources['resources'] = {}
 
-    if region['rangerAgentVersion'] >= 4.0:
-        resources['resources']["%s" % alldata['uuid']] =\
-            {'type': 'OS::Keystone::Project\n',
-             'properties': {'name': "%s" % project_name,
-                            'description': project_description,
-                            'tags': _metadata_to_tags(alldata['metadata']),
-                            'enabled': status}}
-    else:
-        resources['resources']["%s" % alldata['uuid']] =\
-            {'type': 'OS::Keystone::Project2\n',
-             'properties': {'name': "%s" % project_name,
-                            'project_id': alldata['uuid'],
-                            'description': project_description,
-                            'enabled': status}}
-        # create the output
+    resources['resources']["%s" % alldata['uuid']] =\
+        {'type': 'OS::Keystone::Project\n',
+         'properties': {'name': "%s" % project_name,
+                        'project_id': alldata['uuid'],
+                        'description': project_description,
+                        'tags': _metadata_to_tags(alldata['metadata']),
+                        'enabled': status}}
+
+    # create the output
     outputs['outputs']["%s_id" % alldata['uuid']] =\
         {"value": {"get_resource": "%s" % alldata['uuid']}}
 
@@ -160,10 +154,6 @@ def yamlbuilder(alldata, region):
     adjust_quota_resource = CMSAdjustResource(region['rangerAgentVersion'])
     adjust_quota_resource.fix_quota_resource_item(alldata['uuid'], quotas, resources, options)
 
-    if region['rangerAgentVersion'] < 4.0:
-        metadata = _create_metadata_yaml(alldata)
-        resources['resources'].update(metadata)
-
     # putting all parts together for full yaml
     yamldata = create_final_yaml(title, description, resources, outputs)
     logger.debug(
@@ -192,8 +182,8 @@ class CMSAdjustResource(object):
 
                         self.adjust_quota_parameters(ite, items[item])
 
-                    # adding tenant to each quota
-                    items[item]['tenant'] = \
+                    # adding project to each quota
+                    items[item]['project'] = \
                         "{'get_resource': %s}" % uuid
                     resources['resources'][options[item][0]] = \
                         {"type": options[item][1], "properties": items[item]}
