@@ -82,11 +82,18 @@ yaml_configs = {
         'yaml_keys': {
             'quotas_keys': {
                 'keypairs': 'key_pairs',
-                'network': 'networks',
-                'port': 'ports',
-                'router': 'routers',
-                'subnet': 'subnets',
-                'floatingip': 'floating_ips'
+                'security_group_rules': 'security_group_rule',
+                'security_groups': 'security_group',
+                'floating_ips': 'floatingip',
+                'networks': 'network',
+                'ports': 'port',
+                'routers': 'router',
+                'members': 'member',
+                'health_monitors': 'health_monitor',
+                'pools': 'pool',
+                'vips': 'vip',
+                'vcpus': 'cores',
+                'subnets': 'subnet'
             }
         },
         'cms_template_version': {
