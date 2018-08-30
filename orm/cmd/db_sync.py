@@ -14,7 +14,7 @@
 #  License for the specific language governing permissions and limitations
 #  under the License.
 
-import db_setup
+from orm.services import db_setup
 
 
 def main():
