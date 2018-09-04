@@ -130,6 +130,6 @@ authentication = {
     # (for Keystone v3) and the value is the tenant/domain name.
     "role_location": {"tenant": "admin"},
     # The Keystone version currently in use. Can be either "2.0" or "3".
-    "keystone_version": "2.0",
+    "keystone_version": config.token_auth_version,
     "policy_file": config.cms['policy_file']
 }

@@ -110,7 +110,7 @@ authentication = {
     "mech_pass": config.token_auth_pass,
     "tenant_name": config.token_auth_tenant,
     # The Keystone version currently in use.  Can be either "2.0" or "3"
-    "keystone_version": "2.0",
+    "keystone_version": config.token_auth_version,
     "policy_file": config.rms['policy_file']
 }
 

@@ -69,16 +69,9 @@ logging = {
 }
 
 database = {
-    'host': config.db_host,
-    'username': config.db_user,
-    'password': config.db_pass,
-    'db_name': 'orm_ims_db',
-
+    'connection_string': config.db_url + 'orm_ims_db'
 }
-database['connection_string'] = 'mysql://{0}:{1}@{2}:3306/{3}'.format(database['username'],
-                                                                      database['password'],
-                                                                      database['host'],
-                                                                      database['db_name'])
+
 
 application_root = config.ims['base_url']
 
@@ -114,6 +107,6 @@ authentication = {
     "rms_url": config.rms['base_url'],
     "tenant_name": config.token_auth_tenant,
     "token_role": config.token_auth_user_role,
-    "keystone_version": "2.0",
+    "keystone_version": config.token_auth_version,
     "policy_file": config.ims['policy_file']
 }

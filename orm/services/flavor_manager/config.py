@@ -78,17 +78,8 @@ logging = {
 }
 
 database = {
-    'host': config.db_host,
-    'username': config.db_user,
-    'password': config.db_pass,
-    'db_name': 'orm_fms_db',
-
+    'connection_string': config.db_url + 'orm_fms_db'
 }
-
-database['connection_string'] = 'mysql://{0}:{1}@{2}:3306/{3}'.format(database['username'],
-                                                                      database['password'],
-                                                                      database['host'],
-                                                                      database['db_name'])
 
 # this table is for calculating default extra specs needed
 extra_spec_needed_table = {
@@ -164,7 +155,7 @@ authentication = {
     "tenant_name": config.token_auth_tenant,
     "token_role": config.token_auth_user_role,
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "2.0",
+    "keystone_version": config.token_auth_version,
     "policy_file": config.fms['policy_file'],
 }
 
