@@ -90,8 +90,11 @@ quotas_default_values = {
     }
 }
 
+# DB configurations
+db_url = config.db_connect
+
 database = {
-    'connection_string': config.db_url + 'orm_cms_db'
+    'connection_string': db_url.endswith('/orm') and db_url.replace("/orm", "/orm_cms_db") or (db_url + 'orm_cms_db')
 }
 
 api = {
@@ -128,8 +131,8 @@ authentication = {
     # The Keystone collection under which the role was granted.
     # The key can be either "tenant" (for Keystone v2.0) or "domain"
     # (for Keystone v3) and the value is the tenant/domain name.
-    "role_location": {"tenant": "admin"},
+    "role_location": {"domain": "admin"},
     # The Keystone version currently in use. Can be either "2.0" or "3".
-    "keystone_version": "2.0",
+    "keystone_version": config.token_auth_version,
     "policy_file": config.cms['policy_file']
 }

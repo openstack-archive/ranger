@@ -92,8 +92,10 @@ region_options = {
 }
 
 # DB configurations
+db_url = config.db_connect
+
 database = {
-    'url': config.db_url + 'orm_rms_db?charset=utf8',
+    'url': db_url.endswith('/orm') and db_url.replace("/orm", "/orm_rms_db") or (db_url + 'orm_rms_db'),
     'max_retries': 3,
     'retries_interval': 10
 }
@@ -110,7 +112,7 @@ authentication = {
     "mech_pass": config.token_auth_pass,
     "tenant_name": config.token_auth_tenant,
     # The Keystone version currently in use.  Can be either "2.0" or "3"
-    "keystone_version": "2.0",
+    "keystone_version": config.token_auth_version,
     "policy_file": config.rms['policy_file']
 }
 

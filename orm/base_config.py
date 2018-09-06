@@ -42,7 +42,7 @@ OrmOpts = [
 CONF.register_opts(OrmOpts)
 
 #  Keystone config options in [keystone_autotoken] group
-orm_token_group = cfg.OptGroup(name='token',
+orm_token_group = cfg.OptGroup(name='keystone_authtoken',
                                title='Orm Keystone Token Options')
 
 OrmAuthGroup = [
@@ -58,12 +58,20 @@ OrmAuthGroup = [
     cfg.StrOpt('region',
                default='local',
                help='Region.'),
+    cfg.BoolOpt('auth_enabled',
+                default=False,
+                help='Auth token Enabled/Disabled.'),
+    cfg.StrOpt('version',
+               default='v3',
+               help='Keystone version number.'),
     cfg.StrOpt('project_domain_name',
                default='default',
                help='Project domain name.'),
     cfg.StrOpt('user_domain_name',
                default='default',
-               help='User domain name.')
+               help='User domain name.'),
+    cfg.StrOpt('user_role',
+               help='token user role.')
 ]
 
 CONF.register_group(orm_token_group)
@@ -232,17 +240,16 @@ debug_level = CONF.debug_level
 protocol = CONF.protocol
 orm_host = CONF.orm_host
 ranger_base = CONF.ranger_base
-db_user = 'root'
-db_pass = 'devstack'
-db_host = '127.0.0.1'
 ssl_verify = CONF.ssl_verify
-token_auth_enabled = False
-token_auth_user = CONF.token.username
-token_auth_pass = CONF.token.password
-token_auth_tenant = CONF.token.project_name
-token_auth_user_role = 'admin'
+token_auth_enabled = CONF.keystone_authtoken.auth_enabled
+token_auth_user = CONF.keystone_authtoken.username
+token_auth_pass = CONF.keystone_authtoken.password
+token_auth_tenant = CONF.keystone_authtoken.project_name
+token_auth_user_role = CONF.keystone_authtoken.user_role
+db_connect = CONF.database.connection.replace("mysql+pymysql", "mysql")
+# pass keystone version '2.0' or '3'
+token_auth_version = '3' if (CONF.keystone_authtoken.version == 'v3') else '2.0'
 
-db_url = 'mysql://{}:{}@{}:3306/'.format(db_user, db_pass, db_host)
 
 uuid = {'port': CONF.uuid.port,
         'base_url': '{}://{}:{}/'.
