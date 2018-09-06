@@ -7,9 +7,11 @@ server = {
 }
 
 # DB configurations
+
+db_url = config.db_connect
+
 database = {
-    'url': config.db_url + 'orm_audit?charset=utf8',
-    # 'url': 'mysql://root:root@127.0.0.1/orm_audit?charset=utf8',
+    'url': db_url.endswith('/orm') and db_url.replace("/orm", "/orm_audit") or (db_url + 'orm_audit'),
     'echo_statements': True
 }
 

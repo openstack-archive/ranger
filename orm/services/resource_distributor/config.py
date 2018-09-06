@@ -12,8 +12,10 @@ server = {
 }
 
 # DB configurations
+db_url = config.db_connect
+
 database = {
-    'url': config.db_url + 'orm_rds?charset=utf8'
+    'url': db_url.endswith('/orm') and db_url.replace("/orm", "/orm_rds") or (db_url + 'orm_rds')
 }
 
 sot = {
@@ -214,5 +216,5 @@ authentication = {
     "tenant_name": config.token_auth_tenant,
     "token_role": config.token_auth_user_role,
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "3"
+    "keystone_version": config.token_auth_version
 }
