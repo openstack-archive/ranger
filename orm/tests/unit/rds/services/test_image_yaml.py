@@ -45,7 +45,7 @@ yaml_output = {
             'properties': {
                 'container_format': 'bare', 'disk_format': 'raw',
                 'is_public': True,
-                'copy_from': 'https://mirrors.it.att.com/images/image-name',
+                'location': 'https://mirrors.it.att.com/images/image-name',
                 'min_disk': 2, 'min_ram': 0, 'name': 'Ubuntu', 'owner': 'unknown',
                 'protected': True,
                 'id': '12345678-9012-3456-7890-123456789012',
