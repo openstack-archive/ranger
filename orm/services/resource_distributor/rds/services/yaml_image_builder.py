@@ -29,7 +29,7 @@ def _properties(alldata, region):
         min_disk=alldata['min_disk'],
         id=str(uuid.UUID(alldata['id'])),
         protected=protected,
-        copy_from=alldata["url"],
+        location=alldata["url"],
         owner=alldata["owner"],
         is_public=public,
         tenants=str(tenants)
