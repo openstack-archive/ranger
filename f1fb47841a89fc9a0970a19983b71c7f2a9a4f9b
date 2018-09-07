@@ -1,0 +1,10 @@
+Code-Review+1: Hari <hosingh000@gmail.com>
+Code-Review+2: STEW TY <st3wty@att.com>
+Workflow+1: Aaron McLean <am9518@att.com>
+Code-Review+2: Aaron McLean <am9518@att.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 07 Sep 2018 15:49:58 +0000
+Reviewed-on: https://review.openstack.org/599074
+Project: openstack/ranger
+Branch: refs/heads/master
