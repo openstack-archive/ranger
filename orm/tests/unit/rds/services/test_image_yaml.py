@@ -55,7 +55,7 @@ yaml_output = {
                     'image_internal_id': 1
                 }
             },
-            'type': 'OS::Glance::Image2'
+            'type': 'OS::Glance::Image'
         }
     },
     'heat_template_version': '2015-1-1',
