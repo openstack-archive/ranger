@@ -227,12 +227,24 @@ class CustomerRegion(Base, CMSBaseModel):
         type = self.region.type
         quota = []
         quotas = {}
+
+        # This for loop is needed to support the AIC 3.0 RC5 to 3.0.3 RC14 upgrade.
+        # The WSME can't handle existing data and shows empty values for unset new quotas
+        for class_name, class_value in WsmeModels.__dict__.iteritems():
+            if str(class_name) in "Network, Storage, Compute":
+                quotas[str(class_name).lower()] = {}
+                for field_key in dir(class_value):
+                    if not field_key.startswith('__') and not field_key.startswith('_') \
+                            and not callable(getattr(class_value, field_key)):
+                        # unset all possible quotas.
+                        quotas[str(class_name).lower()][field_key] = wsme.Unset
+
         for region_quota in self.customer_region_quotas:
-            quotas[region_quota.quota_type] = {}
+            # quotas[region_quota.quota_type] = {}
             for quota_field in region_quota.quota_field_details:
                 quotas[region_quota.quota_type][quota_field.field_key] = quota_field.field_value or wsme.Unset
 
-        if quotas:
+        if self.customer_region_quotas:
             compute = None
             storage = None
             network = None
