@@ -2,9 +2,9 @@
 import logging
 import requests
 
-from orm.common.client.keystone.mock_keystone.keystoneclient import exceptions
-from orm.common.client.keystone.mock_keystone.keystoneclient.v2_0 import client as v2_client
-from orm.common.client.keystone.mock_keystone.keystoneclient.v3 import client as v3_client
+from keystoneclient.auth.identity import v3
+from keystoneclient.v3 import client as v3_client
+from keystoneclient import session as ksc_session
 from orm.common.orm_common.utils import dictator
 
 from pecan import request
@@ -44,15 +44,21 @@ class TokenConf(object):
 class TokenUser(object):
     """Class with details about the token user."""
 
-    def __init__(self, token):
+    def __init__(self, token_details, keystone_ep):
         """Initialize the Token User.
 
         :param token: The token object (returned by tokens.validate)
         """
-        self.token = token.token
-        self.user = token.user
-        self.tenant = getattr(token, 'tenant', None)
-        self.domain = getattr(token, 'domain', None)
+        self.tenant = {}
+        self.user = {}
+        self.auth_url = keystone_ep
+        self.token = getattr(token_details, 'auth_token', None)
+        self.domain = getattr(token_details, 'project_domain_name', None)
+        self.tenant['name'] = getattr(token_details, 'tenant_name', None)
+        self.tenant['id'] = getattr(token_details, 'tenant_id', None)
+        self.user['name'] = getattr(token_details, 'username', None)
+        self.user['id'] = getattr(token_details, 'user_id', None)
+        self.user['roles'] = token_details['roles']
 
 
 def get_token_user(token, conf, lcp_id=None, keystone_ep=None):
@@ -85,8 +91,6 @@ def get_token_user(token, conf, lcp_id=None, keystone_ep=None):
 
     if conf.version == '3':
         client = v3_client
-    elif conf.version == '2.0':
-        client = v2_client
     else:
         message = 'Invalid Keystone version: %s' % (conf.version,)
         logger.debug(message)
@@ -101,10 +105,10 @@ def get_token_user(token, conf, lcp_id=None, keystone_ep=None):
             request.headers['X-RANGER-Requester'] = \
                 token_info.user['username']
 
-        return TokenUser(token_info)
+        return TokenUser(token_info, keystone_ep)
     # Other exceptions raised by validate() are critical errors,
     # so instead of returning False, we'll just let them propagate
-    except exceptions.NotFound:
+    except client.exceptions.NotFound:
         logger.debug('User token not found in Keystone! Make sure that it is '
                      'correct and that it has not expired yet')
         return None
@@ -174,18 +178,6 @@ def _does_user_have_role(keystone, version, user, role, location):
             #  play on the safe side
             logger.debug('The user parameter came in a wrong format!')
             return False
-    elif version == '2.0':
-        # v2.0 supports tenants only
-        if location.keys()[0] != 'tenant':
-            raise ValueError(
-                'Using Keystone v2.0, expected "tenant", received: "%s"' % (
-                    location.keys()[0],))
-
-        tenant = keystone.tenants.find(name=location['tenant'])
-        # v2.0 does not enable us to check for a specific role (unlike v3)
-        role_list = keystone.roles.roles_for_user(user.user['id'],
-                                                  tenant=tenant)
-        return any([user_role.name == role for user_role in role_list])
 
 
 def _get_keystone_client(client, conf, keystone_ep, lcp_id):
@@ -202,11 +194,15 @@ def _get_keystone_client(client, conf, keystone_ep, lcp_id):
     try:
         if keystone_ep not in _KEYSTONES:
             # Instantiate the Keystone client according to the configuration
-            _KEYSTONES[keystone_ep] = client.Client(
-                username=conf.mech_id,
-                password=conf.password,
-                tenant_name=conf.tenant_name,
-                auth_url=keystone_ep + '/v' + conf.version)
+            auth = v3.Password(user_domain_name='default',
+                               username=conf.mech_id,
+                               password=conf.password,
+                               project_domain_name='default',
+                               project_name=conf.tenant_name,
+                               auth_url=keystone_ep + '/v' + conf.version)
+            sess = ksc_session.Session(auth=auth)
+            keystone = client.Client(session=sess)
+            _KEYSTONES[keystone_ep] = client.Client(session=sess)
 
         return _KEYSTONES[keystone_ep]
     except Exception:
@@ -248,8 +244,6 @@ def is_token_valid(token_to_validate, lcp_id, conf, required_role=None,
 
     if conf.version == '3':
         client = v3_client
-    elif conf.version == '2.0':
-        client = v2_client
     else:
         raise ValueError('Invalid Keystone version: %s' % (conf.version,))
 
@@ -260,7 +254,7 @@ def is_token_valid(token_to_validate, lcp_id, conf, required_role=None,
         logger.debug('User token found in Keystone')
     # Other exceptions raised by validate() are critical errors,
     # so instead of returning False, we'll just let them propagate
-    except exceptions.NotFound:
+    except client.exceptions.NotFound:
         logger.debug('User token not found in Keystone! Make sure that it is'
                      'correct and that it has not expired yet')
         return False
@@ -274,7 +268,7 @@ def is_token_valid(token_to_validate, lcp_id, conf, required_role=None,
             logger.debug('Checking role...')
             return _does_user_have_role(keystone, conf.version, user,
                                         required_role, role_location)
-        except exceptions.NotFound:
+        except client.exceptions.NotFound:
             raise ValueError('Role %s or tenant %s not found!' % (
                 required_role, role_location,))
     else:
