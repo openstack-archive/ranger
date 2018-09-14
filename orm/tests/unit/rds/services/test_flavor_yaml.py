@@ -15,7 +15,7 @@ alldata = {'status': 'complete', 'series': 'P2',
            'tag': {'tagkey2': 'tagvalue2', 'tagkey1': 'tagvalue1'},
            'options': {'optkey2': 'optvalue2', 'optkey1': 'optvalue1'},
            'swap': 51231, 'disk': 512,
-           'tenants': [{'tenant_id': 'abcd-efgh-ijkl-4567'},
+           'project': [{'tenant_id': 'abcd-efgh-ijkl-4567'},
                        {'tenant_id': 'abcd-efgh-ijkl-4567'}],
            'id': 'uuid-uuid-uuid-uuid',
            'name': 'Nice Flavor'}
@@ -29,7 +29,7 @@ fullyaml = 'heat_template_version: 2015-1-1\n\ndescription: yaml file for region
            'tagkey2: tagvalue2, optkey1: optvalue1, optkey2: optvalue2}\n' \
            '      flavorid: uuid-uuid-uuid-uuid\n' \
            '      is_public: true\n      name: Nice Flavor\n      ram: 64\n      rxtx_factor: 1\n' \
-           '      swap: 51231\n      tenants: [abcd-efgh-ijkl-4567, abcd-efgh-ijkl-4567]\n      vcpus: 2\n' \
+           '      swap: 51231\n      project: [abcd-efgh-ijkl-4567, abcd-efgh-ijkl-4567]\n      vcpus: 2\n' \
            '    type: OS::Nova::Flavor\n\n      \n\noutputs:\n  nova_flavor_id:\n' \
            '    value: {get_resource: nova_flavor}\n'
 
@@ -43,7 +43,7 @@ alldata_rxtffactor = {'status': 'complete', 'series': 'P2',
                       'tag': {'tagkey2': 'tagvalue2', 'tagkey1': 'tagvalue1'},
                       'options': {'optkey2': 'optvalue2', 'optkey1': 'optvalue1'},
                       'swap': 51231, 'disk': 512,
-                      'tenants': [{'tenant_id': 'abcd-efgh-ijkl-4567'},
+                      'project': [{'tenant_id': 'abcd-efgh-ijkl-4567'},
                                   {'tenant_id': 'abcd-efgh-ijkl-4567'}],
                       'id': 'uuid-uuid-uuid-uuid',
                       'rxtx_factor': 10,
@@ -55,7 +55,7 @@ fullyaml_rxtx = 'heat_template_version: 2015-1-1\n\ndescription: yaml file for r
                 'tagkey2: tagvalue2, optkey1: optvalue1, optkey2: optvalue2}\n' \
                 '      flavorid: uuid-uuid-uuid-uuid\n' \
                 '      is_public: true\n      name: Nice Flavor\n      ram: 64\n      rxtx_factor: 10\n' \
-                '      swap: 51231\n      tenants: [abcd-efgh-ijkl-4567, abcd-efgh-ijkl-4567]\n      vcpus: 2\n' \
+                '      swap: 51231\n      project: [abcd-efgh-ijkl-4567, abcd-efgh-ijkl-4567]\n      vcpus: 2\n' \
                 '    type: OS::Nova::Flavor\n\n      \n\noutputs:\n  nova_flavor_id:\n' \
                 '    value: {get_resource: nova_flavor}\n'
 
