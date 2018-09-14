@@ -126,11 +126,13 @@ api = {
 verify = False
 
 authentication = {
-    "enabled": False,
+    "enabled": True,
     "mech_id": "admin",
-    "mech_pass": "stack",
+    "user_domain_name": "default",
+    "project_domain_name": "default",
+    "mech_pass": "xxxxxxxx",
     "rms_url": "http://127.0.0.1:8080",
     "tenant_name": "admin",
-    "keystone_version": "2.0",
+    "keystone_version": "3",
     "policy_file": "orm/services/flavor_manager/fms_rest/etc/policy.json"
 }

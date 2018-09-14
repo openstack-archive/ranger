@@ -26,8 +26,11 @@ def get_token_conf(app_conf):
     rms_url = app_conf.authentication.rms_url
     tenant_name = app_conf.authentication.tenant_name
     keystone_version = app_conf.authentication.keystone_version
+    user_domain_name = app_conf.authentication.user_domain_name
+    project_domain_name = app_conf.authentication.project_domain_name
     conf = tokens.TokenConf(mech_id, mech_password, rms_url, tenant_name,
-                            keystone_version)
+                            keystone_version, user_domain_name,
+                            project_domain_name)
     return conf
 
 
