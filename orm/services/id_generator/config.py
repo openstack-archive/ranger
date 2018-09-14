@@ -58,10 +58,8 @@ logging = {
 verify = config.ssl_verify
 
 # DB configurations
-db_url = config.db_connect
-
 database = {
-    'connection_string': db_url.endswith('/orm') or (db_url + 'orm')
+    'connection_string': config.db_connect
 }
 # Custom Configurations must be in Python dictionary format::
 #

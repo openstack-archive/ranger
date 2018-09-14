@@ -149,10 +149,7 @@ def yamlbuilder(alldata, region):
 
 class CMSAdjustResource(object):
     def __init__(self, rangerAgentVersion):
-        if rangerAgentVersion >= conf.yaml_configs.customer_yaml.cms_template_version.resource_v2.ranger_agent_version:
-            self.adjust_quota_parameters = CMSAdjustResourceV2().adjust_quota_parameters
-        else:
-            self.adjust_quota_parameters = CMSAdjustResourceV1().adjust_quota_parameters
+        self.adjust_quota_parameters = CMSAdjustQuotaResource().adjust_quota_parameters
 
     def fix_quota_resource_item(self, uuid, quotas, resources, options):
         if conf.yaml_configs.customer_yaml.yaml_options.quotas:
@@ -175,23 +172,11 @@ class CMSAdjustResource(object):
                         {"type": options[item][1], "properties": items[item]}
 
 
-class CMSAdjustResourceV1(object):
+class CMSAdjustQuotaResource(object):
 
     def __init__(self):
-        self.unsupported_params = conf.yaml_configs.customer_yaml.cms_template_version.resource_v1.quota_unsupported_params
-
-    def adjust_quota_parameters(self, key, item):
-        if key in self.unsupported_params:
-            del item[key]
-            logger.warning("Region does not support Quota Parameter {}."
-                           " removed from resource".format(key))
-
-
-class CMSAdjustResourceV2(object):
-
-    def __init__(self):
-        self.supported_new_params = conf.yaml_configs.customer_yaml.cms_template_version.resource_v1.quota_unsupported_params
+        self.supported_new_params = conf.yaml_configs.customer_yaml.cms_quota.resource_quotas.quota_supported_params
 
     def adjust_quota_parameters(self, key, item):
         if key in self.supported_new_params:
-            logger.debug("New quota Parameter {} is added to quota resource".format(key))
+            logger.debug("New quota parameter {} is added to quota resource".format(key))
