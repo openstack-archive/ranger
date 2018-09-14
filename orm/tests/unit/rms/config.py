@@ -38,9 +38,11 @@ region_options = {
 authentication = {
     "enabled": True,
     "mech_id": "admin",
-    "mech_pass": "stack",
+    "user_domain_name": "default",
+    "project_domain_name": "default",
+    "mech_pass": "xxxxxxxx",
     "tenant_name": "admin",
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "2.0",
+    "keystone_version": "3",
     "policy_file": "/opt/app/orm/rms/rms/etc/policy.json"
 }

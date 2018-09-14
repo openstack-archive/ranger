@@ -67,7 +67,7 @@ def yamlbuilder(alldata, region):
                         'ram': ram,
                         'rxtx_factor': rxtx_factor,
                         'swap': swap,
-                        'tenants': tenants,
+                        'project': tenants,
                         'vcpus': alldata['vcpus']}}
     # gen the output
     outputs['outputs'] = {}
