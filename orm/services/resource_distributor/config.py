@@ -99,17 +99,12 @@ yaml_configs = {
                 'subnets': 'subnet'
             }
         },
-        'cms_template_version': {
-            'resource_v1': {
-                'ranger_agent_version': 3.0,
-                'quota_unsupported_params': ['vips', 'members', 'pools',
-                                             'nat_instance', 'route_table',
-                                             'health_monitors', 'loadbalancer',
-                                             'listener']
-            },
-            'resource_v2': {
-                'ranger_agent_version': 3.6,
-                'quota_unsupported_params': []
+        'cms_quota': {
+            'resource_quotas': {
+                'quota_supported_params': ['vips', 'members', 'pools',
+                                           'nat_instance', 'route_table',
+                                           'health_monitors', 'loadbalancer',
+                                           'listener']
             }
         }
     },
@@ -158,9 +153,9 @@ region_resource_id_status = {
     },
     'allowed_ranger_agent_resource_version':
     {
-        'customer': '3.0',
-        'image': '3.0',
-        'flavor': '3.0'
+        'customer': '1.0',
+        'image': '1.0',
+        'flavor': '1.0'
     }
 }
 
