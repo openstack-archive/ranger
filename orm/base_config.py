@@ -25,6 +25,9 @@ OrmOpts = [
     cfg.HostAddressOpt('orm_host',
                        default='127.0.0.1',
                        help='Orm server IP address.'),
+    cfg.URIOpt('ranger_url',
+               default='http://192.168.56.127',
+               help='Ranger URL.'),
     cfg.StrOpt('ranger_base',
                default='/opt/stack/ranger',
                help='Orm base directory.'),
@@ -239,6 +242,7 @@ CONF.register_opts(OrmCliGroup, orm_cli_group)
 debug_level = CONF.debug_level
 protocol = CONF.protocol
 orm_host = CONF.orm_host
+ranger_url = CONF.ranger_url
 ranger_base = CONF.ranger_base
 ssl_verify = CONF.ssl_verify
 token_auth_enabled = CONF.keystone_authtoken.auth_enabled
