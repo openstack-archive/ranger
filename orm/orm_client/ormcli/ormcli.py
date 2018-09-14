@@ -4,6 +4,7 @@ from orm.orm_client.ormcli import cmscli
 from orm.orm_client.ormcli import fmscli
 from orm.orm_client.ormcli import imscli
 from orm.orm_client.ormcli import rmscli
+from oslo_config import cfg
 import sys
 
 
@@ -31,6 +32,9 @@ def main(argv):
     cli.create_parser()
     cli.parse(argv)
     cli.logic()
+
+    CONF = cfg.CONF
+    CONF(default_config_files=["/etc/ranger/ranger.conf"])
 
 
 if __name__ == "__main__":
