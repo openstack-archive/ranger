@@ -145,12 +145,14 @@ verify = config.ssl_verify
 authentication = {
     "enabled": config.token_auth_enabled,
     "mech_id": config.token_auth_user,
+    "user_domain_name": config.user_domain_name,
+    "project_domain_name": config.project_domain_name,
     "mech_pass": config.token_auth_pass,
     "rms_url": config.rms['base_url'],
     "tenant_name": config.token_auth_tenant,
     "token_role": config.token_auth_user_role,
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "2.0",
+    "keystone_version": "3",
     "policy_file": config.fms['policy_file'],
 }
 

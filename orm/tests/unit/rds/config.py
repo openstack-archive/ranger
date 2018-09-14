@@ -40,7 +40,9 @@ audit = {
 
 authentication = {
     'enabled': False,
-    'mech_id': 'admin',
+    "mech_id": "admin",
+    "user_domain_name": "default",
+    "project_domain_name": "default",
     'mech_pass': 'stack',
     'rms_url': 'http://127.0.0.1:8080',
     'tenant_name': 'admin'
