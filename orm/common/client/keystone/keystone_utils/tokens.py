@@ -2,9 +2,9 @@
 import logging
 import requests
 
-from orm.common.client.keystone.mock_keystone.keystoneclient import exceptions
-from orm.common.client.keystone.mock_keystone.keystoneclient.v2_0 import client as v2_client
-from orm.common.client.keystone.mock_keystone.keystoneclient.v3 import client as v3_client
+from keystoneauth1.identity import v3
+from keystoneauth1 import session as ksc_session
+from keystoneclient.v3 import client as v3_client
 from orm.common.orm_common.utils import dictator
 
 from pecan import request
@@ -25,7 +25,7 @@ class KeystoneNotFoundError(Exception):
 class TokenConf(object):
     """The Token Validator configuration class."""
 
-    def __init__(self, mech_id, password, rms_url, tenant_name, version):
+    def __init__(self, mech_id, password, rms_url, tenant_name, version, user_domain_name, project_domain_name):
         """Initialize the Token Validator configuration.
 
         :param mech_id: Username for Keystone
@@ -39,20 +39,28 @@ class TokenConf(object):
         self.rms_url = rms_url
         self.tenant_name = tenant_name
         self.version = version
+        self.user_domain_name = user_domain_name
+        self.project_domain_name = project_domain_name
 
 
 class TokenUser(object):
     """Class with details about the token user."""
 
-    def __init__(self, token):
+    def __init__(self, token_details, keystone_ep):
         """Initialize the Token User.
 
         :param token: The token object (returned by tokens.validate)
         """
-        self.token = token.token
-        self.user = token.user
-        self.tenant = getattr(token, 'tenant', None)
-        self.domain = getattr(token, 'domain', None)
+        self.tenant = {}
+        self.user = {}
+        self.auth_url = keystone_ep
+        self.token = getattr(token_details, 'auth_token', None)
+        self.domain = getattr(token_details, 'project_domain_name', None)
+        self.tenant['name'] = getattr(token_details, 'tenant_name', None)
+        self.tenant['id'] = getattr(token_details, 'tenant_id', None)
+        self.user['name'] = getattr(token_details, 'username', None)
+        self.user['id'] = getattr(token_details, 'user_id', None)
+        self.user['roles'] = token_details['roles']
 
 
 def get_token_user(token, conf, lcp_id=None, keystone_ep=None):
@@ -85,8 +93,6 @@ def get_token_user(token, conf, lcp_id=None, keystone_ep=None):
 
     if conf.version == '3':
         client = v3_client
-    elif conf.version == '2.0':
-        client = v2_client
     else:
         message = 'Invalid Keystone version: %s' % (conf.version,)
         logger.debug(message)
@@ -99,12 +105,12 @@ def get_token_user(token, conf, lcp_id=None, keystone_ep=None):
         logger.debug('User token found in Keystone')
         if not request.headers.get('X-RANGER-Requester'):
             request.headers['X-RANGER-Requester'] = \
-                token_info.user['username']
+                token_info.username
 
-        return TokenUser(token_info)
+        return TokenUser(token_info, keystone_ep)
     # Other exceptions raised by validate() are critical errors,
     # so instead of returning False, we'll just let them propagate
-    except exceptions.NotFound:
+    except client.exceptions.NotFound:
         logger.debug('User token not found in Keystone! Make sure that it is '
                      'correct and that it has not expired yet')
         return None
@@ -149,45 +155,6 @@ def _find_keystone_ep(rms_url, lcp_name):
     return None
 
 
-def _does_user_have_role(keystone, version, user, role, location):
-    """Check whether a user has a role.
-
-    :param keystone: The Keystone client to use
-    :param version: Keystone version
-    :param user: A dict that represents the user in question
-    :param role: The role to check whether the user has
-    :param location: Keystone role location
-    :return: True if the user has the requested role, False otherwise.
-    :raise: client.exceptions.NotFound when the requested role does not exist,
-    ValueError when the version is 2.0 but the location is not 'tenant'
-    """
-    location = dict(location)
-    if version == '3':
-        role = keystone.roles.find(name=role)
-        try:
-            return keystone.roles.check(role, user=user['user']['id'],
-                                        **location)
-        except exceptions.NotFound:
-            return False
-        except KeyError:
-            # Shouldn't be raised when using Keystone's v3/v2.0 API, but let's
-            #  play on the safe side
-            logger.debug('The user parameter came in a wrong format!')
-            return False
-    elif version == '2.0':
-        # v2.0 supports tenants only
-        if location.keys()[0] != 'tenant':
-            raise ValueError(
-                'Using Keystone v2.0, expected "tenant", received: "%s"' % (
-                    location.keys()[0],))
-
-        tenant = keystone.tenants.find(name=location['tenant'])
-        # v2.0 does not enable us to check for a specific role (unlike v3)
-        role_list = keystone.roles.roles_for_user(user.user['id'],
-                                                  tenant=tenant)
-        return any([user_role.name == role for user_role in role_list])
-
-
 def _get_keystone_client(client, conf, keystone_ep, lcp_id):
     """Get the Keystone client.
 
@@ -202,12 +169,14 @@ def _get_keystone_client(client, conf, keystone_ep, lcp_id):
     try:
         if keystone_ep not in _KEYSTONES:
             # Instantiate the Keystone client according to the configuration
-            _KEYSTONES[keystone_ep] = client.Client(
-                username=conf.mech_id,
-                password=conf.password,
-                tenant_name=conf.tenant_name,
-                auth_url=keystone_ep + '/v' + conf.version)
-
+            auth = v3.Password(user_domain_name=conf.user_domain_name,
+                               username=conf.mech_id,
+                               password=conf.password,
+                               project_domain_name=conf.project_domain_name,
+                               project_name=conf.tenant_name,
+                               auth_url=keystone_ep + '/v' + conf.version)
+            sess = ksc_session.Session(auth=auth)
+            _KEYSTONES[keystone_ep] = client.Client(session=sess)
         return _KEYSTONES[keystone_ep]
     except Exception:
         logger.critical(
@@ -215,70 +184,3 @@ def _get_keystone_client(client, conf, keystone_ep, lcp_id):
             'region {}. Please contact Keystone team.'.format(
                 dictator.get('service_name', 'ORM'), keystone_ep, lcp_id))
         raise
-
-
-def is_token_valid(token_to_validate, lcp_id, conf, required_role=None,
-                   role_location=None):
-    """Validate a token.
-
-    :param token_to_validate: The token to validate
-    :param lcp_id: The ID of the LCP associated with the Keystone instance
-    with which the token was created
-    :param conf: A TokenConf object
-    :param required_role: The required role for privileged actions,
-    e.g. 'admin' (optional).
-    :param role_location: The Keystone role location (a dict whose single
-    key is either 'domain' or 'tenant', whose value is the location name)
-    :return: False if one of the tokens received (or more) is invalid,
-    True otherwise.
-    :raise: KeystoneNotFoundError when the Keystone EP for the required LCP
-    was not found in RMS output,
-    client.exceptions.AuthorizationFailure when the connection with the
-    Keystone EP could not be established,
-    client.exceptions.EndpointNotFound when _our_ authentication
-    (as an admin) with Keystone failed,
-    ValueError when an invalid Keystone version was specified,
-    ValueError when a role or a tenant was not found,
-    ValueError when a role is required but role_location is None.
-    """
-    keystone_ep = _find_keystone_ep(conf.rms_url, lcp_id)
-    if keystone_ep is None:
-        raise KeystoneNotFoundError('Keystone EP of LCP %s not found in RMS' %
-                                    (lcp_id,))
-
-    if conf.version == '3':
-        client = v3_client
-    elif conf.version == '2.0':
-        client = v2_client
-    else:
-        raise ValueError('Invalid Keystone version: %s' % (conf.version,))
-
-    keystone = _get_keystone_client(client, conf, keystone_ep, lcp_id)
-
-    try:
-        user = keystone.tokens.validate(token_to_validate)
-        logger.debug('User token found in Keystone')
-    # Other exceptions raised by validate() are critical errors,
-    # so instead of returning False, we'll just let them propagate
-    except exceptions.NotFound:
-        logger.debug('User token not found in Keystone! Make sure that it is'
-                     'correct and that it has not expired yet')
-        return False
-
-    if required_role is not None:
-        if role_location is None:
-            raise ValueError(
-                'A role is required but no role location was specified!')
-
-        try:
-            logger.debug('Checking role...')
-            return _does_user_have_role(keystone, conf.version, user,
-                                        required_role, role_location)
-        except exceptions.NotFound:
-            raise ValueError('Role %s or tenant %s not found!' % (
-                required_role, role_location,))
-    else:
-        # We know that the token is valid and there's no need to enforce a
-        # policy on this operation, so we can let the user pass
-        logger.debug('No role to check, authentication finished successfully')
-        return True

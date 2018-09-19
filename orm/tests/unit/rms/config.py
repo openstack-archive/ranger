@@ -41,6 +41,8 @@ authentication = {
     "mech_pass": "stack",
     "tenant_name": "admin",
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": "2.0",
-    "policy_file": "/opt/app/orm/rms/rms/etc/policy.json"
+    "keystone_version": "3",
+    "policy_file": "/opt/app/orm/rms/rms/etc/policy.json",
+    "user_domain_name": "default",
+    "project_domain_name": "default"
 }
