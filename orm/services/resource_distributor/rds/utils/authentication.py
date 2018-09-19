@@ -12,6 +12,9 @@ mech_id = ""
 mech_password = False
 rms_url = ""
 tenant_name = ""
+keystone_version = ""
+user_domain_name = "default"
+project_domain_name = "default"
 
 
 headers = {'content-type': 'application/json'}
@@ -25,7 +28,8 @@ def _is_authorization_enabled():
 
 
 def _get_token_conf():
-    conf = tokens.TokenConf(mech_id, mech_password, rms_url, tenant_name)
+    conf = tokens.TokenConf(mech_id, mech_password, rms_url, tenant_name,
+                            keystone_version, user_domain_name, project_domain_name)
     return conf
 
 
@@ -86,23 +90,3 @@ def get_token(region):
     except Exception as exp:
         logger.error(exp)
         logger.exception(exp)
-
-
-def check_permissions(token_to_validate, lcp_id):
-    logger.debug("Check permissions...start")
-    try:
-        if _is_authorization_enabled():
-            token_conf = _get_token_conf()
-            logger.debug("Authorization: validating token=[{}] on lcp_id=[{}]".format(token_to_validate, lcp_id))
-            is_permitted = tokens.is_token_valid(token_to_validate, lcp_id, token_conf)
-            logger.debug("Authorization: The token=[{}] on lcp_id=[{}] is [{}]".format(token_to_validate, lcp_id, "valid" if is_permitted else "invalid"))
-        else:
-            logger.debug("The authentication service is disabled. No authentication is needed.")
-            is_permitted = True
-    except Exception as e:
-        msg = "Fail to validate request. due to {}.".format(e.message)
-        logger.error(msg)
-        logger.exception(e)
-        is_permitted = False
-    logger.debug("Check permissions...end")
-    return is_permitted

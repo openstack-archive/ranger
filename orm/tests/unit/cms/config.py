@@ -126,6 +126,8 @@ authentication = {
     "tenant_name": "admin",
     "token_role": "admin",
     "role_location": {"tenant": "admin"},
-    "keystone_version": "2.0",
-    "policy_file": "orm/services/customer_manager/cms_rest/etc/policy.json"
+    "keystone_version": "3",
+    "policy_file": "orm/services/customer_manager/cms_rest/etc/policy.json",
+    "user_domain_name": "default",
+    "project_domain_name": "default"
 }

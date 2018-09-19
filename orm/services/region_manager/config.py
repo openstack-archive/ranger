@@ -113,7 +113,9 @@ authentication = {
     "tenant_name": config.token_auth_tenant,
     # The Keystone version currently in use.  Can be either "2.0" or "3"
     "keystone_version": config.token_auth_version,
-    "policy_file": config.rms['policy_file']
+    "policy_file": config.rms['policy_file'],
+    "user_domain_name": config.user_domain_name,
+    "project_domain_name": config.project_domain_name
 }
 
 api = {
