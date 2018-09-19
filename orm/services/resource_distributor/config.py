@@ -218,5 +218,7 @@ authentication = {
     "tenant_name": config.token_auth_tenant,
     "token_role": config.token_auth_user_role,
     # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": config.token_auth_version
+    "keystone_version": config.token_auth_version,
+    "user_domain_name": config.user_domain_name,
+    "project_domain_name": config.project_domain_name
 }
