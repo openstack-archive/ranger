@@ -103,7 +103,7 @@ class ImsTests(TestCase):
     def test_get_token_errors(self, mock_post, mock_get_keystone_ep):
         # Bad status code
         my_response = mock.MagicMock()
-        my_response.status_code = 201
+        my_response.status_code = 200
         mock_post.return_value = my_response
         self.assertRaises(imscli.ConnectionError, imscli.get_token,
                           3, mock.MagicMock(), 'c')
