@@ -6,7 +6,7 @@ gittle>=0.5.0 # MIT
 pbr>=2.0 # Apache-2.0
 pecan>=1.3.2
 netifaces==0.10.4
-SQLAlchemy==0.9.7
+SQLAlchemy==1.2.11
 WSME>=0.6
 MySQL-python==1.2.5
 requests==2.6.0
@@ -15,4 +15,7 @@ oslo.serialization
 oslo.config>=4.6.0 # Apache-2.0
 oslo.policy
 oslo.log>=3.30.0 # Apache-2.0
-sqlalchemy-migrate>=0.9.6
+sqlalchemy-migrate>=0.11.0
+keystoneauth1==2.18.0
+keystonemiddleware==4.14.0
+python-keystoneclient==3.10.0

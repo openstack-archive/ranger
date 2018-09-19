@@ -333,16 +333,33 @@ def get_token(timeout, args, host):
     headers = {
         'Content-Type': 'application/json',
     }
-    url = '%s/v2.0/tokens'
+    url = '%s/v3/auth/tokens'
     data = '''
 {
-"auth": {
-    "tenantName": "%s",
-    "passwordCredentials": {
-        "username": "%s",
-        "password": "%s"
-        }
-    }
+   "auth":{
+      "identity":{
+         "methods":[
+            "password"
+         ],
+         "password":{
+            "user":{
+               "domain":{
+                  "name":"%s"
+               },
+               "name":"%s",
+               "password":"%s"
+            }
+         }
+      },
+      "scope":{
+         "project":{
+            "name":"%s",
+            "domain":{
+               "id":"%s"
+            }
+         }
+      }
+   }
 }'''
     for argument in ('tenant_name', 'username', 'password', 'auth_region'):
         argument_value = getattr(args, argument, None)
@@ -366,7 +383,7 @@ def get_token(timeout, args, host):
             'Failed in get_token, host: {}, region: {}'.format(host,
                                                                auth_region))
     url = url % (keystone_ep,)
-    data = data % (tenant_name, username, password,)
+    data = data % (base_config.user_domain_name, username, password, tenant_name, base_config.project_domain_name,)
 
     if args.verbose:
         print(
@@ -374,11 +391,11 @@ def get_token(timeout, args, host):
                 timeout, headers, url))
     try:
         resp = requests.post(url, timeout=timeout, data=data, headers=headers)
-        if resp.status_code != 200:
+        if resp.status_code != 201:
             raise ResponseError(
                 'Failed to get token (Reason: {})'.format(
                     resp.status_code))
-        return resp.json()['access']['token']['id']
+        return resp.headers['x-subject-token']
 
     except Exception as e:
         print e.message

@@ -61,9 +61,3 @@ verify = config.ssl_verify
 database = {
     'connection_string': config.db_connect
 }
-# Custom Configurations must be in Python dictionary format::
-#
-# foo = {'bar':'baz'}
-#
-# All configurations are accessible at::
-# pecan.conf
