@@ -160,6 +160,8 @@ authentication = {
     # The Keystone version currently in use. Can be either "2.0" or "3"
     "keystone_version": config.token_auth_version,
     "policy_file": config.fms['policy_file'],
+    "user_domain_name": config.user_domain_name,
+    "project_domain_name": config.project_domain_name
 }
 
 # valid_flavor_options
@@ -188,5 +190,5 @@ flavor_limits = {
     # swap_file_limit is in MB and must be a multiple of 1024
     "swap_file_limit": "393216",
     # ephemeral_limit is in GB
-    "ephemeral_limit": "10000",
+    "ephemeral_limit": "10000" 
 }

@@ -59,13 +59,13 @@ OrmAuthGroup = [
                default='admin',
                help='Token user name.'),
     cfg.StrOpt('password',
-               default='devstack',
+               default='nomoresecrete',
                help='Token password.'),
     cfg.StrOpt('project_name',
                default='admin',
                help='Project name.'),
     cfg.StrOpt('region',
-               default='local',
+               default='RegionOne',
                help='Region.'),
     cfg.BoolOpt('auth_enabled',
                 default=False,
@@ -108,7 +108,7 @@ orm_uuid_group = cfg.OptGroup(name='uuid', title='Orm UUID Options')
 
 OrmUuidGroup = [
     cfg.PortOpt('port',
-                default=7001,
+                default=8090,
                 help='UUID port.'),
     cfg.StrOpt('log',
                default='uuidgen.log',
@@ -156,7 +156,7 @@ orm_audit_group = cfg.OptGroup(name='audit', title='Orm Audit Options')
 
 OrmAuditGroup = [
     cfg.PortOpt('port',
-                default=7002,
+                default=8776,
                 help='Audit port.'),
     cfg.StrOpt('log',
                default='audit_server.log',
@@ -184,11 +184,12 @@ CONF.register_opts(OrmImsGroup, orm_ims_group)
 
 
 #  rms config options in [rms] group
+# old 7003
 orm_rms_group = cfg.OptGroup(name='rms', title='Orm Rms Options')
 
 OrmRmsGroup = [
     cfg.PortOpt('port',
-                default=7003,
+                default=8080,
                 help='Rms port.'),
     cfg.StrOpt('log',
                default='rms.log',
@@ -232,7 +233,7 @@ orm_cli_group = cfg.OptGroup(name='cli', title='Orm CLI Options')
 
 OrmCliGroup = [
     cfg.StrOpt('base_region',
-               default='local',
+               default='RegionOne',
                help='Base region.')
 ]
 
@@ -250,16 +251,19 @@ protocol = CONF.protocol
 orm_host = CONF.orm_host
 ranger_url = CONF.ranger_url
 ranger_base = CONF.ranger_base
+ranger_url = CONF.ranger_url
 ssl_verify = CONF.ssl_verify
 token_auth_enabled = CONF.keystone_authtoken.auth_enabled
 token_auth_user = CONF.keystone_authtoken.username
 token_auth_pass = CONF.keystone_authtoken.password
 token_auth_tenant = CONF.keystone_authtoken.project_name
 token_auth_user_role = CONF.keystone_authtoken.user_role
+user_domain_name = CONF.keystone_authtoken.user_domain_name
+project_domain_name = CONF.keystone_authtoken.project_domain_name
 conn = CONF.database.connection
 db_connect = conn.replace("mysql+pymysql", "mysql") if conn else None
 # pass keystone version '2.0' or '3'
-token_auth_version = '3' if (CONF.keystone_authtoken.version == 'v3') else '2.0'
+token_auth_version = '3' 
 cert_path = CONF.ranger_agent_client_cert_path
 https_enabled = CONF.ranger_agent_https_enabled
 
@@ -292,8 +296,10 @@ ims = {'port': CONF.ims.port,
        '/orm/services/image_manager/ims/etc/policy.json',
        'log': '{}/{}'.format(CONF.log_location, CONF.ims.log)}
 
+#Had to remove trailing slash from port number so rms get would work. 
+#try doing CLI ./orm get_customer 123434
 rms = {'port': CONF.rms.port,
-       'base_url': '{}://{}:{}/'.format(protocol, orm_host, CONF.rms.port),
+       'base_url': '{}://{}:{}'.format(protocol, orm_host, CONF.rms.port),
        'policy_file': CONF.ranger_base +
        '/orm/services/region_manager/rms/etc/policy.json',
        'log': '{}/{}'.format(CONF.log_location, CONF.rms.log)}

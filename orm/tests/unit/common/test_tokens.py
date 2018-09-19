@@ -71,7 +71,7 @@ class TokensTest(unittest.TestCase):
     @mock.patch.object(tokens.v3_client, 'Client')
     def test_is_token_valid_sanity(self, mock_get, mock_client):
         self.assertTrue(tokens.is_token_valid('a', 'b', tokens.TokenConf(
-            'a', 'b', 'c', 'd', '3')))
+            'a', 'b', 'c', 'd', '3', 'e', 'f')))
 
     @mock.patch.object(tokens.requests, 'get', return_value=MyResponse(
         tokens.OK_CODE, {'regions': [{'endpoints': [{'publicURL': 'test',
@@ -81,16 +81,18 @@ class TokensTest(unittest.TestCase):
         user = {'user': {'id': 'test_id', 'domain': {'id': 'test'}}}
         mock_client.tokens.validate = mock.MagicMock(return_value=user)
         self.assertTrue(tokens.is_token_valid('a', 'b', tokens.TokenConf(
-            'a', 'b', 'c', 'd', '3'), 'test', {'domain': 'test'}))
+            *('3',) * 7), 'test', {'domain': 'test'}))
 
     @mock.patch.object(tokens.requests, 'get', return_value=MyResponse(
         tokens.OK_CODE, {'regions': [{'endpoints': [{'publicURL': 'test',
                                                      'type': 'identity'}]}]}))
     def test_is_token_valid_token_not_found(self, mock_get):
+        import pdb
+        pdb.set_trace()        
         client_backup = tokens.v3_client.Client
         tokens.v3_client.Client = mock.MagicMock(return_value=MyClient())
         self.assertFalse(tokens.is_token_valid('a', 'b', tokens.TokenConf(
-            'a', 'b', 'c', 'd', '3')))
+            *('3',) * 7)))
         tokens.v3_client.Client = client_backup
 
     @mock.patch.object(tokens.requests, 'get', return_value=MyResponse(
@@ -100,39 +102,42 @@ class TokensTest(unittest.TestCase):
         client_backup = tokens.v3_client.Client
         tokens.v3_client.Client = mock.MagicMock(return_value=MyClient())
         self.assertRaises(ValueError, tokens.is_token_valid, 'a', 'b',
-                          tokens.TokenConf('a', 'b', 'c', 'd', '4'))
+                          tokens.TokenConf('a', 'b', 'c', 'd', '4', 'e', 'f'))
         tokens.v3_client.Client = client_backup
 
     @mock.patch.object(tokens.requests, 'get', return_value=MyResponse(
         tokens.OK_CODE, {'regions': [{'endpoints': [{'publicURL': 'test',
                                                      'type': 'identity'}]}]}))
-    def test_is_token_valid_keystone_v2(self, mock_get):
-        client_backup = tokens.v2_client.Client
-        tokens.v2_client.Client = mock.MagicMock()
+    def test_is_token_valid_keystone_v3(self, mock_get):
+        client_backup = tokens.v3_client.Client
+        tokens.v3_client.Client = mock.MagicMock()
         self.assertFalse(tokens.is_token_valid('a', 'b',
                                                tokens.TokenConf('a', 'b', 'c',
-                                                                'd', '2.0'),
+                                                                'd', '3', 'e',
+                                                                'f'),
                                                'test',
                                                {'tenant': 'test'}))
-        tokens.v2_client.Client = client_backup
+        tokens.v3_client.Client = client_backup
 
     @mock.patch.object(tokens.requests, 'get', return_value=MyResponse(
         tokens.OK_CODE, {'regions': [{'endpoints': [{'publicURL': 'test',
                                                      'type': 'identity'}]}]}))
-    def test_is_token_valid_keystone_v2_invalid_location(self, mock_get):
-        client_backup = tokens.v2_client.Client
-        tokens.v2_client.Client = mock.MagicMock()
+    def test_is_token_valid_keystone_v3_invalid_location(self, mock_get):
+        #import pdb
+        #pdb.set_trace()          
+        client_backup = tokens.v3_client.Client
+        tokens.v3_client.Client = mock.MagicMock()
         self.assertRaises(ValueError, tokens.is_token_valid, 'a', 'b',
-                          tokens.TokenConf('a', 'b', 'c', 'd', '2.0'), 'test',
+                          tokens.TokenConf('a', 'b', 'c', 'd', '3', 'e', 'f'), 'test',
                           {'domain': 'test'})
-        tokens.v2_client.Client = client_backup
+        tokens.v3_client.Client = client_backup
 
     @mock.patch.object(tokens.requests, 'get', return_value=MyResponse(
         tokens.OK_CODE + 1, {'regions': [{'endpoints': [
             {'publicURL': 'test', 'type': 'identity'}]}]}))
     def test_is_token_valid_keystone_ep_not_found(self, mock_get):
         self.assertRaises(tokens.KeystoneNotFoundError, tokens.is_token_valid,
-                          'a', 'b', tokens.TokenConf('a', 'b', 'c', 'd', '3'))
+                          'a', 'b', tokens.TokenConf('a', 'b', 'c', 'd', '3', 'e', 'f'))
 
     @mock.patch.object(tokens.requests, 'get', return_value=MyResponse(
         tokens.OK_CODE, {'regions': [{'endpoints': [{'publicURL': 'test',
@@ -140,7 +145,7 @@ class TokensTest(unittest.TestCase):
     def test_is_token_valid_no_role_location(self, mock_get):
         tokens.v3_client.Client = mock.MagicMock()
         self.assertRaises(ValueError, tokens.is_token_valid, 'a', 'b',
-                          tokens.TokenConf('a', 'b', 'c', 'd', '3'), 'test')
+                          tokens.TokenConf('a', 'b', 'c', 'd', '3', 'e', 'f'), 'test')
 
     @mock.patch.object(tokens.v3_client, 'Client')
     def test_does_user_have_role_sanity_true(self, mock_client):
@@ -180,7 +185,7 @@ class TokensTest(unittest.TestCase):
     def test_is_token_valid_role_does_not_exist(self, mock_get):
         tokens.v3_client.Client = mock.MagicMock(return_value=MyClient(False))
         self.assertRaises(ValueError, tokens.is_token_valid, 'a', 'b',
-                          tokens.TokenConf('a', 'b', 'c', 'd', '3'), 'test',
+                          tokens.TokenConf('a', 'b', 'c', 'd', '3', 'e', 'f'), 'test',
                           {'domain': 'test'})
 
     def test_get_token_user_invalid_arguments(self):
@@ -193,7 +198,7 @@ class TokensTest(unittest.TestCase):
                           tokens.get_token_user, 'a', mock.MagicMock(), 'c')
 
     def test_get_token_user_invalid_keystone_version(self):
-        conf = tokens.TokenConf(*(None,) * 5)
+        conf = tokens.TokenConf(*(None,) * 7)
         self.assertRaises(ValueError, tokens.get_token_user, 'a', conf, 'c',
                           'd')
 
@@ -202,7 +207,7 @@ class TokensTest(unittest.TestCase):
         ks = mock.MagicMock()
         ks.tokens.validate.side_effect = exceptions.NotFound()
         mock_get_keystone_client.return_value = ks
-        conf = tokens.TokenConf(*('3',) * 5)
+        conf = tokens.TokenConf(*('3',) * 7)
         self.assertIsNone(tokens.get_token_user('a', conf, 'c', 'd'))
 
     @mock.patch.object(tokens, 'request')
@@ -216,8 +221,23 @@ class TokensTest(unittest.TestCase):
         ks.tokens.validate.return_value = token_info
         mock_get_keystone_client.return_value = ks
 
-        conf = tokens.TokenConf(*('2.0',) * 5)
+        conf = tokens.TokenConf(*('3',) * 7)
         result = tokens.get_token_user('a', conf, 'c', 'd')
 
         self.assertEqual(result.token, 'a')
         self.assertEqual(result.user, 'test_user')
+        
+#FAIL: orm.tests.unit.common.test_tokens.TokensTest.test_get_token_user_success
+#FAIL: orm.tests.unit.common.test_tokens.TokensTest.test_is_token_valid_keystone_v3
+#FAIL: orm.tests.unit.common.test_tokens.TokensTest.test_is_token_valid_keystone_v3_invalid_location
+#
+#ERROR: orm.tests.unit.common.test_tokens.TokensTest.test_does_user_have_role_sanity_false
+#ERROR: orm.tests.unit.common.test_tokens.TokensTest.test_get_token_user_token_not_found
+#ERROR: orm.tests.unit.common.test_tokens.TokensTest.test_is_token_valid_role_does_not_exist
+#ERROR: orm.tests.unit.common.test_tokens.TokensTest.test_is_token_valid_token_not_found
+#
+#python -m testtools.run orm.tests.unit.common.test_tokens.TokensTest
+
+
+
+

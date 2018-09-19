@@ -12,6 +12,9 @@ mech_id = ""
 mech_password = False
 rms_url = ""
 tenant_name = ""
+keystone_version = ""
+user_domain_name = "default"
+project_domain_name = "default"  
 
 
 headers = {'content-type': 'application/json'}
@@ -25,7 +28,8 @@ def _is_authorization_enabled():
 
 
 def _get_token_conf():
-    conf = tokens.TokenConf(mech_id, mech_password, rms_url, tenant_name)
+    conf = tokens.TokenConf(mech_id, mech_password, rms_url, tenant_name,
+                            keystone_version, user_domain_name, project_domain_name)
     return conf
 
 

@@ -80,3 +80,5 @@ def main(argv=None):
         conn = engine.connect()
         exec_script = conn.execute(sql_queries[exec_item])
         conn.close()
+
+main()

@@ -145,6 +145,8 @@ def authorize(action, request, app_conf, keystone_ep=None):
                                              lcp_id, keystone_ep)
                 request.headers['X-RANGER-Client'] = user.user['name']
                 request.headers['X-RANGER-Owner'] = user.tenant['id']
+                request.headers['Keystone-Endpoint'] = user.auth_url
+                keystone_ep = user.auth_url
             except Exception:
                 user = None
                 request.headers['X-RANGER-Client'] = 'NA'
@@ -184,3 +186,4 @@ def authorize(action, request, app_conf, keystone_ep=None):
     logger.info('Authorize...end')
     if not is_permitted:
         raise err_utils.get_error('N/A', status_code=401)
+

@@ -111,5 +111,7 @@ authentication = {
     "tenant_name": config.token_auth_tenant,
     "token_role": config.token_auth_user_role,
     "keystone_version": config.token_auth_version,
-    "policy_file": config.ims['policy_file']
+    "policy_file": config.ims['policy_file'],
+    "user_domain_name": config.user_domain_name,
+    "project_domain_name": config.project_domain_name
 }
