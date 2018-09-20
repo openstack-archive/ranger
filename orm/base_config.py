@@ -12,10 +12,11 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+# import ast
 from oslo_config import cfg
 
-CONF = cfg.CONF
 
+CONF = cfg.CONF
 
 # Orm config options in DEFAULT block
 OrmOpts = [
@@ -45,7 +46,11 @@ OrmOpts = [
                help='Orm log directory.'),
     cfg.StrOpt('debug_level',
                default='DEBUG',
-               help='logging debug level')
+               help='logging debug level'),
+    cfg.StrOpt('use_handlers',
+               choices=('console', 'logfile', 'console,logfile'),
+               default='console',
+               help='output logging to console or logfile or both'),
 ]
 
 CONF.register_opts(OrmOpts)
@@ -244,20 +249,25 @@ CONF.register_opts(OrmCliGroup, orm_cli_group)
 # backward compatiblitiy as other modules still
 # referenced to them.
 ################################################################
-
+# logging config settings
 debug_level = CONF.debug_level
+handler_list = CONF.use_handlers.split(",")
+
+# ranger settings
 protocol = CONF.protocol
 orm_host = CONF.orm_host
 ranger_url = CONF.ranger_url
 ranger_base = CONF.ranger_base
+conn = CONF.database.connection
+db_connect = conn.replace("mysql+pymysql", "mysql") if conn else None
+
+# authentication settings
 ssl_verify = CONF.ssl_verify
 token_auth_enabled = CONF.keystone_authtoken.auth_enabled
 token_auth_user = CONF.keystone_authtoken.username
 token_auth_pass = CONF.keystone_authtoken.password
 token_auth_tenant = CONF.keystone_authtoken.project_name
 token_auth_user_role = CONF.keystone_authtoken.user_role
-conn = CONF.database.connection
-db_connect = conn.replace("mysql+pymysql", "mysql") if conn else None
 # pass keystone version '2.0' or '3'
 token_auth_version = '3' if (CONF.keystone_authtoken.version == 'v3') else '2.0'
 cert_path = CONF.ranger_agent_client_cert_path
@@ -307,3 +317,74 @@ rds = {'port': CONF.rds.port,
        'log': '{}/{}'.format(CONF.log_location, CONF.rds.log)}
 
 cli = {'base_region': CONF.cli.base_region}
+
+
+def get_log_config(log_file_name, ranger_service, ranger_service_module):
+
+    # Ranger logging template - we want to have the option of not routing to logfiles
+    # for all loggers except 'pecan' and 'py.warnings', which only logs to console
+    logging_template = {
+        'root': {'level': 'INFO', 'handlers': handler_list},
+        'loggers': {
+            ranger_service_module: {
+                'level': debug_level,
+                'handlers': handler_list,
+                'propagate': False
+            },
+            'orm.common.orm_common': {
+                'level': debug_level,
+                'handlers': handler_list,
+                'propagate': False
+            },
+            'orm.common.client.keystone.keystone_utils': {
+                'level': debug_level,
+                'handlers': handler_list,
+                'propagate': False
+            },
+            'orm.common.client.audit.audit_client': {
+                'level': debug_level,
+                'handlers': handler_list,
+                'propagate': False
+            },
+            'pecan': {'level': debug_level, 'handlers': handler_list,
+                      'propagate': False},
+            'py.warnings': {'handlers': handler_list},
+            '__force_dict__': True
+        },
+        'handlers': {
+            'console': {
+                'level': debug_level,
+                'class': 'logging.StreamHandler',
+                'formatter': 'color'
+            },
+            'logfile': {
+                'level': debug_level,
+                'class': 'logging.handlers.RotatingFileHandler',
+                'maxBytes': 50000000,
+                'backupCount': 10,
+                'filename': log_file_name,
+                'formatter': 'simple'
+            }
+        },
+        'formatters': {
+            'simple': {
+                'format': ('%(asctime)s %(levelname)-5.5s [%(name)s]'
+                           '[%(threadName)s] %(message)s')
+            },
+            'color': {
+                '()': 'pecan.log.ColorFormatter',
+                'format': ('%(asctime)s [%(padded_color_levelname)s] [%(name)s]'
+                           '[%(threadName)s] %(message)s'),
+                '__force_dict__': True
+            }
+        }
+    }
+
+    service_logging = logging_template
+
+    if CONF.use_handlers == 'console':
+        del service_logging['handlers']['Logfile']
+    elif CONF.use_handlers == 'Logfile':
+        del service_logging['handlers']['console']
+
+    return service_logging
