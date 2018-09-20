@@ -21,60 +21,8 @@ app = {
     'hooks': lambda: [TransactionIdHook(), APIErrorHook(), SecurityHeadersHook()]
 }
 
-logging = {
-    'root': {'level': 'INFO', 'handlers': ['console']},
-    'loggers': {
-        'orm.services.region_manager.rms': {
-            'level': config.debug_level,
-            'handlers': ['console', 'Logfile'],
-            'propagate': False
-        },
-        'pecan': {'level': config.debug_level, 'handlers': ['console'],
-                  'propagate': False},
-        'orm.common.client.audit.audit_client': {
-            'level': config.debug_level,
-            'handlers': ['console', 'Logfile'],
-            'propagate': False
-        },
-        'orm.common.orm_common': {'level': config.debug_level,
-                                  'handlers': ['console', 'Logfile'],
-                                  'propagate': False},
-        'orm.common.client.keystone.keystone_utils': {
-            'level': config.debug_level,
-            'handlers': ['console', 'Logfile'],
-            'propagate': False
-        },
-        'py.warnings': {'handlers': ['console']},
-        '__force_dict__': True
-    },
-    'handlers': {
-        'console': {
-            'level': config.debug_level,
-            'class': 'logging.StreamHandler',
-            'formatter': 'color'
-        },
-        'Logfile': {
-            'level': config.debug_level,
-            'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes': 50000000,
-            'backupCount': 10,
-            'filename': config.rms['log'],
-            'formatter': 'simple'
-        }
-    },
-    'formatters': {
-        'simple': {
-            'format': ('%(asctime)s %(levelname)-5.5s [%(name)s]'
-                       '[%(threadName)s] %(message)s')
-        },
-        'color': {
-            '()': 'pecan.log.ColorFormatter',
-            'format': ('%(asctime)s [%(padded_color_levelname)s] [%(name)s]'
-                       '[%(threadName)s] %(message)s'),
-            '__force_dict__': True
-        }
-    }
-}
+app_module = app['modules'][0]
+logging = config.get_log_config(config.rms['log'], server['name'], app_module)
 
 # user input validations
 region_options = {

@@ -12,10 +12,11 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import ast
 from oslo_config import cfg
 
-CONF = cfg.CONF
 
+CONF = cfg.CONF
 
 # Orm config options in DEFAULT block
 OrmOpts = [
@@ -45,7 +46,10 @@ OrmOpts = [
                help='Orm log directory.'),
     cfg.StrOpt('debug_level',
                default='DEBUG',
-               help='logging debug level')
+               help='logging debug level'),
+    cfg.BoolOpt('use_logfile',
+                default=False,
+                help='use logfile for logging - defaults to false'),
 ]
 
 CONF.register_opts(OrmOpts)
@@ -307,3 +311,81 @@ rds = {'port': CONF.rds.port,
        'log': '{}/{}'.format(CONF.log_location, CONF.rds.log)}
 
 cli = {'base_region': CONF.cli.base_region}
+
+
+def get_log_config(log_file_name, ranger_service, ranger_service_module):
+
+    # Ranger logging template - we want to have the option of not routing to logfiles
+    # for all loggers except 'pecan' and 'py.warnings', which only logs to console
+    logging_template = {
+        'root': {'level': 'INFO', 'handlers': ['console']},
+        'loggers': {
+            'orm.services.manager.rest': {
+                'level': debug_level,
+                'handlers': ['console', 'Logfile'],
+                'propagate': False
+            },
+            'orm.common.orm_common': {
+                'level': debug_level,
+                'handlers': ['console', 'Logfile'],
+                'propagate': False
+            },
+            'orm.common.client.keystone.keystone_utils': {
+                'level': debug_level,
+                'handlers': ['console', 'Logfile'],
+                'propagate': False
+            },
+            'pecan': {'level': debug_level, 'handlers': ['console'],
+                      'propagate': False},
+            'orm.common.client.audit.audit_client': {'level': debug_level,
+                                                     'handlers': ['console', 'Logfile'],
+                                                     'propagate': False},
+            'py.warnings': {'handlers': ['console']},
+            '__force_dict__': True
+        },
+        'handlers': {
+            'console': {
+                'level': debug_level,
+                'class': 'logging.StreamHandler',
+                'formatter': 'color'
+            },
+            'Logfile': {
+                'level': debug_level,
+                'class': 'logging.handlers.RotatingFileHandler',
+                'maxBytes': 50000000,
+                'backupCount': 10,
+                'filename': log_file_name,
+                'formatter': 'simple'
+            }
+        },
+        'formatters': {
+            'simple': {
+                'format': ('%(asctime)s %(levelname)-5.5s [%(name)s]'
+                           '[%(threadName)s] %(message)s')
+            },
+            'color': {
+                '()': 'pecan.log.ColorFormatter',
+                'format': ('%(asctime)s [%(padded_color_levelname)s] [%(name)s]'
+                           '[%(threadName)s] %(message)s'),
+                '__force_dict__': True
+            }
+        }
+    }
+
+    logging = logging_template
+
+    if not CONF.use_logfile:
+        # disable routing logs to logfile by dropping 'logfiles' from 'handlers' for
+        # specific logging_template['loggers'] keys as shown below.
+        del logging['loggers']['orm.services.manager.rest']['handlers'][1]
+        del logging['loggers']['orm.common.orm_common']['handlers'][1]
+        del logging['loggers']['orm.common.client.audit.audit_client']['handlers'][1]
+        del logging['loggers']['orm.common.client.keystone.keystone_utils']['handlers'][1]
+        del logging['handlers']['Logfile']
+
+    # ensure that ranger service modules are correctly set to allow service logging to route to correct destinations
+    service_logging = ast.literal_eval(str(logging)
+                                       .replace("orm.services.manager.rest",
+                                       ranger_service_module))
+
+    return service_logging
