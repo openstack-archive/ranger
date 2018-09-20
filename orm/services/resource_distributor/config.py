@@ -3,7 +3,7 @@ import orm.base_config as config
 app = {
     'root': 'orm.services.resource_distributor.rds.controllers.root.RootController',
     'modules': ['orm.services.resource_distributor.rds'],
-    'service_name': 'RDS'
+    'service_name': 'rds'
 }
 
 server = {
@@ -159,66 +159,9 @@ region_resource_id_status = {
     }
 }
 
-logging = {
-    'root': {'level': 'INFO', 'handlers': ['console']},
-    'loggers': {
-        'orm.services.resource_distributor.rds': {
-            'level': config.debug_level,
-            'handlers': ['console', 'Logfile'],
-            'propagate': False
-        },
-        'orm.common.orm_common': {'level': config.debug_level,
-                                  'handlers': ['console', 'Logfile'],
-                                  'propagate': False},
-        'orm.common.client.audit.audit_client': {
-            'level': config.debug_level,
-            'handlers': ['console', 'Logfile'],
-            'propagate': False
-        },
-        'pecan': {'level': config.debug_level,
-                  'handlers': ['console'], 'propagate': False},
-        'py.warnings': {'handlers': ['console']},
-        '__force_dict__': True
-    },
-    'handlers': {
-        'console': {
-            'level': config.debug_level,
-            'class': 'logging.StreamHandler',
-            'formatter': 'color'
-        },
-        'Logfile': {
-            'level': config.debug_level,
-            'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes': 50000000,
-            'backupCount': 10,
-            'filename': config.rds['log'],
-            'formatter': 'simple'
-        }
-    },
-    'formatters': {
-        'simple': {
-            'format': ('%(asctime)s %(levelname)-5.5s [%(name)s]'
-                       '[%(threadName)s] %(message)s')
-        },
-        'color': {
-            '()': 'pecan.log.ColorFormatter',
-            'format': '%(asctime)s [%(padded_color_levelname)s] [%(name)s] [%(threadName)s] %(message)s',
-            '__force_dict__': True
-        }
-    }
-}
-
+app_module = app['modules'][0]
+logging = config.get_log_config(config.rds['log'], app['service_name'], app_module)
 
 verify = config.ssl_verify
 
-authentication = {
-    "enabled": config.token_auth_enabled,
-    "mech_id": config.token_auth_user,
-    "mech_pass": config.token_auth_pass,
-    "tenant_name": config.token_auth_tenant,
-    "token_role": config.token_auth_user_role,
-    # The Keystone version currently in use. Can be either "2.0" or "3"
-    "keystone_version": config.token_auth_version,
-    "user_domain_name": config.user_domain_name,
-    "project_domain_name": config.project_domain_name
-}
+authentication = config.server_request_auth(app['service_name'])

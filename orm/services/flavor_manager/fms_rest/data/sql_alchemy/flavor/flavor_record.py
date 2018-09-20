@@ -96,7 +96,6 @@ class FlavorRecord:
         try:
             query = self.session.query(Flavor)
             query = self.customise_query(query, kw)
-            print str(query)
             return query.all()
 
         except Exception as exception:
@@ -114,7 +113,6 @@ class FlavorRecord:
         if limit > 0:
             query = query.limit(limit)
 
-        print str(query)
         return query
 
     def get_count_of_flavors_by_series(self, series):

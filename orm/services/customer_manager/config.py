@@ -11,7 +11,6 @@ server = {
     'port': config.cms['port'],
     'host': config.orm_host,
     'name': 'cms',
-    'host_ip': config.orm_host
 }
 
 # Pecan Application Configurations
@@ -23,60 +22,8 @@ app = {
     'hooks': lambda: [TransactionIdHook(), APIErrorHook(), SecurityHeadersHook()]
 }
 
-logging = {
-    'root': {'level': 'INFO', 'handlers': ['console']},
-    'loggers': {
-        'orm.services.customer_manager.cms_rest': {
-            'level': config.debug_level,
-            'handlers': ['console', 'Logfile'],
-            'propagate': False
-        },
-        'orm.common.orm_common': {
-            'level': config.debug_level,
-            'handlers': ['console', 'Logfile'],
-            'propagate': False
-        },
-        'orm.common.client.keystone.keystone_utils': {
-            'level': config.debug_level,
-            'handlers': ['console', 'Logfile'],
-            'propagate': False
-        },
-        'pecan': {'level': 'DEBUG', 'handlers': ['console'],
-                  'propagate': False},
-        'orm.common.client.audit.audit_client': {'level': config.debug_level,
-                                                 'handlers': ['console', 'Logfile'],
-                                                 'propagate': False},
-        'py.warnings': {'handlers': ['console']},
-        '__force_dict__': True
-    },
-    'handlers': {
-        'console': {
-            'level': config.debug_level,
-            'class': 'logging.StreamHandler',
-            'formatter': 'color'
-        },
-        'Logfile': {
-            'level': config.debug_level,
-            'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes': 50000000,
-            'backupCount': 10,
-            'filename': config.cms['log'],
-            'formatter': 'simple'
-        }
-    },
-    'formatters': {
-        'simple': {
-            'format': ('%(asctime)s %(levelname)-5.5s [%(name)s]'
-                       '[%(threadName)s] %(message)s')
-        },
-        'color': {
-            '()': 'pecan.log.ColorFormatter',
-            'format': ('%(asctime)s [%(padded_color_levelname)s] [%(name)s]'
-                       '[%(threadName)s] %(message)s'),
-            '__force_dict__': True
-        }
-    }
-}
+app_module = app['modules'][0]
+logging = config.get_log_config(config.cms['log'], server['name'], app_module)
 
 quotas_default_values = {
     'compute': {
@@ -121,20 +68,4 @@ api = {
 
 verify = config.ssl_verify
 
-authentication = {
-    "enabled": config.token_auth_enabled,
-    "mech_id": config.token_auth_user,
-    "mech_pass": config.token_auth_pass,
-    "rms_url": config.rms['base_url'],
-    "tenant_name": config.token_auth_tenant,
-    "token_role": config.token_auth_user_role,
-    # The Keystone collection under which the role was granted.
-    # The key can be either "tenant" (for Keystone v2.0) or "domain"
-    # (for Keystone v3) and the value is the tenant/domain name.
-    "role_location": {"domain": "admin"},
-    # The Keystone version currently in use. Can be either "2.0" or "3".
-    "keystone_version": config.token_auth_version,
-    "policy_file": config.cms['policy_file'],
-    "user_domain_name": config.user_domain_name,
-    "project_domain_name": config.project_domain_name
-}
+authentication = config.server_request_auth(server['name'])

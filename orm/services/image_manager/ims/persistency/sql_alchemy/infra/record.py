@@ -22,7 +22,6 @@ class Record(object):
         if limit > 0:
             query = query.limit(limit)
 
-        print str(query)
         return query
 
 #   5644 ProCG uses this line - don't edit it
