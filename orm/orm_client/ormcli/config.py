@@ -2,9 +2,9 @@
 # along with region, with each cms and fms api request
 import orm.base_config as config
 
-tenant_name = config.token_auth_tenant
-username = config.token_auth_user
-password = config.token_auth_pass
+tenant_name = config.CONF.keystone_authtoken.project_name
+username = config.CONF.keystone_authtoken.username
+password = config.CONF.keystone_authtoken.password
 auth_region = config.CONF.cli.base_region
-orm_base_url = config.ranger_url
-verify = config.ssl_verify
+orm_base_url = config.CONF.ranger_url
+verify = config.CONF.ssl_verify
