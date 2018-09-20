@@ -87,5 +87,5 @@ class CustomerRegionRecord:
 
         result = self.session.connection().execute(
             "delete from customer_region where customer_id = {} and region_id <> -1 ".format(customer_id))
-        print "num records deleted from customer regions: " + str(result.rowcount)
+        # print "num records deleted from customer regions: " + str(result.rowcount)
         return result
