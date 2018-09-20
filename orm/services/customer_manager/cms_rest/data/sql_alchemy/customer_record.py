@@ -186,5 +186,4 @@ class CustomerRecord:
         if limit > 0:
             query = query.limit(limit)
 
-        print str(query)
         return query
