@@ -4,7 +4,8 @@ from orm import base_config as config
 # Server Specific Configurations
 server = {
     'port': config.uuid['port'],
-    'host': config.orm_host
+    'host': config.orm_host,
+    'name': 'uuid'
 }
 # Pecan Application Configurations
 app = {
@@ -13,47 +14,8 @@ app = {
     'debug': True,
 }
 
-logging = {
-    'root': {'level': 'INFO', 'handlers': ['console']},
-    'loggers': {
-        'orm.services.id_generator.uuidgen': {
-            'level': config.debug_level,
-            'handlers': ['console', 'Logfile'],
-            'propagate': False
-        },
-        'pecan': {'level': config.debug_level, 'handlers': ['console'],
-                  'propagate': False},
-        'py.warnings': {'handlers': ['console']},
-        '__force_dict__': True
-    },
-    'handlers': {
-        'console': {
-            'level': config.debug_level,
-            'class': 'logging.StreamHandler',
-            'formatter': 'color'
-        },
-        'Logfile': {
-            'level': config.debug_level,
-            'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes': 50000000,
-            'backupCount': 10,
-            'filename': config.uuid['log'],
-            'formatter': 'simple'
-        }
-    },
-    'formatters': {
-        'simple': {
-            'format': ('%(asctime)s %(levelname)-5.5s [%(name)s]'
-                       '[%(threadName)s] %(message)s')
-        },
-        'color': {
-            '()': 'pecan.log.ColorFormatter',
-            'format': ('%(asctime)s [%(padded_color_levelname)s] [%(name)s]'
-                       '[%(threadName)s] %(message)s'),
-            '__force_dict__': True
-        }
-    }
-}
+app_module = app['modules'][0]
+logging = config.get_log_config(config.uuid['log'], server['name'], app_module)
 
 verify = config.ssl_verify
 
