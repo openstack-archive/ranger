@@ -90,6 +90,68 @@ create table if not exists user_role
 	 index region_id (region_id),
 	 index user_id (user_id));
 
+create table if not exists cms_domain
+   (
+         id integer auto_increment not null,
+         name varchar(64) not null,
+         primary key (id),
+         unique name_idx (name));
+
+create table if not exists group
+   (
+         id integer auto_increment not null,
+         domain_id integer not null,
+         name varchar(64) not null,
+         description varchar(255) not null,
+         primary key (id, domain_id),
+         foreign key (`domain_id`) references `cms_domain` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         unique name_idx (name),
+         unique domain_id_idx (domain_id));
+
+create table if not exists group_role
+   (
+         role_id integer not null,
+         group_id integer not null,
+         primary key (role_id, group_id),
+         foreign key (`role_id`) references `cms_role` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`group_id`) references `group` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         index role_id (role_id),
+         index group_id (group_id));
+
+create table if not exists group_region
+   (
+         region_id integer not null,
+         group_id integer not null,
+         primary key (region_id, group_id),
+         foreign key (`group_id`) references `group` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`region_id`) references `cms_region` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         index group_id_idx (group_id));
+
+create table if not exists group_user
+   (
+         group_id integer not null,
+         user_id integer not null,
+         region_id integer not null default -1,
+         primary key (group_id, user_id),
+         foreign key (`user_id`) references `cms_user` (`id`) ON DELETE CASCADE,
+         foreign key (`region_id`) references `group_region` (`region_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+         foreign key (`group_id`) references `group` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         index user_id (user_id),
+         index group_id (group_id),
+         index region_id (region_id));
+
+create table if not exists group_customer
+   (
+         group_id integer not null,
+         customer_id integer not null,
+         region_id integer not null,
+         primary key (group_id, customer_id, region_id),
+         foreign key (`group_id`) references `group` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`customer_id`) references `customer` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`region_id`) references `cms_region` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         index customer_id_idx (customer_id),
+         index regio_id_idx (region_id));
+
 create or replace view rds_resource_status_view AS
     (
         SELECT id, resource_id, region, status,
