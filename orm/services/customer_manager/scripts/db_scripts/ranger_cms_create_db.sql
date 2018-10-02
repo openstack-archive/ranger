@@ -1,7 +1,6 @@
 SET sql_notes=0;
 
-create database if not exists orm_cms_db DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
-use orm_cms_db;
+use orm;
 
 create table if not exists cms_role
    (
@@ -16,7 +15,7 @@ create table if not exists cms_user
 	 primary key (id),
 	 unique name_idx (name));
 
-create table if not exists region
+create table if not exists cms_region
    (
 	 id integer auto_increment not null,
 	 name varchar(64) not null,
@@ -52,7 +51,7 @@ create table if not exists customer_region
 	 primary key (customer_id,region_id),
 	 index region_id (region_id),
   	 foreign key (customer_id) REFERENCES `customer` (`id`) ON DELETE CASCADE,
-	 foreign key (region_id) REFERENCES `region` (`id`));
+	 foreign key (region_id) REFERENCES `cms_region` (`id`));
 
 create table if not exists quota
    (
@@ -85,7 +84,7 @@ create table if not exists user_role
 	 primary key (customer_id,region_id,user_id,role_id),
 	 foreign key (customer_id, region_id) REFERENCES customer_region (`customer_id`, `region_id`) ON DELETE CASCADE,
 	 foreign key (customer_id) references customer(id) ON DELETE CASCADE,
-	 foreign key (region_id) references region(id),
+	 foreign key (region_id) references cms_region(id),
 	 foreign key (user_id) references cms_user(id),
 	 foreign key (role_id) references cms_role(id),
 	 index region_id (region_id),
@@ -94,4 +93,4 @@ create table if not exists user_role
 create or replace view rds_resource_status_view AS
     (
         SELECT id, resource_id, region, status,
-        err_code, operation from orm_rds.resource_status);
+        err_code, operation from resource_status);

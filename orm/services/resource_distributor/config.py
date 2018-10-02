@@ -12,10 +12,8 @@ server = {
 }
 
 # DB configurations
-db_url = config.db_connect
-
 database = {
-    'url': db_url.endswith('/orm') and db_url.replace("/orm", "/orm_rds") or (db_url + 'orm_rds')
+    'url': config.db_connect
 }
 
 sot = {
