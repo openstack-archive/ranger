@@ -1,4 +1,4 @@
-use orm_rms_db;
+use orm;
 
 insert into region (region_id,
                     name,

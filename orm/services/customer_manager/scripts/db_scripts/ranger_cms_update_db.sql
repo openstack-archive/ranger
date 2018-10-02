@@ -1,6 +1,9 @@
 SET sql_notes=0;
 
-USE orm_cms_db;
+USE orm;
+
+insert ignore into cms_region(id,name,type) values(-1, "DEFAULT", "single");
+
 DROP PROCEDURE IF EXISTS MoveKeyToQuota;
 DELIMITER ;;
 CREATE PROCEDURE `MoveKeyToQuota`(p_field_key varchar(64), p_quota varchar(64))
@@ -86,10 +89,10 @@ DROP PROCEDURE IF EXISTS add_region_type ;;
 CREATE PROCEDURE add_region_type()
 BEGIN
 
-  UPDATE region set type = "single" where id = -1;
+  UPDATE cms_region set type = "single" where id = -1;
 
-	IF NOT EXISTS( SELECT * FROM region WHERE id=-1) THEN
-  	insert ignore into region(id,name,type) values(-1, "DEFAULT", "single");
+	IF NOT EXISTS( SELECT * FROM cms_region WHERE id=-1) THEN
+  	insert ignore into cms_region(id,name,type) values(-1, "DEFAULT", "single");
 	END IF;
 
 END ;;
