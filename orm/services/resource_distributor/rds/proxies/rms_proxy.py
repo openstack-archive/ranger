@@ -15,7 +15,7 @@ def get_rms_region(region_name):
         headers = {
             'content-type': 'application/json',
         }
-        rms_server_url = '%s%s/%s' % (
+        rms_server_url = '%s/%s/%s' % (
             conf.rms.base_url, conf.rms.all_regions_path, region_name)
         resp = requests.get(rms_server_url, headers=headers,
                             verify=conf.verify).json()

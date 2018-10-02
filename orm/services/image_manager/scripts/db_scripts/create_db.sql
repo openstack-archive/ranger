@@ -1,7 +1,6 @@
 SET sql_notes=0;
 
-create database if not exists orm_ims_db DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
-use orm_ims_db;
+use orm;
 
 #***** 
 #* MySql script for Creating Table image
@@ -94,4 +93,4 @@ create table if not exists image_customer
 create or replace view rds_resource_status_view AS
     (
       SELECT ID, RESOURCE_ID, REGION,STATUS,
-      ERR_CODE,OPERATION from orm_rds.resource_status);
+      ERR_CODE,OPERATION from resource_status);

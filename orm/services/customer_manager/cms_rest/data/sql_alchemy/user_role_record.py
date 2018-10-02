@@ -52,14 +52,25 @@ class UserRoleRecord:
             region_record = RegionRecord(self.session)
             region_id = region_record.get_region_id_from_name(region_id)
             if region_id is None:
-                raise NotFound("region %s is not found" % region_query)
+                raise NotFound("region {} ".format(region_query))
 
         if isinstance(user_id, basestring):
             user_query = user_id
             cms_user_record = CmsUserRecord(self.session)
             user_id = cms_user_record.get_cms_user_id_from_name(user_id)
             if user_id is None:
-                raise NotFound("user %s is not found" % user_query)
+                raise NotFound("user {} ".format(user_query))
+
+            # additional logic for delete_user only: check if the provided user id
+            # is associated with the customer and region in cms delete_user request
+            elif region_id > -1:
+                user_check = "SELECT DISTINCT user_id from user_role " \
+                             "WHERE customer_id =%d AND region_id =%d " \
+                             "AND user_id =%d" % (customer_id, region_id, user_id)
+
+                result = self.session.connection().execute(user_check)
+                if result.rowcount == 0:
+                    raise NotFound("user {} ".format(user_query))
 
         if region_id == -1:
             delete_query = "DELETE ur FROM user_role ur,user_role u " \
@@ -67,10 +78,12 @@ class UserRoleRecord:
                            "and ur.customer_id = u.customer_id and u.region_id =-1 " \
                            "and ur.customer_id = %d and ur.user_id=%d" % (customer_id, user_id)
         else:
+            # modify query to correctly determine that the provided region user and its role(s)
+            # do NOT match that of the default user; otherwise delete user is NOT permitted
             delete_query = "DELETE ur FROM user_role as ur LEFT JOIN user_role AS u " \
                            "ON ur.customer_id = u.customer_id and u.user_id=ur.user_id " \
-                           "and u.region_id=-1 where ur.customer_id = %d and ur.region_id= %d " \
-                           "and ur.user_id =%d and ur.role_id !=IFNULL(u.role_id,'')" \
+                           "and u.region_id=-1  and ur.role_id = u.role_id where ur.customer_id = %d " \
+                           "and ur.region_id= %d and ur.user_id =%d and u.role_id IS NULL" \
                            % (customer_id, region_id, user_id)
 
         result = self.session.connection().execute(delete_query)
