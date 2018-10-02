@@ -27,10 +27,8 @@ app_module = app['modules'][0]
 logging = config.get_log_config(config.fms['log'], server['name'], app_module)
 
 # DB configurations
-db_url = config.db_connect
-
 database = {
-    'connection_string': db_url.endswith('/orm') and db_url.replace("/orm", "/orm_fms_db") or (db_url + 'orm_fms_db')
+    'connection_string': config.db_connect
 }
 
 # this table is for calculating default extra specs needed
