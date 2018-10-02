@@ -1,7 +1,6 @@
 SET sql_notes=0;
 
-create database if not exists orm_fms_db DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
-use orm_fms_db;
+use orm;
 
 #***** 
 #* MySql script for Creating Table Flavor

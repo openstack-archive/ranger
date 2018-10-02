@@ -1,7 +1,6 @@
 SET sql_notes=0;
 
-create database if not exists orm_cms_db DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
-use orm_cms_db;
+use orm;
 
 create table if not exists cms_role
    (
@@ -16,7 +15,7 @@ create table if not exists cms_user
 	 primary key (id),
 	 unique name_idx (name));
 
-create table if not exists region
+create table if not exists cms_region
    (
 	 id integer auto_increment not null,
 	 name varchar(64) not null,

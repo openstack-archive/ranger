@@ -369,7 +369,7 @@ class QuotaFieldDetail(Base, CMSBaseModel):
 
 
 class Region(Base, CMSBaseModel):
-    __tablename__ = "region"
+    __tablename__ = "cms_region"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(64), nullable=False, unique=True)

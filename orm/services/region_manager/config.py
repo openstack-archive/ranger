@@ -40,10 +40,8 @@ region_options = {
 }
 
 # DB configurations
-db_url = config.db_connect
-
 database = {
-    'url': db_url.endswith('/orm') and db_url.replace("/orm", "/orm_rms_db") or (db_url + 'orm_rms_db'),
+    'url': config.db_connect,
     'max_retries': 3,
     'retries_interval': 10
 }
