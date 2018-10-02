@@ -13,7 +13,7 @@ class RegionRecord:
         # self.setRecordData(self.region)
         # self.region.Clear()
 
-        self.__TableName = "region"
+        self.__TableName = "cms_region"
 
         if (session):
             self.session = session
@@ -37,7 +37,7 @@ class RegionRecord:
             raise
 
     def get_region_id_from_name(self, region_name):
-        result = self.session.connection().scalar("SELECT id from region WHERE name = \"{}\"".format(region_name))
+        result = self.session.connection().scalar("SELECT id from cms_region WHERE name = \"{}\"".format(region_name))
         if result is not None:
             return int(result)
         return result
