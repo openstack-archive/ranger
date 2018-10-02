@@ -8,12 +8,8 @@ server = {
 }
 
 # DB configurations
-
-db_url = config.db_connect
-
 database = {
-    'url': db_url.endswith('/orm') and db_url.replace("/orm", "/orm_audit") or (db_url + 'orm_audit'),
-    'echo_statements': False
+    'url': config.db_connect, 'echo_statements': False
 }
 
 # Pecan Application Configurations

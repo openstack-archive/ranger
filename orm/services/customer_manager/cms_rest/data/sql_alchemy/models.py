@@ -176,7 +176,7 @@ class CustomerRegion(Base, CMSBaseModel):
     __tablename__ = "customer_region"
 
     customer_id = Column(Integer, ForeignKey('customer.id'), primary_key=True, nullable=False)
-    region_id = Column(Integer, ForeignKey('region.id'), primary_key=True, nullable=False, index=True)
+    region_id = Column(Integer, ForeignKey('cms_region.id'), primary_key=True, nullable=False, index=True)
 
     customer_region_quotas = relationship("Quota",
                                           uselist=True,
@@ -369,7 +369,7 @@ class QuotaFieldDetail(Base, CMSBaseModel):
 
 
 class Region(Base, CMSBaseModel):
-    __tablename__ = "region"
+    __tablename__ = "cms_region"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(64), nullable=False, unique=True)

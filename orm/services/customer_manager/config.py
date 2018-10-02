@@ -39,10 +39,8 @@ quotas_default_values = {
 }
 
 # DB configurations
-db_url = config.db_connect
-
 database = {
-    'connection_string': db_url.endswith('/orm') and db_url.replace("/orm", "/orm_cms_db") or (db_url + 'orm_cms_db')
+    'connection_string': config.db_connect
 }
 
 api = {
