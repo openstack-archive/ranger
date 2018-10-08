@@ -3,6 +3,7 @@ import db_comander as db
 import initializer
 import logging
 import sys
+from six.moves import input
 import utils
 import yaml_handler as yh
 
@@ -103,7 +104,7 @@ def _start_cleaning():
 
 
 if __name__ == '__main__':
-    warning_message = raw_input(
+    warning_message = input(
         'IMPORTANT:- please note its your responsibility to backup the db'
         ' before running this script... click enter before continue'
     )
