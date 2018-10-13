@@ -465,46 +465,10 @@ class Flavor(Model):
                 es.key_value = 1
                 es.key_name = "hw:numa_nodes"
                 extra_spec_needed.append(es)
-            if {'v5', 'i1'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'i2'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_sockets"
-                es.key_value = "1"
-                extra_spec_needed.append(es)
-
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_threads"
-                es.key_value = "1"
-                extra_spec_needed.append(es)
-
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:pci_numa_custom_policy"
-                es.key_value = "ignore"
-                extra_spec_needed.append(es)
-
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_cores"
-                es.key_value = self.vcpus
-                extra_spec_needed.append(es)
-            if {'i2'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'i1'}.issubset(options_items.keys()):
+            if {'i2'}.issubset(options_items.keys()) and self.series in 'ns':
                 es = db_models.FlavorExtraSpec()
                 es.key_name = "hw:pci_numa_affinity_policy"
                 es.key_value = "dedicated"
-                extra_spec_needed.append(es)
-            if {'up'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'tp'}.issubset(options_items.keys()) and not \
-                    {'i1'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "aggregate_instance_extra_specs:up"
-                es.key_value = "true"
-                extra_spec_needed.append(es)
-            if {'tp'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'up'}.issubset(options_items.keys()) and not \
-                    {'i1'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "aggregate_instance_extra_specs:tp"
-                es.key_value = "true"
                 extra_spec_needed.append(es)
 
         # convert the key_value to a string to avoid/fix pecan json rendering error in update extra_specs

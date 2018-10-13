@@ -868,10 +868,7 @@ def calculate_name(flavor):
         name += '{}{}'.format('e', ephemeral)
 
     if len(flavor.flavor.options) > 0:
-        v_option = ""
         for key in sorted(flavor.flavor.options.iterkeys()):
-            if key[0] == 'v':
-                v_option = key
 
             # only include valid option parameters in flavor name
             if ((series == 'ns' and key[0] == 'v' and key in valid_vnf_opts) or
@@ -884,37 +881,8 @@ def calculate_name(flavor):
                     name += '.'
                 name += key
 
-        if {'i2', v_option}.issubset(flavor.flavor.options.keys()) and \
-                v_option not in valid_vnf_opts:
-            raise ConflictError(409, "Flavor i2 option must be used with one of "
-                                     "these choices %s" % str(valid_vnf_opts))
-
-        if {'i1', 'i2'}.issubset(flavor.flavor.options.keys()):
-            raise ConflictError(409, "Flavor i1 and i2 options cannot be used together")
-
-        if {'i1'}.issubset(flavor.flavor.options.keys()) and not \
-                {'v5'}.issubset(flavor.flavor.options.keys()):
-            raise ConflictError(409, "Flavor i1 option must be used with v5 option")
-
-        if {'i2', 'tp', 'up', v_option}.issubset(flavor.flavor.options.keys()) or \
-                {'i2', 'tp', 'up'}.issubset(flavor.flavor.options.keys()) or \
-                {'i2', 'up', v_option}.issubset(flavor.flavor.options.keys()) or \
-                {'i2', 'tp', v_option}.issubset(flavor.flavor.options.keys()):
-            raise ConflictError(409, "Flavor i2 option can only be used with one "
-                                     "of the following: vx, tp, or up")
-
         if series in 'ns':
-            if {'v5', 'i1'}.issubset(flavor.flavor.options.keys()):
-                name += 'i1'
-            if {'i2', 'up'}.issubset(flavor.flavor.options.keys()) and not \
-                    {'i1'}.issubset(flavor.flavor.options.keys()):
-                name += 'upi2'
-            if {'i2', 'tp'}.issubset(flavor.flavor.options.keys()) and not \
-                    {'i1'}.issubset(flavor.flavor.options.keys()):
-                name += 'tpi2'
-            if {'i2'}.issubset(flavor.flavor.options.keys()) and \
-                    v_option in valid_vnf_opts and not \
-                    {'i1'}.issubset(flavor.flavor.options.keys()):
+            if {'i2'}.issubset(flavor.flavor.options.keys()):
                 name += 'i2'
 
     return name
