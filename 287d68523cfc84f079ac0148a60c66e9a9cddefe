@@ -1,0 +1,9 @@
+Code-Review+2: Hari <hosingh000@gmail.com>
+Code-Review+2: Chi Lo <cl566n@att.com>
+Workflow+1: Hari <hosingh000@gmail.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 24 Oct 2018 15:31:35 +0000
+Reviewed-on: https://review.openstack.org/607174
+Project: openstack/ranger
+Branch: refs/heads/master
