@@ -29,19 +29,19 @@ class OrmClientManager(clients.Manager):
 
     def __init__(self, credentials=None):
         super(OrmClientManager, self).__init__(credentials)
-        self.cms_client = CmsClient(base_client.OrmAuthProvider(credentials),
+        self.cms_client = CmsClient(base_client.RangerAuthProvider(credentials),
                                     CONF.identity.catalog_type,
                                     CONF.identity.region,
-                                    CONF.orm.uri)
-        self.fms_client = FmsClient(base_client.OrmAuthProvider(credentials),
+                                    CONF.ranger.uri)
+        self.fms_client = FmsClient(base_client.RangerAuthProvider(credentials),
                                     CONF.identity.catalog_type,
                                     CONF.identity.region,
-                                    CONF.orm.uri)
-        self.rms_client = RmsClient(base_client.OrmAuthProvider(credentials),
+                                    CONF.ranger.uri)
+        self.rms_client = RmsClient(base_client.RangerAuthProvider(credentials),
                                     CONF.identity.catalog_type,
                                     CONF.identity.region,
-                                    CONF.orm.uri)
-        self.ims_client = ImsClient(base_client.OrmAuthProvider(credentials),
+                                    CONF.ranger.uri)
+        self.ims_client = ImsClient(base_client.RangerAuthProvider(credentials),
                                     CONF.identity.catalog_type,
                                     CONF.identity.region,
-                                    CONF.orm.uri)
+                                    CONF.ranger.uri)

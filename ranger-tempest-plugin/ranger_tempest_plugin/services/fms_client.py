@@ -24,9 +24,9 @@ from tempest.lib.common import rest_client
 CONF = config.CONF
 
 
-class FmsClient(base_client.OrmClientBase):
+class FmsClient(base_client.RangerClientBase):
 
-    fms_url = '%s:%s' % (CONF.orm.uri, CONF.orm.fms_port)
+    fms_url = '%s:%s' % (CONF.ranger.uri, CONF.ranger.fms_port)
     version = "v1"
 
     def get_extra_headers(self):

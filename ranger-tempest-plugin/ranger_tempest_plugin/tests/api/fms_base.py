@@ -38,10 +38,10 @@ class FmsBaseOrmTest(base.BaseOrmTest):
         super(FmsBaseOrmTest, cls).setup_clients()
         cls.client = cls.os_primary.fms_client
         cls.flavors_client = cls.os_admin.flavors_client
-        cls.tenant_id = cls._get_tenant_id(
-            cls.os_primary.credentials.tenant_name)
-        cls.alt_tenant_id = cls._get_tenant_id(
-            cls.os_alt.credentials.tenant_name)
+        cls.tenant_id = cls._get_project_id(
+            cls.os_primary.credentials.project_name)
+        cls.alt_tenant_id = cls._get_project_id(
+            cls.os_alt.credentials.project_name)
 
     @classmethod
     def _get_flavor_params(cls, set_region=True, single_tenant=True):
@@ -230,12 +230,12 @@ class FmsBaseOrmTest(base.BaseOrmTest):
             raise exceptions.TempestException(message)
 
     @classmethod
-    def _get_tenant_id(cls, tenant_name):
-        body = cls.identity_client.list_tenants()
-        for tenant in body["tenants"]:
-            if(tenant["name"] == tenant_name):
-                return tenant["id"]
-        message = ('tenant %s not found on tenant list' % cls.tenant_name)
+    def _get_project_id(cls, project_name):
+        body = cls.identity_client.list_projects()
+        for project in body["projects"]:
+            if(project["name"] == project_name):
+                return project["id"]
+        message = ('project %s not found on projects list' % project_name)
         raise exceptions.TempestException(message)
 
     @classmethod

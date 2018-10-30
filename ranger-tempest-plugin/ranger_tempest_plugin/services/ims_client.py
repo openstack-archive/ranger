@@ -22,9 +22,9 @@ from tempest import config
 CONF = config.CONF
 
 
-class ImsClient(base_client.OrmClientBase):
+class ImsClient(base_client.RangerClientBase):
 
-    ims_url = '%s:%s' % (CONF.orm.uri, CONF.orm.ims_port)
+    ims_url = '%s:%s' % (CONF.ranger.uri, CONF.ranger.ims_port)
     version = "v1"
 
     def get_headers(self):

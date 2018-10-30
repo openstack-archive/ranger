@@ -304,7 +304,7 @@ class CmsBaseOrmTest(base.BaseOrmTest):
 
     @classmethod
     def _validate_customer_deletion_on_lcp(cls, customer_id):
-        body = cls.identity_client.list_tenants()["tenants"]
+        body = cls.identity_client.list_projects()["projects"]
         customer_ids = [customer["id"]
                         for customer in body
                         if customer["id"] == customer_id]
