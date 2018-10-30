@@ -36,13 +36,13 @@ class BaseOrmTest(test.BaseTestCase):
     @classmethod
     def setup_clients(cls):
         super(BaseOrmTest, cls).setup_clients()
-        cls.identity_client = cls.os_admin.tenants_client
+        cls.identity_client = cls.os_admin.projects_client
 
     @classmethod
     def skip_checks(cls):
         super(BaseOrmTest, cls).skip_checks()
-        if not CONF.service_available.orm:
-            skip_msg = ("%s skipped as orm is not available" % cls.__name__)
+        if not CONF.service_available.ranger:
+            skip_msg = ("%s skipped as ranger is not available" % cls.__name__)
             raise cls.skipException(skip_msg)
 
     def assertExpected(self, expected, actual, excluded_keys):

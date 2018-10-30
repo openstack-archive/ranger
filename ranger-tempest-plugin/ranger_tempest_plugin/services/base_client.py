@@ -22,7 +22,7 @@ from tempest.lib.common import rest_client
 CONF = config.CONF
 
 
-class OrmClientBase(rest_client.RestClient):
+class RangerClientBase(rest_client.RestClient):
 
     def get_headers(self):
         headers = {'X-Auth-Region': CONF.identity.region,
@@ -66,17 +66,18 @@ class OrmClientBase(rest_client.RestClient):
         return resp, body
 
 
-class OrmAuthProvider(auth.KeystoneV2AuthProvider):
+class RangerAuthProvider(auth.KeystoneV3AuthProvider):
 
-    def __init__(self, credentials, auth_url=CONF.identity.uri):
-        super(OrmAuthProvider, self).__init__(credentials, auth_url)
+    def __init__(self, credentials, auth_url=CONF.identity.uri_v3):
+        super(RangerAuthProvider, self).__init__(credentials, auth_url)
 
     def auth_request(self, method, url, headers=None, body=None, filters=None):
         filters = {'service': 'identity'}
-        auth_headers = super(OrmAuthProvider,
+        auth_headers = super(RangerAuthProvider,
                              self).auth_request(method,
                                                 url,
                                                 filters=filters)
+
         base_headers = auth_headers[1]
         base_headers.update(headers)
         auth_req = dict(url=url, headers=base_headers, body=body)

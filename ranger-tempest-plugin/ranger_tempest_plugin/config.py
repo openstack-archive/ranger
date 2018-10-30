@@ -22,13 +22,13 @@ service_available_group = cfg.OptGroup(
 )
 
 ServiceAvailableGroup = [
-    cfg.BoolOpt("orm", default=False,
-                help="Whether or not orm is expected to be available")
+    cfg.BoolOpt("ranger", default=False,
+                help="Whether or not ranger is expected to be available")
 ]
 
 orm_group = cfg.OptGroup(
-    name="orm",
-    title="Orm Service option"
+    name="ranger",
+    title="Ranger Service option"
 )
 
 OrmGroup = [
