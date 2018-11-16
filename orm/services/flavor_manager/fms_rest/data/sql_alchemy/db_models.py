@@ -4,6 +4,7 @@ from orm.services.flavor_manager.fms_rest.logger import get_logger
 from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
 
 from oslo_db.sqlalchemy import models
+from pecan import conf
 from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, validates
@@ -123,8 +124,10 @@ class Flavor(Base, FMSBaseModel):
 
     @validates("series")
     def validate_series(self, key, series):
-        if series not in ['ns', 'nd', 'nv', 'gv', 'ss']:
-            raise ValueError("Series must be one of: 'ns' 'nd' 'nv' 'gv' 'ss'")
+        valid_flvr_series = conf.flavor_series.valid_series
+        if series not in valid_flvr_series:
+            raise ValueError("Series must be one of {}:".format(str(valid_flvr_series)))
+
         return series
 
     def add_region(self, flavor_region):

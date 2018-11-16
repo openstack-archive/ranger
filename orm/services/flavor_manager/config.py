@@ -33,38 +33,15 @@ database = {
 
 # this table is for calculating default extra specs needed
 extra_spec_needed_table = {
-    "ns": {
-        "aggregate_instance_extra_specs____ns": "true",
+    "p1": {
+        "aggregate_instance_extra_specs____p1": "true",
         "hw____mem_page_size": "large"
-    },
-    "nd": {
-        "aggregate_instance_extra_specs____nd": "true",
-        "hw____mem_page_size": "large"
-    },
-    "nv": {
-        "aggregate_instance_extra_specs____nv": "true",
-        "hw____mem_page_size": "large"
-    },
-    "gv": {
-        "aggregate_instance_extra_specs____gv": "true",
-        "aggregate_instance_extra_specs____c2": "true"
-    },
-    "ss": {
-        "aggregate_instance_extra_specs____ss": "true"
     }
 }
 
 # any key will be added to extra_spec_needed_table need to be added here
 default_extra_spec_calculated_table = {
-    "aggregate_instance_extra_specs____ns": "",
-    "aggregate_instance_extra_specs____nd": "",
-    "aggregate_instance_extra_specs____nv": "",
-    "aggregate_instance_extra_specs____gv": "",
-    "aggregate_instance_extra_specs____c2": "",
-    "aggregate_instance_extra_specs____ss": "",
-    "aggregate_instance_extra_specs____c2": "",
-    "aggregate_instance_extra_specs____c4": "",
-    "aggregate_instance_extra_specs____v": "",
+    "aggregate_instance_extra_specs____p1": "",
     "hw____mem_page_size": "",
     "hw____cpu_policy": "",
     "hw____numa_nodes": ""
@@ -95,20 +72,20 @@ api = {
 
 }
 
+flavor_series = {
+    'valid_series': [
+        'p1'
+    ]
+}
+
 # valid_flavor_options
 flavor_options = {
-    'valid_cpin_opt_values': [
-        'c2', 'c4'
+    'valid_p1_numa_values': [
+        'n0', 'n1'
     ],
-    'valid_stor_opt_values': [
-        's1', 's2'
-    ],
-    'valid_vnf_opt_values': [
-        'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'
-    ],
-    'valid_numa_values': ['n0'],
-    'valid_nd_vnf_values': ['v8'],
-    'valid_ss_vnf_values': ['v3']
+    'valid_p1_opt_values': [
+        'n0', 'n1', 'i2'
+    ]
 }
 
 flavor_limits = {
