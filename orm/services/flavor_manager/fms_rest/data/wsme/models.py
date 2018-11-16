@@ -217,7 +217,7 @@ class Flavor(Model):
         self.vcpus = vcpus
         self.disk = disk
         self.swap = swap
-        self.ephemeral = "0" if not ephemeral else ephemeral
+        self.ephemeral = ephemeral
         self.extra_specs = extra_specs
         self.tag = tag
         self.options = options
@@ -227,14 +227,44 @@ class Flavor(Model):
         self.status = status
 
     def validate_model(self, context=None):
+
         bundle = ['b1', 'b2']
-        numa = ['n0', 'n1']
+        numa = ['n0']
         vlan = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']
-        vcpu_limit = int(conf.flavor_limits.vcpu_limit)
-        vram_limit = int(conf.flavor_limits.vram_limit)
-        swap_file_limit = int(conf.flavor_limits.swap_file_limit)
-        ephemeral_limit = int(conf.flavor_limits.ephemeral_limit)
+
+        # validate that input entries are valid
         try:
+            # flavor option values must be either 'true' or 'false' (in quotes)
+            bools = ['true', 'false']
+
+            if self.options:
+                option_values = self.options.values()
+                invalid_opt_vals = [x for x in option_values if (x.lower()
+                                    not in bools)]
+                if invalid_opt_vals:
+                    raise ErrorStatus(400, "All flavor option values must have"
+                                      " a value of 'true' or 'false'")
+
+            # validate series and set flavor limits
+            if self.series:
+                valid_flavor_series = conf.flavor_series.valid_series
+                if self.series not in valid_flavor_series:
+                    raise ErrorStatus(400, "series possible values are {}".format(
+                                      valid_flavor_series))
+
+                if self.series == 'p1':
+                    if {'n0'}.issubset(self.options.keys()) and \
+                            eval(self.options.get('n0').lower().capitalize()):
+                        vcpu_limit = int(conf.flavor_limits.p1_n0_vcpu_limit)
+                        vram_limit = int(conf.flavor_limits.p1_n0_vram_limit)
+                    else:
+                        vcpu_limit = int(conf.flavor_limits.p1_nx_vcpu_limit)
+                        vram_limit = int(conf.flavor_limits.p1_nx_vram_limit)
+
+            # determine other flavor limits
+            swap_file_limit = int(conf.flavor_limits.swap_file_limit)
+            ephemeral_limit = int(conf.flavor_limits.ephemeral_limit)
+
             isValid = validate_description(self.description)
             if not isValid:
                 raise ErrorStatus(400, "Flavor description does not allow special characters :"
@@ -247,13 +277,8 @@ class Flavor(Model):
                 raise ErrorStatus(400, "disk must be a number")
             if not self.swap.isdigit():
                 raise ErrorStatus(400, "swap must be a number")
-            if not self.ephemeral.isdigit():
+            if self.ephemeral and not self.ephemeral.isdigit():
                 raise ErrorStatus(400, "ephemeral must be a number")
-            if self.series:
-                allowed_series = conf.extra_spec_needed_table.to_dict().keys()
-                if self.series not in allowed_series:
-                    raise ErrorStatus(400, "series possible values are {}".format(
-                        allowed_series))
             if int(self.ram) not in range(1024, vram_limit + 1, 1024):
                 raise ErrorStatus(400,
                                   "ram value is out of range. Expected range is 1024(1GB)-"
@@ -264,9 +289,13 @@ class Flavor(Model):
                                   "%2d" % (vcpu_limit))
             if int(self.disk) < 0:
                 raise ErrorStatus(400, "disk cannot be less than zero")
-            if int(self.ephemeral) not in range(0, ephemeral_limit + 1):
+
+            if not self.ephemeral:
+                self.ephemeral = "0"
+            elif self.ephemeral and int(self.ephemeral) not in range(0, ephemeral_limit + 1):
                 raise ErrorStatus(400, "ephemeral value is out of range. Expected range is 0-"
                                        "%5d(%2dTB)" % (ephemeral_limit, ephemeral_limit / 1000))
+
             if int(self.swap) not in range(0, swap_file_limit + 1, 1024):
                 raise ErrorStatus(400,
                                   "swap value is out of range. Expected range is 0-"
@@ -274,6 +303,7 @@ class Flavor(Model):
                                   (swap_file_limit, swap_file_limit / 1024))
         except ValueError:
             raise ErrorStatus(400, "ram, vcpus, disk, ephemeral and swap must be integers")
+
         for symbol, value in self.extra_specs.iteritems():
             if symbol == 'bundle' and value not in bundle:
                 raise ErrorStatus(400,
@@ -321,7 +351,7 @@ class Flavor(Model):
         for symbol, value in self.options.iteritems():
             option = db_models.FlavorOption()
             option.key_name = symbol
-            option.key_value = value
+            option.key_value = value.lower()
             options.append(option)
 
         for region in self.regions:
@@ -408,10 +438,6 @@ class Flavor(Model):
         return False
 
     def get_extra_spec_needed(self):
-        valid_vnf_opts = conf.flavor_options.valid_vnf_opt_values[:]
-        valid_stor_opts = conf.flavor_options.valid_stor_opt_values[:]
-        valid_cpin_opts = conf.flavor_options.valid_cpin_opt_values[:]
-
         extra_spec_needed = []
         items = conf.extra_spec_needed_table.to_dict()
         for symbol, value in items[self.series].iteritems():
@@ -419,19 +445,11 @@ class Flavor(Model):
             es.key_name = symbol.replace("____", ":")
             es.key_value = value
 
-            # update extra_spec default values as needed
-            if self.series == "gv" and "c2" in es.key_name:
-                if "c4" in self.options and self.options['c4'].lower() == "true":
-                    es.key_name = es.key_name.replace("c2", "c4")
-            elif self.series == "ss" and "s1" in es.key_name:
-                if "s2" in self.options and self.options['s2'].lower() == "true":
-                    es.key_name = es.key_name.replace("s1", "s2")
             extra_spec_needed.append(es)
 
         options_items = self.options
         # check some keys if they exist in option add values to extra specs
-        if self.series in ('ns', 'nv', 'nd', 'ss'):
-            c2_c4_in = False
+        if self.series in 'p1':
             n0_in = False
             for symbol, value in options_items.iteritems():
                 es = db_models.FlavorExtraSpec()
@@ -443,68 +461,23 @@ class Flavor(Model):
                     es.key_value = 2
                     es.key_name = "hw:numa_nodes"
                     extra_spec_needed.append(es)
-                # format cpu pinnin extra spec as appropriate
-                elif symbol in valid_cpin_opts and options_items[symbol].lower() == "true":
-                    c2_c4_in = True
-                    extra_spec_needed.append(es)
-                # format vnf profile extra spec as appropriate
-                try:
-                    if self.series == 'ns' and symbol in valid_vnf_opts and options_items[symbol].lower() == "true":
-                        extra_spec_needed.append(es)
-                except Exception:
-                    pass
 
-            # if c4, c2 and n0 not in options keys add these values to extra specs
-            if not c2_c4_in:
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_policy"
-                es.key_value = "dedicated"
-                extra_spec_needed.append(es)
+            # add the default extra specs
+            es = db_models.FlavorExtraSpec()
+            es.key_name = "hw:cpu_policy"
+            es.key_value = "dedicated"
+            extra_spec_needed.append(es)
+
             if not n0_in:
                 es = db_models.FlavorExtraSpec()
                 es.key_value = 1
                 es.key_name = "hw:numa_nodes"
                 extra_spec_needed.append(es)
-            if {'v5', 'i1'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'i2'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_sockets"
-                es.key_value = "1"
-                extra_spec_needed.append(es)
 
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_threads"
-                es.key_value = "1"
-                extra_spec_needed.append(es)
-
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:pci_numa_custom_policy"
-                es.key_value = "ignore"
-                extra_spec_needed.append(es)
-
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_cores"
-                es.key_value = self.vcpus
-                extra_spec_needed.append(es)
-            if {'i2'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'i1'}.issubset(options_items.keys()):
+            if self.series in ['p1'] and {'i2'}.issubset(options_items.keys()):
                 es = db_models.FlavorExtraSpec()
                 es.key_name = "hw:pci_numa_affinity_policy"
                 es.key_value = "dedicated"
-                extra_spec_needed.append(es)
-            if {'up'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'tp'}.issubset(options_items.keys()) and not \
-                    {'i1'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "aggregate_instance_extra_specs:up"
-                es.key_value = "true"
-                extra_spec_needed.append(es)
-            if {'tp'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'up'}.issubset(options_items.keys()) and not \
-                    {'i1'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "aggregate_instance_extra_specs:tp"
-                es.key_value = "true"
                 extra_spec_needed.append(es)
 
         # convert the key_value to a string to avoid/fix pecan json rendering error in update extra_specs

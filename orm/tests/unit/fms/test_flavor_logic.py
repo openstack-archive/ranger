@@ -57,17 +57,16 @@ class TestFlavorLogic(FunctionalTest):
         error = 31
         injector.override_injected_dependency(
             ('rds_proxy', get_rds_proxy_mock()))
-
         res_flavor = flavor_logic.create_flavor(get_flavor_mock(), 'uuid',
                                                 'transaction')
         self.assertEqual(res_flavor.flavor.profile, 'N1')
         self.assertEqual(res_flavor.flavor.ram, '1024')
         self.assertEqual(res_flavor.flavor.vcpus, '1')
-        self.assertEqual(res_flavor.flavor.series, 'ss')
+        self.assertEqual(res_flavor.flavor.series, 'p1')
         self.assertEqual(res_flavor.flavor.id, 'g')
 
         flavor = get_flavor_mock()
-        flavor.flavor.ephemeral = ''
+        flavor.flavor.swap = '1024000'
         self.assertRaises(flavor_logic.ErrorStatus, flavor_logic.create_flavor,
                           flavor, 'uuid', 'transaction')
 
@@ -76,8 +75,8 @@ class TestFlavorLogic(FunctionalTest):
                                                 'transaction')
         self.assertEqual(res_flavor.flavor.profile, 'N1')
         self.assertEqual(res_flavor.flavor.ram, '1024')
-        self.assertEqual(res_flavor.flavor.vcpus, '1')
-        self.assertEqual(res_flavor.flavor.series, 'ss')
+        self.assertEqual(res_flavor   .flavor.vcpus, '1')
+        self.assertEqual(res_flavor.flavor.series, 'p1')
         self.assertEqual(res_flavor.flavor.id, 'g')
 
     #
@@ -720,7 +719,7 @@ def get_rds_proxy_mock():
 
 def get_flavor_mock():
     flavor_mock = FlavorWrapper()
-    flavor_mock.flavor = Flavor(ram='1024', vcpus='1', series='ss', id='g')
+    flavor_mock.flavor = Flavor(ram='1024', vcpus='1', series='p1', id='g')
     flavor_mock.flavor.profile = 'N1'
 
     return flavor_mock

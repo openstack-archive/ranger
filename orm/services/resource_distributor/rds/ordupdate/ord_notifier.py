@@ -123,10 +123,16 @@ def _notify(ord_url,
         try:
             # Added the header to support the older version of requests
             headers = {'Content-Type': 'application/json'}
-            response = requests.post('%s/v1/ord/ord_notifier' % (ord_url,),
-                                     data=json.dumps(data_to_send),
-                                     headers=headers,
-                                     cert=conf.ordupdate.cert_path)
+            if not conf.ordupdate.cert_path:
+                response = requests.post('%s/v1/ord/ord_notifier' % (ord_url,),
+                                         data=json.dumps(data_to_send),
+                                         headers=headers,
+                                         verify=conf.verify)
+            else:
+                response = requests.post('%s/v1/ord/ord_notifier' % (ord_url,),
+                                         data=json.dumps(data_to_send),
+                                         headers=headers,
+                                         cert=conf.ordupdate.cert_path)
         except requests.exceptions.SSLError:
             logger.debug('Received an SSL error (is the certificate valid?)')
             raise
