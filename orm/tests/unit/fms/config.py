@@ -55,65 +55,37 @@ database = {
     'host': 'localhost',
     'username': 'root',
     'password': 'xxxxxxxxxxx',
-    'db_name': 'orm_fms_db',
+    'db_name': 'orm',
 
+}
+
+flavor_series = {
+    'valid_series': [
+        'p1'
+    ]
 }
 
 # valid_flavor_options
 flavor_options = {
-    'valid_cpin_opt_values': [
-        'c2', 'c4'
+    'valid_p1_numa_values': [
+        'n0', 'n1'
     ],
-    'valid_stor_opt_values': [
-        's1', 's2'
-    ],
-    'valid_vnf_opt_values': [
-        'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'
-    ],
-    'valid_numa_values': ['n0'],
-    'valid_nd_vnf_values': ['v8'],
-    'valid_ss_vnf_values': ['v3']
+    'valid_p1_opt_values': [
+        'n0', 'n1', 'i2'
+    ]
 }
 
 # this table is for calculating default extra specs needed
 extra_spec_needed_table = {
-    "ns": {
-        "aggregate_instance_extra_specs____ns": "true",
+    "p1": {
+        "aggregate_instance_extra_specs____p1": "true",
         "hw____mem_page_size": "large"
-    },
-    "nd": {
-        "aggregate_instance_extra_specs____nd": "true",
-        "aggregate_instance_extra_specs____v8": "true",
-        "hw____mem_page_size": "large"
-    },
-    "nv": {
-        "aggregate_instance_extra_specs____nv": "true",
-        "hw____mem_page_size": "large"
-    },
-    "gv": {
-        "aggregate_instance_extra_specs____gv": "true",
-        "aggregate_instance_extra_specs____c2": "true"
-    },
-    "ss": {
-        "aggregate_instance_extra_specs____ss": "true",
-        "aggregate_instance_extra_specs____s1": "true",
-        "aggregate_instance_extra_specs____v3": "true"
     }
 }
 
 # any key will be added to extra_spec_needed_table need to be added here
 default_extra_spec_calculated_table = {
-    "aggregate_instance_extra_specs____ns": "",
-    "aggregate_instance_extra_specs____nd": "",
-    "aggregate_instance_extra_specs____nv": "",
-    "aggregate_instance_extra_specs____gv": "",
-    "aggregate_instance_extra_specs____ss": "",
-    "aggregate_instance_extra_specs____c2": "",
-    "aggregate_instance_extra_specs____c4": "",
-    "aggregate_instance_extra_specs____v": "",
-    "aggregate_instance_extra_specs____s1": "",
-    "aggregate_instance_extra_specs____v3": "",
-    "aggregate_instance_extra_specs____v8": "",
+    "aggregate_instance_extra_specs____p1": "",
     "hw____mem_page_size": "",
     "hw____cpu_policy": "",
     "hw____numa_nodes": ""
@@ -158,15 +130,20 @@ authentication = {
 }
 
 flavor_limits = {
-    # All flavor limits will be converted to integers, and must not
-    # have any non-numeric values.
-    # Root disk, block storage and object storage don't have limits
-    # in ORM, but may be limited via SSP
-    "vcpu_limit": "64",
-    # vram_limit is in MB and must be a multiple of 1024
-    "vram_limit": "393216",
-    # swap_file_limit is in MB and must be a multiple of 1024
-    "swap_file_limit": "393216",
-    # ephemeral_limit is in GB
-    "ephemeral_limit": "10000",
+    # All flavor limits will be converted to integers, and must not be non-numeric.
+    # Root disk, block storage and object storage don't have set limits
+    # vcpu_limit and ephemeral_limit values are in GB
+    # vram_limit and swap_file_limit values are in MB and must be a multiple of 1024
+
+    "swap_file_limit": "327680",
+    "ephemeral_limit": "2000",
+
+    # for 'p1' series:
+    # vcpu_limit and vram_limit for 'p1' series with "n0":"true" option
+    "p1_n0_vcpu_limit": "80",
+    "p1_n0_vram_limit": "327680",
+    # vcpu_limit and vram_limit for 'p1' series with  "n0":"false" option
+    "p1_nx_vcpu_limit": "40",
+    "p1_nx_vram_limit": "163840"
+
 }

@@ -13,7 +13,7 @@ create table if not exists flavor
 		name varchar(250) not null,
 		alias varchar(64) null,
 		description varchar(100) not null,
-		series enum('ns', 'nd', 'nv', 'gv', 'ss') not null,
+		series enum('p1') not null,
 		ram integer not null,
 		vcpus integer not null,
 		disk integer not null,

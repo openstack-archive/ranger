@@ -6,6 +6,7 @@ from orm.tests.unit.fms import FunctionalTest
 
 class TestWsmeModels(FunctionalTest):
     def test_flavor_wrapper_from_db_model(self):
+
         sql_flavor = db_models.Flavor()
         sql_flavor.description = 'desc'
         sql_flavor.disk = 1
@@ -25,7 +26,7 @@ class TestWsmeModels(FunctionalTest):
         sql_flavor.ram = 1
         sql_flavor.visibility = 'visibility'
         sql_flavor.vcpus = 1
-        sql_flavor.series = "gv"
+        sql_flavor.series = "p1"
         sql_flavor.swap = 1
         sql_flavor.disk = 1
         sql_flavor.name = 'name'
@@ -57,7 +58,7 @@ class TestWsmeModels(FunctionalTest):
         flavor_wrapper.flavor.swap = '1'
         flavor_wrapper.flavor.disk = '1'
         flavor_wrapper.flavor.name = 'name'
-        flavor_wrapper.flavor.series = 'ns'
+        flavor_wrapper.flavor.series = 'p1'
 
         sql_flavor = flavor_wrapper.to_db_model()
 

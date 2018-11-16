@@ -25,6 +25,7 @@ def create_flavor(flavor, flavor_uuid, transaction_id):
         if not flavor.flavor.ephemeral or flavor.flavor.ephemeral.isspace():
             flavor.flavor.ephemeral = '0'
         flavor.flavor.name = calculate_name(flavor)
+
         LOG.debug("Flavor name is [{}] ".format(flavor.flavor.name))
 
         sql_flavor = flavor.to_db_model()
@@ -44,9 +45,9 @@ def create_flavor(flavor, flavor_uuid, transaction_id):
         return ret_flavor
 
     except Exception as exp:
-        LOG.log_exception("FlavorLogic - Failed to CreateFlavor", exp)
+        LOG.log_exception("FlavorLogic - Failed to CreateFlavor", str(exp.args))
         datamanager.rollback()
-        if "Duplicate entry" in str(exp.message):
+        if "Duplicate entry" in exp.args:
             raise ConflictError(409, "Flavor {} already exists".format(flavor.flavor.name))
         raise
     finally:
@@ -217,7 +218,7 @@ def add_regions(flavor_uuid, regions, transaction_id):
     except Exception as exp:
         LOG.log_exception("FlavorLogic - Failed to add regions", exp)
         datamanager.rollback()
-        if "conflicts with persistent instance" in str(exp.message):
+        if "conflicts with persistent instance" in str(exp.args):
             raise ConflictError(409, "One or more regions already exists in Flavor")
         raise exp
     finally:
@@ -304,7 +305,7 @@ def add_tenants(flavor_uuid, tenants, transaction_id):
     except Exception as exp:
         datamanager.rollback()
         LOG.log_exception("FlavorLogic - Failed to add tenants", exp)
-        if "conflicts with persistent instance" in str(exp.message):
+        if "conflicts with persistent instance" in str(exp.args):
             raise ConflictError(409, "One or more tenants already exist")
         raise
     finally:
@@ -590,7 +591,7 @@ def add_extra_specs(flavor_id, extra_specs, transaction_id):
 
     except Exception as exp:
         datamanager.rollback()
-        if "conflicts with persistent instance" in str(exp.message):
+        if "conflicts with persistent instance" in str(exp.args):
             raise ConflictError(409, "one or all extra specs {} already exists".format(extra_specs.os_extra_specs))
         LOG.log_exception("FlavorLogic - fail to add extra spec", exp)
         raise
@@ -702,7 +703,7 @@ def add_tags(flavor_id, tags, transaction_id):
 
     except Exception as exp:
         datamanager.rollback()
-        if "conflicts with persistent instance" in str(exp.message):
+        if "conflicts with persistent instance" in str(exp.args):
             raise ConflictError(409, "one or all tags {} already exists".format(
                 tags.tags))
         LOG.log_exception("FlavorLogic - fail to add tags", exp)
@@ -849,73 +850,63 @@ def get_flavor_list_by_params(visibility, region, tenant, series, vm_type,
 
 def calculate_name(flavor):
 
-    valid_vnf_opts = conf.flavor_options.valid_vnf_opt_values[:]
-    valid_stor_opts = conf.flavor_options.valid_stor_opt_values[:]
-    valid_cpin_opts = conf.flavor_options.valid_cpin_opt_values[:]
-    valid_numa_opts = conf.flavor_options.valid_numa_values[:]
-    valid_ss_vnf_opts = conf.flavor_options.valid_ss_vnf_values[:]
+    """ calculate_name function returns the ranger flavor_name:
+    Ranger flavor name  is made up of the following components, each separated by a DOT separator:
+        - flavor series
+        - flavor attributes (cores, ram, disk, swap file, ephemeral disks)
+        - flavor options (OPTIONAL)
+
+        Following is a sample flavor name:
+        name = p1.c1r1d1s4e5.i2n0
+
+    where p1 : flavor series name of 'p1'
+          c1 : number of cores (or cpu); sample shows vcpu = 1
+          r1 : RAM value divided by units of 1024 MB; sample ram = 1024 (in MB)
+          d3 : disk value measured in units of GB; sample shows disk = 3
+          s4 : (optional)  swap disk value divided by units of 1024 MB; sample swap value = 4096 (in MB)
+          e5 : (optional)  ephemeral disk measured in units of GB - sample shows ephemeral = 5 (in GB)
+
+          Anything after the second dot separator are flavor options 'i2' and 'n0' - flavor options are OPTIONAL
+    """
+
+    valid_p1_opts = conf.flavor_options.valid_p1_opt_values[:]
 
     name = "{0}.c{1}r{2}d{3}".format(flavor.flavor.series, flavor.flavor.vcpus,
                                      int(flavor.flavor.ram) / 1024,
                                      flavor.flavor.disk)
     series = name[:2]
+
+    # validate if a flavor is assigned with incompatible or invalid flavor options
+    n0_in = True
+
+    if series in 'p1':
+        if ({'n0'}.issubset(flavor.flavor.options.keys()) and
+                flavor.flavor.options['n0'].lower() == 'false') or \
+                not ({'n0'}.issubset(flavor.flavor.options.keys())):
+            n0_in = False
+
+        if {'i2'}.issubset(flavor.flavor.options.keys()) and not n0_in:
+            raise ConflictError(409, "Flavor option i2 must be used with "
+                                "flavor option 'n0' set to 'true'")
+
+    # add swap disk info to flavor name IF provided
     swap = getattr(flavor.flavor, 'swap', 0)
     if swap and int(swap):
         name += '{}{}'.format('s', int(swap) / 1024)
 
+    # add ephemeral disk info to flavor name IF provided
     ephemeral = getattr(flavor.flavor, 'ephemeral', 0)
     if ephemeral and int(ephemeral):
         name += '{}{}'.format('e', ephemeral)
 
+    # add the valid option keys to the flavor name
     if len(flavor.flavor.options) > 0:
-        v_option = ""
-        for key in sorted(flavor.flavor.options.iterkeys()):
-            if key[0] == 'v':
-                v_option = key
-
+        for key in sorted(flavor.flavor.options):
             # only include valid option parameters in flavor name
-            if ((series == 'ns' and key[0] == 'v' and key in valid_vnf_opts) or
-                    (series == 'ss' and key[0] == 'v' and key in valid_ss_vnf_opts) or
-                    (key[0] == 'n' and key in valid_numa_opts) or
-                    (key[0] == 's' and key in valid_stor_opts) or
-                    (key[0] == 'c' and key in valid_cpin_opts)):
-
+            if series == 'p1' and key in valid_p1_opts and n0_in:
                 if name.count('.') < 2:
                     name += '.'
                 name += key
-
-        if {'i2', v_option}.issubset(flavor.flavor.options.keys()) and \
-                v_option not in valid_vnf_opts:
-            raise ConflictError(409, "Flavor i2 option must be used with one of "
-                                     "these choices %s" % str(valid_vnf_opts))
-
-        if {'i1', 'i2'}.issubset(flavor.flavor.options.keys()):
-            raise ConflictError(409, "Flavor i1 and i2 options cannot be used together")
-
-        if {'i1'}.issubset(flavor.flavor.options.keys()) and not \
-                {'v5'}.issubset(flavor.flavor.options.keys()):
-            raise ConflictError(409, "Flavor i1 option must be used with v5 option")
-
-        if {'i2', 'tp', 'up', v_option}.issubset(flavor.flavor.options.keys()) or \
-                {'i2', 'tp', 'up'}.issubset(flavor.flavor.options.keys()) or \
-                {'i2', 'up', v_option}.issubset(flavor.flavor.options.keys()) or \
-                {'i2', 'tp', v_option}.issubset(flavor.flavor.options.keys()):
-            raise ConflictError(409, "Flavor i2 option can only be used with one "
-                                     "of the following: vx, tp, or up")
-
-        if series in 'ns':
-            if {'v5', 'i1'}.issubset(flavor.flavor.options.keys()):
-                name += 'i1'
-            if {'i2', 'up'}.issubset(flavor.flavor.options.keys()) and not \
-                    {'i1'}.issubset(flavor.flavor.options.keys()):
-                name += 'upi2'
-            if {'i2', 'tp'}.issubset(flavor.flavor.options.keys()) and not \
-                    {'i1'}.issubset(flavor.flavor.options.keys()):
-                name += 'tpi2'
-            if {'i2'}.issubset(flavor.flavor.options.keys()) and \
-                    v_option in valid_vnf_opts and not \
-                    {'i1'}.issubset(flavor.flavor.options.keys()):
-                name += 'i2'
 
     return name
 
