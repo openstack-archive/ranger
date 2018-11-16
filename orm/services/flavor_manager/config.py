@@ -51,7 +51,11 @@ extra_spec_needed_table = {
     },
     "ss": {
         "aggregate_instance_extra_specs____ss": "true"
-    }
+    },
+    "p1": {
+        "aggregate_instance_extra_specs____p1": "true",
+        "hw____mem_page_size": "large"
+    },
 }
 
 # any key will be added to extra_spec_needed_table need to be added here
@@ -65,6 +69,7 @@ default_extra_spec_calculated_table = {
     "aggregate_instance_extra_specs____c2": "",
     "aggregate_instance_extra_specs____c4": "",
     "aggregate_instance_extra_specs____v": "",
+    "aggregate_instance_extra_specs____p1": "",
     "hw____mem_page_size": "",
     "hw____cpu_policy": "",
     "hw____numa_nodes": ""
@@ -106,7 +111,8 @@ flavor_options = {
     'valid_vnf_opt_values': [
         'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'
     ],
-    'valid_numa_values': ['n0'],
+    'valid_ns_numa_values': ['n0'],
+    'valid_p1_numa_values': ['n0', 'n1', 'i2'],
     'valid_nd_vnf_values': ['v8'],
     'valid_ss_vnf_values': ['v3']
 }

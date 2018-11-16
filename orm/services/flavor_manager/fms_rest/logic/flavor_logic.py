@@ -848,11 +848,11 @@ def get_flavor_list_by_params(visibility, region, tenant, series, vm_type,
 
 
 def calculate_name(flavor):
-
     valid_vnf_opts = conf.flavor_options.valid_vnf_opt_values[:]
     valid_stor_opts = conf.flavor_options.valid_stor_opt_values[:]
     valid_cpin_opts = conf.flavor_options.valid_cpin_opt_values[:]
-    valid_numa_opts = conf.flavor_options.valid_numa_values[:]
+    valid_ns_numa_opts = conf.flavor_options.valid_ns_numa_values[:]
+    valid_p1_numa_opts = conf.flavor_options.valid_p1_numa_values[:]
     valid_ss_vnf_opts = conf.flavor_options.valid_ss_vnf_values[:]
 
     name = "{0}.c{1}r{2}d{3}".format(flavor.flavor.series, flavor.flavor.vcpus,
@@ -875,8 +875,9 @@ def calculate_name(flavor):
 
             # only include valid option parameters in flavor name
             if ((series == 'ns' and key[0] == 'v' and key in valid_vnf_opts) or
+                    (series == 'p1' and key in valid_p1_numa_opts) or
                     (series == 'ss' and key[0] == 'v' and key in valid_ss_vnf_opts) or
-                    (key[0] == 'n' and key in valid_numa_opts) or
+                    (key[0] == 'n' and key in valid_ns_numa_opts) or
                     (key[0] == 's' and key in valid_stor_opts) or
                     (key[0] == 'c' and key in valid_cpin_opts)):
 

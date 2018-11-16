@@ -70,7 +70,8 @@ flavor_options = {
     'valid_vnf_opt_values': [
         'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'
     ],
-    'valid_numa_values': ['n0'],
+    'valid_ns_numa_values': ['n0'],
+    'valid_p1_numa_values': ['n0', 'n1', 'i2'],
     'valid_nd_vnf_values': ['v8'],
     'valid_ss_vnf_values': ['v3']
 }

@@ -430,7 +430,7 @@ class Flavor(Model):
 
         options_items = self.options
         # check some keys if they exist in option add values to extra specs
-        if self.series in ('ns', 'nv', 'nd', 'ss'):
+        if self.series in ('ns', 'nv', 'nd', 'ss', 'p1'):
             c2_c4_in = False
             n0_in = False
             for symbol, value in options_items.iteritems():
@@ -486,7 +486,7 @@ class Flavor(Model):
                 es.key_name = "hw:cpu_cores"
                 es.key_value = self.vcpus
                 extra_spec_needed.append(es)
-            if {'i2'}.issubset(options_items.keys()) and self.series in 'ns' and not \
+            if self.series in ['ns', 'p1'] and {'i2'}.issubset(options_items.keys()) and not \
                     {'i1'}.issubset(options_items.keys()):
                 es = db_models.FlavorExtraSpec()
                 es.key_name = "hw:pci_numa_affinity_policy"

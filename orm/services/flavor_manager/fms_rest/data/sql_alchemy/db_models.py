@@ -123,8 +123,8 @@ class Flavor(Base, FMSBaseModel):
 
     @validates("series")
     def validate_series(self, key, series):
-        if series not in ['ns', 'nd', 'nv', 'gv', 'ss']:
-            raise ValueError("Series must be one of: 'ns' 'nd' 'nv' 'gv' 'ss'")
+        if series not in ['ns', 'nd', 'nv', 'gv', 'p1', 'ss']:
+            raise ValueError("Series must be one of: 'ns' 'nd' 'nv' 'gv' 'p1' 'ss'")
         return series
 
     def add_region(self, flavor_region):
