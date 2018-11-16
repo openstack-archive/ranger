@@ -408,10 +408,6 @@ class Flavor(Model):
         return False
 
     def get_extra_spec_needed(self):
-        valid_vnf_opts = conf.flavor_options.valid_vnf_opt_values[:]
-        valid_stor_opts = conf.flavor_options.valid_stor_opt_values[:]
-        valid_cpin_opts = conf.flavor_options.valid_cpin_opt_values[:]
-
         extra_spec_needed = []
         items = conf.extra_spec_needed_table.to_dict()
         for symbol, value in items[self.series].iteritems():
@@ -419,19 +415,11 @@ class Flavor(Model):
             es.key_name = symbol.replace("____", ":")
             es.key_value = value
 
-            # update extra_spec default values as needed
-            if self.series == "gv" and "c2" in es.key_name:
-                if "c4" in self.options and self.options['c4'].lower() == "true":
-                    es.key_name = es.key_name.replace("c2", "c4")
-            elif self.series == "ss" and "s1" in es.key_name:
-                if "s2" in self.options and self.options['s2'].lower() == "true":
-                    es.key_name = es.key_name.replace("s1", "s2")
             extra_spec_needed.append(es)
 
         options_items = self.options
         # check some keys if they exist in option add values to extra specs
-        if self.series in ('ns', 'nv', 'nd', 'ss'):
-            c2_c4_in = False
+        if self.series in 'p1':
             n0_in = False
             for symbol, value in options_items.iteritems():
                 es = db_models.FlavorExtraSpec()
@@ -443,68 +431,23 @@ class Flavor(Model):
                     es.key_value = 2
                     es.key_name = "hw:numa_nodes"
                     extra_spec_needed.append(es)
-                # format cpu pinnin extra spec as appropriate
-                elif symbol in valid_cpin_opts and options_items[symbol].lower() == "true":
-                    c2_c4_in = True
-                    extra_spec_needed.append(es)
-                # format vnf profile extra spec as appropriate
-                try:
-                    if self.series == 'ns' and symbol in valid_vnf_opts and options_items[symbol].lower() == "true":
-                        extra_spec_needed.append(es)
-                except Exception:
-                    pass
 
-            # if c4, c2 and n0 not in options keys add these values to extra specs
-            if not c2_c4_in:
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_policy"
-                es.key_value = "dedicated"
-                extra_spec_needed.append(es)
+            # add the default extra specs
+            es = db_models.FlavorExtraSpec()
+            es.key_name = "hw:cpu_policy"
+            es.key_value = "dedicated"
+            extra_spec_needed.append(es)
+
             if not n0_in:
                 es = db_models.FlavorExtraSpec()
                 es.key_value = 1
                 es.key_name = "hw:numa_nodes"
                 extra_spec_needed.append(es)
-            if {'v5', 'i1'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'i2'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_sockets"
-                es.key_value = "1"
-                extra_spec_needed.append(es)
 
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_threads"
-                es.key_value = "1"
-                extra_spec_needed.append(es)
-
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:pci_numa_custom_policy"
-                es.key_value = "ignore"
-                extra_spec_needed.append(es)
-
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:cpu_cores"
-                es.key_value = self.vcpus
-                extra_spec_needed.append(es)
-            if {'i2'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'i1'}.issubset(options_items.keys()):
+            if self.series in ['p1'] and {'i2'}.issubset(options_items.keys()):
                 es = db_models.FlavorExtraSpec()
                 es.key_name = "hw:pci_numa_affinity_policy"
                 es.key_value = "dedicated"
-                extra_spec_needed.append(es)
-            if {'up'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'tp'}.issubset(options_items.keys()) and not \
-                    {'i1'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "aggregate_instance_extra_specs:up"
-                es.key_value = "true"
-                extra_spec_needed.append(es)
-            if {'tp'}.issubset(options_items.keys()) and self.series in 'ns' and not \
-                    {'up'}.issubset(options_items.keys()) and not \
-                    {'i1'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "aggregate_instance_extra_specs:tp"
-                es.key_value = "true"
                 extra_spec_needed.append(es)
 
         # convert the key_value to a string to avoid/fix pecan json rendering error in update extra_specs
