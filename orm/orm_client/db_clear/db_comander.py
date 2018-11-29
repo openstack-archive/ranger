@@ -60,7 +60,7 @@ def _build_delet_resource_status_query(resource_id, table_name):
     query = '''
         DELETE from %s
         WHERE resource_id = '%s'
-        ''' % (table_name, resource_id)
+        ''' % (table_name, resource_id)  # nosec
     return query
 
 
@@ -70,7 +70,7 @@ def _build_delete_image_metadata(resource_id, image_metadata_table,
         DELETE from %s
         WHERE  image_meta_data_id in
             (SELECT id from %s where resource_id = '%s')
-        ''' % (image_metadata_table, resource_table, resource_id)
+        ''' % (image_metadata_table, resource_table, resource_id)  # nosec
     return query
 
 
@@ -78,7 +78,7 @@ def _build_delete_resource_query(resource_id, table_col, table_name):
     query = '''
         DELETE from %s
         WHERE %s.%s = '%s'
-        ''' % (table_name, table_name, table_col, resource_id)
+        ''' % (table_name, table_name, table_col, resource_id)  # nosec
     return query
 
 
@@ -86,7 +86,7 @@ def _build_get_cms_regions_query(resource_id, table_name):
     query = '''
         select region_id from %s
         WHERE customer_id = '%s' and region_id != '-1'
-        ''' % (table_name, resource_id)
+        ''' % (table_name, resource_id)    # nosec
     return query
 
 
@@ -94,7 +94,7 @@ def _build_get_fms_regions_query(resource_id, table_name):
     query = '''
         select region_name from %s
         WHERE flavor_internal_id = '%s'
-        ''' % (table_name, resource_id)
+        ''' % (table_name, resource_id)    # nosec
     return query
 
 
@@ -102,7 +102,7 @@ def _build_get_ims_regions_query(resource_id, table_name):
     query = '''
         select region_name from %s
         WHERE image_id = '%s'
-        ''' % (table_name, resource_id)
+        ''' % (table_name, resource_id)    # nosec
     return query
 
 
@@ -110,7 +110,7 @@ def _build_get_resource_id_query(resource_id, table_col, table_name):
     query = '''
         select * from %s
         WHERE %s.%s = '%s'
-        ''' % (table_name, table_name, table_col, resource_id)
+        ''' % (table_name, table_name, table_col, resource_id)    # nosec
     return query
 
 
