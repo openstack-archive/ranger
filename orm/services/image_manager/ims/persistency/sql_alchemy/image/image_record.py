@@ -48,7 +48,7 @@ class ImageRecord(Record):
 
     def delete_image_by_id(self, id):
         try:
-            result = self.session.connection().execute("delete from image where id = '{0}'".format(id))
+            result = self.session.connection().execute("delete from image where id = '{0}'".format(id))  #nosec
             return result
 
         except Exception as exception:
@@ -95,7 +95,7 @@ class ImageRecord(Record):
             raise
 
     def get_images_status_by_uuids(self, uuid_str):
-        results = self.session.connection().execute("SELECT id, resource_id, region, status"
+        results = self.session.connection().execute("SELECT id, resource_id, region, status"  #nosec
                                                     "  FROM rds_resource_status_view WHERE resource_id IN ({})".format(uuid_str))
         img_region_dict = {}
         if results:

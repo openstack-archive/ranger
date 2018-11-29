@@ -53,7 +53,7 @@ class FlavorRecord:
 
     def delete_by_uuid(self, flavor_uuid):
         try:
-            result = self.session.connection().execute("delete from flavor where id = \"{0}\"".format(flavor_uuid))
+            result = self.session.connection().execute("delete from flavor where id = \"{0}\"".format(flavor_uuid))    #nosec
             return result
 
         except Exception as exception:
@@ -148,7 +148,7 @@ class FlavorRecord:
             raise
 
     def get_flavors_status_by_uuids(self, uuid_str):
-        results = self.session.connection().execute("SELECT id, resource_id, region, status"
+        results = self.session.connection().execute("SELECT id, resource_id, region, status"  #nosec
                                                     "  FROM rds_resource_status_view WHERE resource_id IN ({})".format(uuid_str))
 
         flvr_region_dict = {}

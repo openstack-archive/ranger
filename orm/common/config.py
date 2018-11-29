@@ -22,7 +22,7 @@ CONF = cfg.CONF
 api_opts = [
     cfg.HostAddressOpt(
         'host',
-        default='0.0.0.0',
+        default='0.0.0.0',    #nosec
         help='Ranger API server host'
     ),
     cfg.BoolOpt('ssl_verify', default=False, help='Enable HTTPS')
