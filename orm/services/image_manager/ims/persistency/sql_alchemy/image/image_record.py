@@ -9,7 +9,7 @@ LOG = get_logger(__name__)
 class ImageRecord(Record):
     def __init__(self, session):
 
-        # this model is uses only for the parameters of access mothods, not an instance of model in the database
+        # this model is uses only for the parameters of access methods, not an instance of model in the database
         self.__image = Image()
         # self.set_record_data(self.__image)
         # self.__image.clear()
@@ -48,7 +48,7 @@ class ImageRecord(Record):
 
     def delete_image_by_id(self, id):
         try:
-            result = self.session.connection().execute("delete from image where id = '{0}'".format(id))
+            result = self.session.connection().execute("delete from image where id = '{0}'".format(id))  # nosec
             return result
 
         except Exception as exception:
@@ -95,7 +95,7 @@ class ImageRecord(Record):
             raise
 
     def get_images_status_by_uuids(self, uuid_str):
-        results = self.session.connection().execute("SELECT id, resource_id, region, status"
+        results = self.session.connection().execute("SELECT id, resource_id, region, status"  # nosec
                                                     "  FROM rds_resource_status_view WHERE resource_id IN ({})".format(uuid_str))
         img_region_dict = {}
         if results:
