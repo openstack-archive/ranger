@@ -42,7 +42,7 @@ def _properties(alldata, region):
 
 def _glanceimage(alldata, region):
     return dict(
-        type="OS::Glance::Image",
+        type="OS::Glance::Image2",
         properties=_properties(alldata, region)
     )
 
