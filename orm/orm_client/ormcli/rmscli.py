@@ -362,8 +362,8 @@ def get_environment_variable(argument):
 
 def run(args):
     url_path = get_path(args)
-    host = args.orm_base_url if args.orm_base_url else config.orm_base_url
-    port = args.port if args.port else base_config.rms['port']
+    host = args.orm_base_url if args.orm_base_url else base_config.rms['base_url']
+    port = args.port if args.port else base_config.ranger_port
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
     rest_cmd, cmd_url = cmd_details(args)

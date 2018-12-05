@@ -36,6 +36,8 @@ def add_to_parser(service_sub):
                         default=get_environment_variable('password'))
     parser.add_argument('--orm-base-url', type=str, help='ORM base URL',
                         default=get_environment_variable('orm-base-url'))
+    parser.add_argument('--cms-base-url', type=str, help='CMS base URL',
+                        default=get_environment_variable('cms-base-url'))
     parser.add_argument('--tracking_id', type=str,
                         help='"X-RANGER-Tracking-Id" header')
     parser.add_argument('--port', type=int, help='port number of CMS server')
@@ -361,6 +363,7 @@ def get_token(timeout, args, host):
       }
    }
 }'''
+
     for argument in ('tenant_name', 'username', 'password', 'auth_region'):
         argument_value = getattr(args, argument, None)
         if argument_value is not None:
@@ -377,7 +380,11 @@ def get_token(timeout, args, host):
                 raise cli_common.MissingArgumentError(message)
 
     keystone_ep = cli_common.get_keystone_ep(
-        '{}:{}'.format(host, base_config.rms['port']), auth_region)
+        # '{}:{}'.format(host, base_config.rms['port']), auth_region)
+        '{}:{}'.format(host, 443), auth_region)
+
+    print 'keystone_ep : {}, auth_region = {}'.format(keystone_ep, auth_region)
+
     if keystone_ep is None:
         raise ConnectionError(
             'Failed in get_token, host: {}, region: {}'.format(host,
@@ -404,6 +411,7 @@ def get_token(timeout, args, host):
 
 def get_environment_variable(argument):
     # The rules are: all caps, underscores instead of dashes and prefixed
+
     environment_variable = 'RANGER_{}'.format(
         argument.replace('-', '_').upper())
 
@@ -411,8 +419,9 @@ def get_environment_variable(argument):
 
 
 def run(args):
-    host = args.orm_base_url if args.orm_base_url else config.orm_base_url
-    port = args.port if args.port else 7080
+    rms_url = args.orm_base_url if args.orm_base_url else base_config.rms['base_url']
+    host = args.cms_base_url if args.cms_base_url else base_config.cms['base_url']
+    port = args.port if args.port else 443
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
 
@@ -422,7 +431,7 @@ def run(args):
         auth_token = auth_region = requester = client = ''
     else:
         try:
-            auth_token = get_token(timeout, args, host)
+            auth_token = get_token(timeout, args, rms_url)
         except Exception:
             exit(1)
         auth_region = globals()['auth_region']
