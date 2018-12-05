@@ -1,3 +1,4 @@
+import ast
 import wsme
 
 from orm.common.orm_common.utils.cross_api_utils import (set_utils_conf,
@@ -254,7 +255,7 @@ class Flavor(Model):
 
                 if self.series == 'p1':
                     if {'n0'}.issubset(self.options.keys()) and \
-                            eval(self.options.get('n0').lower().capitalize()):
+                            ast.literal_eval(self.options.get('n0').lower().capitalize()):
                         vcpu_limit = int(conf.flavor_limits.p1_n0_vcpu_limit)
                         vram_limit = int(conf.flavor_limits.p1_n0_vram_limit)
                     else:

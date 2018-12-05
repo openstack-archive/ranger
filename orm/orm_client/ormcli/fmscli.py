@@ -26,9 +26,6 @@ def add_to_parser(service_sub):
     parser.add_argument('--auth-region', type=str,
                         help='Region used for authentication',
                         default=get_environment_variable('auth-region'))
-    parser.add_argument('--orm-base-url', type=str, help='ORM base URL',
-                        default=get_environment_variable('orm-base-url'))
-    parser.add_argument('--tracking_id', type=str, help='tracking id')
     parser.add_argument('--tenant-name', type=str,
                         help='Keystone user tenant name',
                         default=get_environment_variable('tenant-name'))
@@ -36,6 +33,11 @@ def add_to_parser(service_sub):
                         default=get_environment_variable('username'))
     parser.add_argument('--password', type=str, help='Keystone user password',
                         default=get_environment_variable('password'))
+    parser.add_argument('--rms-base-url', type=str, help='RMS base URL',
+                        default=get_environment_variable('rms-base-url'))
+    parser.add_argument('--fms-base-url', type=str, help='FMS base URL',
+                        default=get_environment_variable('fms-base-url'))
+    parser.add_argument('--tracking_id', type=str, help='tracking id')
     parser.add_argument('--port', type=int, help='port number of FMS server')
     parser.add_argument('--timeout', type=int,
                         help='request timeout in seconds (default: 10)')
@@ -334,8 +336,7 @@ def get_token(timeout, args, host):
                 print message
                 raise cli_common.MissingArgumentError(message)
 
-    keystone_ep = cli_common.get_keystone_ep(
-        '{}:{}'.format(host, base_config.rms['port']), auth_region)
+    keystone_ep = cli_common.get_keystone_ep('{}'.format(host), auth_region)
     if keystone_ep is None:
         raise ConnectionError(
             'Failed in get_token, host: {}, region: {}'.format(host,
@@ -369,18 +370,19 @@ def get_environment_variable(argument):
 
 
 def run(args):
-    host = args.orm_base_url if args.orm_base_url else config.orm_base_url
-    port = args.port if args.port else 8082
+    rms_url = args.rms_base_url if args.rms_base_url else base_config.rms['base_url']
+    host = args.fms_base_url if args.fms_base_url else base_config.fms['base_url']
+    port = args.port if args.port else base_config.fms['port']
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
 
     rest_cmd, cmd_url = cmd_details(args)
-    url = '%s:%d/v1/orm/flavors' % (host, port,) + cmd_url
+    url = '%s/v1/orm/flavors' % (host) + cmd_url
     if args.faceless:
         auth_token = auth_region = requester = client = ''
     else:
         try:
-            auth_token = get_token(timeout, args, host)
+            auth_token = get_token(timeout, args, rms_url)
         except Exception:
             exit(1)
         auth_region = globals()['auth_region']
