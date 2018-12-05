@@ -1,0 +1,69 @@
+FROM ubuntu:16.04
+
+#ubuntu environment variables
+ENV DEBIAN_FRONTEND noninteractive
+ENV container docker
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
+# define and pass application environment variables
+ARG RANGER_USERNAME 
+ARG RANGER_PASSWORD
+ARG RANGER_TENANT_NAME
+ARG RANGER_ORM_BASE_URL
+ARG RANGER_AUTH_REGION
+
+ENV RANGER_USERNAME ${RANGER_USERNAME:-ranger}
+ENV RANGER_PASSWORD ${RANGER_USERNAME:-password}
+ENV RANGER_TENANT_NAME ${RANGER_USERNAME:-admin}
+ENV RANGER_ORM_BASE_URL ${RANGER_ORM_BASE_URL:-http://127.0.0.1}
+ENV RANGER_AUTH_REGION ${RANGER_AUTH_REGION:-RegionOne}
+
+# install needed components
+RUN apt -qq update && \
+apt -y install git \
+netcat \
+netbase \
+openssh-server \
+python-minimal \
+python-setuptools \
+python-pip \
+python-dev \
+python-dateutil \
+ca-certificates \
+openstack-pkg-tools \
+gcc \
+g++ \
+libffi-dev \
+libssl-dev --no-install-recommends \
+libmysqlclient-dev \
+&& apt-get clean \
+&& rm -rf \
+     /var/lib/apt/lists/* \
+     /tmp/* \
+     /var/tmp/* \
+     /usr/share/man \
+     /usr/share/doc \
+     /usr/share/doc-base
+
+RUN pip install wheel
+
+COPY . /tmp/ranger
+
+WORKDIR /tmp/ranger
+
+RUN pip install --default-timeout=100 -r requirements.txt
+
+RUN python setup.py install
+
+# Create user ranger
+RUN useradd -u 1000 -ms /bin/bash ranger
+
+# Change permissions
+RUN  mv /tmp/ranger/orm/orm_client /home/ranger/ \
+    && rm -rf /tmp/* \
+    && chown -R ranger: /home/ranger/orm_client
+
+# Set work directory
+USER ranger
+WORKDIR /home/ranger/orm_client/ormcli
