@@ -223,7 +223,7 @@ class RmsTests(TestCase):
         cli = ormcli.Cli()
         cli.create_parser()
         cli.parse(
-            'orm rms --faceless --orm-base-url 12.11.10.9 --port 8832'
+            'orm rms --faceless --rms-base-url 12.11.10.9 --port 8832'
             ' --timeout 150 get_region zoneone'.split())
         resp = self.respond(
             {

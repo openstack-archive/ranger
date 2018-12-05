@@ -64,15 +64,15 @@ api = {
         'trans': 'v1/audit/transaction'
     },
     'fms_server': {
-        'base': config.fms['base_url'],
+        'base': config.fms['fms_url'],
         'flavors': 'v1/orm/flavors'
     },
     'cms_server': {
-        'base': config.cms['base_url'],
+        'base': config.cms['cms_url'],
         'customers': 'v1/orm/customers'
     },
     'ims_server': {
-        'base': config.ims['base_url'],
+        'base': config.ims['ims_url'],
         'images': 'v1/orm/images'
     }
 }
