@@ -40,23 +40,23 @@ audit = {
 }
 
 cms = {
-    'base_url': config.cms['base_url'],
+    'base_url': config.cms['cms_url'],
     'delete_region': 'v1/orm/customers/{0}/regions/{1}'
 }
 
 fms = {
-    'base_url': config.fms['base_url'],
+    'base_url': config.fms['fms_url'],
     'delete_region': 'v1/orm/flavors/{0}/regions/{1}'
 }
 
 ims = {
-    'base_url': config.ims['base_url'],
+    'base_url': config.ims['ims_url'],
     'metadata_path': 'v1/orm/images/{0}/regions/{1}/metadata',
     'delete_region': 'v1/orm/images/{0}/regions/{1}'
 }
 
 rms = {
-    'base_url': config.rms['base_url'],
+    'base_url': config.rms['rms_url'],
     'all_regions_path': 'v2/orm/regions'
 }
 

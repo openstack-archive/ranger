@@ -30,7 +30,7 @@ database = {
 }
 
 
-application_root = config.ims['base_url']
+application_root = 'http://localhost:{0}'.format(server['port'])
 
 api = {
     'uuid_server': {
