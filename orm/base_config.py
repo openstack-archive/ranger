@@ -40,6 +40,9 @@ OrmOpts = [
     cfg.StrOpt('ranger_agent_client_cert_path',
                default='',
                help='Ranger Agent certificate path.'),
+    cfg.PortOpt('ranger_port',
+                default=443,
+                help='orm service port.'),
     cfg.StrOpt('log_location',
                default='/var/log/ranger',
                help='Orm log directory.'),
@@ -133,7 +136,10 @@ OrmCmsGroup = [
                 help='Cms port.'),
     cfg.StrOpt('log',
                default='cms.log',
-               help='Cms log name.')
+               help='Cms log name.'),
+    cfg.URIOpt('service_url',
+               default='http://127.0.0.1',
+               help='CMS service URL.')
 ]
 
 CONF.register_group(orm_cms_group)
@@ -149,7 +155,10 @@ OrmFmsGroup = [
                 help='Fms port.'),
     cfg.StrOpt('log',
                default='fms.log',
-               help='Fms log name.')
+               help='Fms log name.'),
+    cfg.URIOpt('service_url',
+               default='http://127.0.0.1',
+               help='FMS service URL.')
 ]
 
 CONF.register_group(orm_fms_group)
@@ -181,7 +190,10 @@ OrmImsGroup = [
                 help='Ims port.'),
     cfg.StrOpt('log',
                default='ims.log',
-               help='Ims log name.')
+               help='Ims log name.'),
+    cfg.URIOpt('service_url',
+               default='http://127.0.0.1',
+               help='IMS service URL.')
 ]
 
 CONF.register_group(orm_ims_group)
@@ -189,7 +201,6 @@ CONF.register_opts(OrmImsGroup, orm_ims_group)
 
 
 #  rms config options in [rms] group
-# old 7003
 orm_rms_group = cfg.OptGroup(name='rms', title='Orm Rms Options')
 
 OrmRmsGroup = [
@@ -198,7 +209,10 @@ OrmRmsGroup = [
                 help='Rms port.'),
     cfg.StrOpt('log',
                default='rms.log',
-               help='Rms log name.')
+               help='Rms log name.'),
+    cfg.URIOpt('service_url',
+               default='http://127.0.0.1',
+               help='RMS service URL.')
 ]
 
 CONF.register_group(orm_rms_group)
@@ -257,7 +271,8 @@ handler_list = CONF.use_handlers.split(",")
 # ranger settings
 protocol = CONF.protocol
 orm_host = CONF.orm_host
-ranger_url = CONF.ranger_url
+ranger_port = CONF.ranger_port
+# ranger_url = CONF.ranger_url
 ranger_base = CONF.ranger_base
 user_domain_name = CONF.keystone_authtoken.user_domain_name
 project_domain_name = CONF.keystone_authtoken.project_domain_name
@@ -275,14 +290,14 @@ uuid = {'port': CONF.uuid.port,
                     format(protocol, orm_host, CONF.uuid.port),
         'log': '{}/{}'.format(CONF.log_location, CONF.uuid.log)}
 
-cms = {'port': CONF.cms.port,
-       'base_url': '{}://{}:{}/'.format(protocol, orm_host, CONF.cms.port),
+cms = {'base_url': CONF.cms.service_url,
+       'port': ranger_port,
        'policy_file': CONF.ranger_base +
        '/orm/services/customer_manager/cms_rest/etc/policy.json',
        'log': '{}/{}'.format(CONF.log_location, CONF.cms.log)}
 
-fms = {'port': CONF.fms.port,
-       'base_url': '{}://{}:{}/'.format(protocol, orm_host, CONF.fms.port),
+fms = {'base_url': CONF.fms.service_url,
+       'port': ranger_port,
        'policy_file': CONF.ranger_base +
        '/orm/services/flavor_manager/fms_rest/etc/policy.json',
        'log': '{}/{}'.format(CONF.log_location, CONF.fms.log)}
@@ -292,15 +307,15 @@ audit_server = {'port': CONF.audit.port,
                             .format(protocol, orm_host, CONF.audit.port),
                 'log': '{}/{}'.format(CONF.log_location, CONF.audit.log)}
 
-ims = {'port': CONF.ims.port,
-       'base_url': '{}://{}:{}/'.format(protocol, orm_host, CONF.ims.port),
+ims = {'base_url': CONF.ims.service_url,
+       'port': ranger_port,
        'policy_file': CONF.ranger_base +
        '/orm/services/image_manager/ims/etc/policy.json',
        'log': '{}/{}'.format(CONF.log_location, CONF.ims.log)}
 
 # Had to remove trailing slash from port number in base_url so rms would work.
-rms = {'port': CONF.rms.port,
-       'base_url': '{}://{}:{}'.format(protocol, orm_host, CONF.rms.port),
+rms = {'base_url': CONF.rms.service_url,
+       'port': ranger_port,
        'policy_file': CONF.ranger_base +
        '/orm/services/region_manager/rms/etc/policy.json',
        'log': '{}/{}'.format(CONF.log_location, CONF.rms.log)}
