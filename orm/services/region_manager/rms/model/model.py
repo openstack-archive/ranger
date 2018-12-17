@@ -1,7 +1,9 @@
 """model module."""
+from orm.services.region_manager.rms.logger import get_logger
 from orm.services.region_manager.rms.services import error_base
-
 from pecan import conf
+
+logger = get_logger(__name__)
 
 
 class Address(object):
@@ -123,8 +125,9 @@ class RegionData(object):
                             "type {}".format(endpoint.type))
             try:
                 endpoints_types_must_have.remove(endpoint.type)
-            except Exception:
-                pass
+            except Exception as exp:
+                # pass
+                logger.debug(exp)
         if len(endpoints_types_must_have) > 0:
             raise error_base.InputValueError(
                 message="Invalid endpoints. Endpoint type '{}' "

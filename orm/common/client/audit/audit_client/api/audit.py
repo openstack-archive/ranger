@@ -169,13 +169,13 @@ def _post_data(data):
     # Validate that the configuration was initialized
     _validate()
     # Send the data
-    req = urllib2.Request(config['AUDIT_SERVER_URL'])
+    req = urllib2.Request(config['AUDIT_SERVER_URL'])    # nosec
     req.add_header('Content-Type', 'application/json')
     # Retry to send the data to the audit server
     success = False
     for retry_number in range(config['NUM_OF_SEND_RETRIES']):
         try:
-            urllib2.urlopen(req, json.dumps(data))
+            urllib2.urlopen(req, json.dumps(data))    # nosec
             success = True
             break
         except Exception as error:
@@ -197,13 +197,13 @@ def _get_data(query):
     # Send the data
     audit_server_url_with_query = "{}?{}".format(config['AUDIT_SERVER_URL'],
                                                  query)
-    req = urllib2.Request(audit_server_url_with_query)
+    req = urllib2.Request(audit_server_url_with_query)    # nosec
     # Retry to get the data from the audit server
     success = False
     response = None
     for retry_number in range(config['NUM_OF_SEND_RETRIES']):
         try:
-            response = urllib2.urlopen(req)
+            response = urllib2.urlopen(req)    # nosec
             success = True
             break
         except Exception as error:
