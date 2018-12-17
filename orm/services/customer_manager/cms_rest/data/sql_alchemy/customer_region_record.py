@@ -67,8 +67,8 @@ class CustomerRegionRecord:
             raise ValueError(
                 'region with the region name {0} not found'.format(
                     region_name))
-        result = self.session.connection().execute(
-            "delete from customer_region where customer_id = {} and region_id = {}".format(customer_id, region_id))  # nosec
+        cmd = 'DELETE FROM customer_region WHERE customer_id = %s AND region_id = %s'
+        result = self.session.connection().execute(cmd, (customer_id, region_id))
         self.session.flush()
 
         if result.rowcount == 0:
@@ -85,7 +85,7 @@ class CustomerRegionRecord:
             customer_record = CustomerRecord(self.session)
             customer_id = customer_record.get_customer_id_from_uuid(customer_id)
 
-        result = self.session.connection().execute(
-            "delete from customer_region where customer_id = {} and region_id <> -1 ".format(customer_id))  # nosec
+        cmd = 'DELETE FROM customer_region WHERE customer_id = %s AND region_id <> -1'
+        result = self.session.connection().execute(cmd, (customer_id,))
         # print "num records deleted from customer regions: " + str(result.rowcount)
         return result
