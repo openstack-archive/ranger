@@ -37,7 +37,8 @@ class RegionRecord:
             raise
 
     def get_region_id_from_name(self, region_name):
-        result = self.session.connection().scalar("SELECT id from cms_region WHERE name = \"{}\"".format(region_name))  # nosec
+        cmd = 'SELECT id FROM cms_region WHERE name = %s'
+        result = self.session.connection().scalar(cmd, (region_name,))
         if result is not None:
             return int(result)
         return result

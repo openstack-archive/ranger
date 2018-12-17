@@ -42,7 +42,8 @@ class CustomerRecord:
             raise
 
     def delete_by_primary_key(self, customer_id):
-        result = self.session.connection().execute("delete from customer where id = {}".format(customer_id))    # nosec
+        cmd = 'DELETE FROM customer WHERE id = %s'
+        result = self.session.connection().execute(cmd, (customer_id,))
         return result
 
     def read_by_primary_key(self):
@@ -69,7 +70,8 @@ class CustomerRecord:
             raise
 
     def get_customer_id_from_uuid(self, uuid):
-        result = self.session.connection().scalar("SELECT id from customer WHERE uuid = \"{}\"".format(uuid))  # nosec
+        cmd = 'SELECT id FROM customer WHERE uuid = %s'
+        result = self.session.connection().scalar(cmd, (uuid,))
 
         if result:
             return int(result)
@@ -77,8 +79,9 @@ class CustomerRecord:
             return None
 
     def get_customers_status_by_uuids(self, uuid_str):
-        results = self.session.connection().execute("SELECT id, resource_id, region, status"  # nosec
-                                                    "  FROM rds_resource_status_view WHERE resource_id IN ({})".format(uuid_str))
+        cmd = ('SELECT id, resource_id, region, status FROM '
+               'rds_resource_status_view WHERE resource IN %s')
+        results = self.session.connection().execute(cmd, (uuid_str,))
         cust_region_dict = {}
         if results:
             resource_status_dict = dict((id, (resource_id, region, status)) for id, resource_id, region, status in results)
