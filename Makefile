@@ -13,20 +13,29 @@
 # limitations under the License.
 
 DOCKER_REGISTRY            ?= quay.io
-IMAGE_NAME                 ?= ranger
+IMAGE_NAME                 := ranger rangercli
 IMAGE_PREFIX               ?= attcomdev
 IMAGE_TAG                  ?= ocata
 HELM                       ?= helm
 LABEL                      ?= commit-id
 PROXY                      ?= http://proxy.foo.com:8000
 NO_PROXY                   ?= localhost,127.0.0.1,.svc.cluster.local
-USE_PROXY                  ?= false
+USE_PROXY                  ?= true
 
 IMAGE := ${DOCKER_REGISTRY}/${IMAGE_PREFIX}/${IMAGE_NAME}:${IMAGE_TAG}
+IMAGE_DIR:=images/$(IMAGE_NAME)
 
 # Build ranger Docker image for this project
 .PHONY: images
+#Build all images in the list
+images: $(IMAGE_NAME)
+#sudo make images will build and run ranger and rangercli
 images: build_$(IMAGE_NAME)
+ $(IMAGE_NAME):
+	@echo
+	@echo "===== Processing [$@] image ====="
+	@make build_$@ IMAGE=${DOCKER_REGISTRY}/${IMAGE_PREFIX}/$@:${IMAGE_TAG} IMAGE_DIR=images/$@ IMAGE_NAME=$@
+# @make run IMAGE=${DOCKER_REGISTRY}/${IMAGE_PREFIX}/$@:${IMAGE_TAG} SCRIPT=./tools/$@_image_run.sh
 
 # Create tgz of the chart
 .PHONY: charts
@@ -44,11 +53,11 @@ dry-run: clean
 	tools/helm_tk.sh $(HELM)
 
 # Make targets intended for use by the primary targets above.
-.PHONY: build_$(IMAGE_NAME)
-build_$(IMAGE_NAME):
+.PHONY: build_ranger
+build_ranger:
 
 ifeq ($(USE_PROXY), true)
-	docker build --network host -t $(IMAGE) --label $(LABEL) -f Dockerfile \
+	docker build --network host -t $(IMAGE) --label $(LABEL) -f $(IMAGE_DIR)/Dockerfile \
 		--build-arg http_proxy=$(PROXY) \
 		--build-arg https_proxy=$(PROXY) \
 		--build-arg HTTP_PROXY=$(PROXY) \
@@ -56,8 +65,24 @@ ifeq ($(USE_PROXY), true)
 		--build-arg no_proxy=$(NO_PROXY) \
 		--build-arg NO_PROXY=$(NO_PROXY) .
 else
-	docker build --network host -t $(IMAGE) --label $(LABEL) -f Dockerfile .
+	docker build --network host -t $(IMAGE) --label $(LABEL) -f $(IMAGE_DIR)/Dockerfile .
 endif
+
+.PHONY: build_rangercli
+build_rangercli:
+
+ifeq ($(USE_PROXY), true)
+	docker build --network host -t $(IMAGE) --label $(LABEL) -f $(IMAGE_DIR)/Dockerfile \
+		--build-arg http_proxy=$(PROXY) \
+		--build-arg https_proxy=$(PROXY) \
+		--build-arg HTTP_PROXY=$(PROXY) \
+		--build-arg HTTPS_PROXY=$(PROXY) \
+		--build-arg no_proxy=$(NO_PROXY) \
+		--build-arg NO_PROXY=$(NO_PROXY) .
+else
+	docker build --network host -t $(IMAGE) --label $(LABEL) -f $(IMAGE_DIR)/Dockerfile .
+endif
+
 
 .PHONY: clean
 clean:
@@ -66,7 +91,7 @@ clean:
 
 .PHONY: pep8
 pep8:
-	tox -e pep8
+	cd /home/ranger/ranger; tox -e pep8
 
 .PHONY: helm_lint
 helm_lint: clean
