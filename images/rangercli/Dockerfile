@@ -32,6 +32,8 @@ python-dev \
 python-dateutil \
 ca-certificates \
 openstack-pkg-tools \
+vim \
+curl \
 gcc \
 g++ \
 libffi-dev \
