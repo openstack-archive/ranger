@@ -79,7 +79,7 @@
 tests:
 
 # (optional) list skipped test IDs here, eg '[B101, B406]':
-skips: [B101, B404, B603, B606]
+skips: [B101, B404, B603, B606, B608]
 
 # globs of files which should be analyzed
 include:
