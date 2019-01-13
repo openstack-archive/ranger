@@ -38,7 +38,9 @@ class CmsUserRecord:
             raise
 
     def get_cms_user_id_from_name(self, cms_user_name):
-        result = self.session.connection().scalar("SELECT id from cms_user WHERE name = \"%s\"", (cms_user_name,))
+        cmd = "SELECT id from cms_user WHERE name = %s"
+        result = self.session.connection().scalar(cmd, (cms_user_name,))
+
         if result is not None:
             return int(result)
         return result
