@@ -66,7 +66,7 @@ class UserRoleRecord:
             elif region_id > -1:
                 user_check = '''
                     SELECT DISTINCT user_id from user_role
-                    WHERE customer_id =%d AND region_id =%d AND user_id =%d"
+                    WHERE customer_id =%d AND region_id =%d AND user_id =%d
                     ''' % (customer_id, region_id, user_id)  # nosec
 
                 result = self.session.connection().execute(user_check)
