@@ -43,19 +43,20 @@ RUN pip install --default-timeout=100 -r requirements.txt
 
 RUN python setup.py install
 
-# Create user ranger
-RUN useradd -u 1000 -ms /bin/bash ranger
+ARG user
+
+# Create user for ranger
+RUN useradd -u 1000 -ms /bin/false ${user:-ranger}
 
 # Change permissions
 RUN  mkdir -p /etc/ranger \
     && mkdir /var/log/ranger \
-    && mkdir -p /opt/app \
-    && mkdir /home/ranger/git_repo \
-    && chown -R ranger: /var/log/ranger \
-    && mv /tmp/ranger /home/ranger/ranger \
-    && chown -R ranger: /home/ranger \
-    && chown -R ranger: /etc/ranger
+   && mkdir /home/${user:-ranger}/git_repo \
+    && chown -R ${user:-ranger}: /var/log/ranger \
+    && mv /tmp/ranger /home/${user:-ranger}/ranger \
+    && chown -R ${user:-ranger}: /home/${user:-ranger} \
+    && chown -R ${user:-ranger}: /etc/ranger
 
 # Set work directory
-USER ranger
-WORKDIR /home/ranger
+USER ${user:-ranger}
+WORKDIR /home/${user:-ranger}
