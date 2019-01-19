@@ -161,7 +161,7 @@ def add_to_parser(service_sub):
 
     h1, h2 = ('[<"X-RANGER-Client" header>]',
               '[--visibility <public|private>] [--region <name>] [--tenant '
-              '<id>] [--series {gv,nv,ns,nd,ss}] [--alias <alias>] '
+              '<id>] [--series {p1}] [--alias <alias>] '
               '[--starts_with <name>] [--contains <name>] '
               '[--vm_type <vm_type>] [--vnf_name <vnf_name>]')
     parser_list_flavor = subparsers.add_parser('list_flavors',
@@ -176,7 +176,7 @@ def add_to_parser(service_sub):
     parser_list_flavor.add_argument('--contains', type=str,
                                     help='* contains in flavor name')
     parser_list_flavor.add_argument('--series', type=str,
-                                    choices=['gv', 'nv', 'ns', 'nd', 'ss'])
+                                    choices=['p1'])
     parser_list_flavor.add_argument('--alias', type=str, help='flavor alias')
     parser_list_flavor.add_argument('--vm_type', type=str, help='vm type')
     parser_list_flavor.add_argument('--vnf_name', type=str, help='vnf name')
