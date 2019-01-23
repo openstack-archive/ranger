@@ -30,6 +30,7 @@ cover/
 nosetests.xml
 .testrepository
 .venv
+.env
 .idea/
 .stestr/
 

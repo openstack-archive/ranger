@@ -12,7 +12,11 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import os
+from os.path import join
 from oslo_config import cfg
+
+from ConfigParser import ConfigParser
 
 
 CONF = cfg.CONF
@@ -140,6 +144,22 @@ OrmCmsGroup = [
 CONF.register_group(orm_cms_group)
 CONF.register_opts(OrmCmsGroup, orm_cms_group)
 
+config = ConfigParser()
+
+#for k, v in CONF.iteritems():
+#    print("{:<20}={:<20}".format(k, v))
+
+for k, v in os.environ.items():
+    print("{:<20}={:<20}".format(k, v))
+
+if CONF.config_file:
+    cfgfile = CONF.config_file[0]
+else:
+    workspace = os.environ['WORKSPACE']
+    cfgfile = join(workspace, 'etc', 'ranger', 'ranger.conf')
+
+config.read(cfgfile)
+default_flavor = 'xx'
 
 #  fms config options in [fms] group
 orm_fms_group = cfg.OptGroup(name='fms', title='Orm Fms Options')
@@ -150,12 +170,62 @@ OrmFmsGroup = [
                 help='Fms port.'),
     cfg.StrOpt('log',
                default='fms.log',
-               help='Fms log name.')
+               help='Fms log name.'),
+    cfg.ListOpt('flavor_series',
+                default=[default_flavor],
+                help='Supported flavor series.'),
+    cfg.IntOpt('flavor_swap_file_limit',
+               default=0,
+               help='Flavor series swap file size limit.'),
+    cfg.IntOpt('flavor_ephemeral_limit',
+               default=0,
+               help='Flavor series ephemeral limit.')
 ]
 
 CONF.register_group(orm_fms_group)
 CONF.register_opts(OrmFmsGroup, orm_fms_group)
 
+autogen_es = set()
+
+flavor_group = cfg.OptGroup(name='flavor_series_metadata',
+                            title='A Group of Flavor Series')
+CONF.register_group(flavor_group)
+
+
+if default_flavor in CONF.fms.flavor_series:
+    default_dict = {'alt_vcpu_limit': 1, 'alt_vram_limit': 1024}
+
+    FlavorGroup = [
+        cfg.DictOpt(default_flavor,
+                    default=default_dict,
+                    help="Dict that contains default flavor series metadata.")
+    ]
+    CONF.register_opts(FlavorGroup, flavor_group)
+else:
+    sections = config.sections()
+    series_metadata = [s for s in sections if "_flavor_series_metadata" in s]
+    for metadata in series_metadata:
+        flavor = metadata.replace('_flavor_series_metadata', '')
+        flavor_dict = dict(set(config.items(metadata)) -
+                           set(config.items('DEFAULT')))
+
+        FlavorGroup = [
+            cfg.DictOpt(flavor,
+                        default=flavor_dict,
+                        help="Dict that contains flavor series metadata. ")
+        ]
+        CONF.register_opts(FlavorGroup, flavor_group)
+
+        for key, value in flavor_dict.items():
+            if key.startswith("es_"):
+                autogen_es.add(value.split(': ')[0])
+
+AutogenEsGroup = [
+    cfg.ListOpt('autogen_extra_specs',
+                default=list(autogen_es),
+                help="List of auto generated extra specs.")
+]
+CONF.register_opts(AutogenEsGroup, flavor_group)
 
 #  audit config options in [audit] group
 orm_audit_group = cfg.OptGroup(name='audit', title='Orm Audit Options')
@@ -266,7 +336,8 @@ conn = CONF.database.connection
 db_connect = conn.replace("mysql+pymysql", "mysql") if conn else None
 
 ssl_verify = CONF.ssl_verify
-token_auth_version = '3' if (CONF.keystone_authtoken.auth_version == 'v3') else '2.0'
+token_auth_version = '3' if (CONF.keystone_authtoken.auth_version ==
+                             'v3') else '2.0'
 
 cert_path = CONF.ranger_agent_client_cert_path
 https_enabled = CONF.ranger_agent_https_enabled
@@ -333,7 +404,8 @@ def server_request_auth(server_name):
     # authentication settings
     request_authentication = {
         "enabled": CONF.keystone_authtoken.auth_enabled,
-        # The Keystone version currently in use. For Ranger, use '3' by default.
+        # The Keystone version currently in use. For Ranger,
+        # use '3' by default.
         "keystone_version": token_auth_version,
         "mech_id": CONF.keystone_authtoken.username,
         "mech_pass": CONF.keystone_authtoken.password,
@@ -353,8 +425,9 @@ def server_request_auth(server_name):
 
 def get_log_config(log_file_name, ranger_service, ranger_service_module):
 
-    # Ranger logging template - we want to have the option of not routing to logfiles
-    # for all loggers except 'pecan' and 'py.warnings', which only logs to console
+    # Ranger logging template - we want to have the option of not
+    # routing to logfiles for all loggers except 'pecan' and
+    # 'py.warnings', which only logs to console
     logging_template = {
         'root': {'level': 'INFO', 'handlers': handler_list},
         'loggers': {
@@ -405,8 +478,9 @@ def get_log_config(log_file_name, ranger_service, ranger_service_module):
             },
             'color': {
                 '()': 'pecan.log.ColorFormatter',
-                'format': ('%(asctime)s [%(padded_color_levelname)s] [%(name)s]'
-                           '[%(threadName)s] %(message)s'),
+                'format': (
+                    '%(asctime)s [%(padded_color_levelname)s] [%(name)s]'
+                    '[%(threadName)s] %(message)s'),
                 '__force_dict__': True
             }
         }
