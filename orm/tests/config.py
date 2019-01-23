@@ -25,8 +25,16 @@ app = {
 logging = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'loggers': {
-        'fms_rest': {'level': 'DEBUG', 'handlers': ['console'], 'propagate': False},
-        'pecan': {'level': 'DEBUG', 'handlers': ['console'], 'propagate': False},
+        'fms_rest': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False
+        },
+        'pecan': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False
+        },
         'py.warnings': {'handlers': ['console']},
         '__force_dict__': True
     },
@@ -59,50 +67,11 @@ database = {
 
 }
 
-# this table is for calculating default extra specs needed
-extra_spec_needed_table = {
-    "ns": {
-        "aggregate_instance_extra_specs____ns": "true",
-        "hw____mem_page_size": "large"
-    },
-    "nd": {
-        "aggregate_instance_extra_specs____nd": "true",
-        "hw____mem_page_size": "large"
-    },
-    "nv": {
-        "aggregate_instance_extra_specs____nv": "true",
-        "hw____mem_page_size": "large"
-    },
-    "gv": {
-        "aggregate_instance_extra_specs____gv": "true",
-        "aggregate_instance_extra_specs____c2": "true",
-        "hw____numa_nodes": "2"
-    },
-    "ss": {
-        "aggregate_instance_extra_specs____ss": "true"
-    }
-}
-
-# any key will be added to extra_spec_needed_table need to be added here
-default_extra_spec_calculated_table = {
-    "aggregate_instance_extra_specs____ns": "",
-    "aggregate_instance_extra_specs____nd": "",
-    "aggregate_instance_extra_specs____nv": "",
-    "aggregate_instance_extra_specs____gv": "",
-    "aggregate_instance_extra_specs____c2": "",
-    "aggregate_instance_extra_specs____ss": "",
-    "aggregate_instance_extra_specs____c2": "",
-    "aggregate_instance_extra_specs____c4": "",
-    "aggregate_instance_extra_specs____v": "",
-    "hw____mem_page_size": "",
-    "hw____cpu_policy": "",
-    "hw____numa_nodes": ""
-}
-
-database['connection_string'] = 'mysql://{0}:{1}@{2}:3306/{3}'.format(database['username'],
-                                                                      database['password'],
-                                                                      database['host'],
-                                                                      database['db_name'])
+database['connection_string'] = 'mysql://{0}:{1}@{2}:3306/{3}'.format(
+    database['username'],
+    database['password'],
+    database['host'],
+    database['db_name'])
 
 application_root = 'http://localhost:{0}'.format(server['port'])
 
