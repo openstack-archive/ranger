@@ -2,6 +2,7 @@ from orm.services.flavor_manager.fms_rest.data.sql_alchemy import db_models
 from orm.services.flavor_manager.fms_rest.data.wsme import models
 
 from orm.tests.unit.fms import FunctionalTest
+from oslo_config import cfg
 
 
 class TestWsmeModels(FunctionalTest):
@@ -11,8 +12,9 @@ class TestWsmeModels(FunctionalTest):
         sql_flavor.description = 'desc'
         sql_flavor.disk = 1
         sql_flavor.ephemeral = 1
-        sql_flavor.flavor_extra_specs = [db_models.FlavorExtraSpec('key1', 'val1'),
-                                         db_models.FlavorExtraSpec('key2', 'val2')]
+        sql_flavor.flavor_extra_specs = [db_models.FlavorExtraSpec(
+            'key1', 'val1'),
+            db_models.FlavorExtraSpec('key2', 'val2')]
         sql_flavor.flavor_tag = [db_models.FlavorExtraSpec('key1', 'val1'),
                                  db_models.FlavorExtraSpec('key2', 'val2')]
         sql_flavor.flavor_options = [db_models.FlavorExtraSpec('key1', 'val1'),
@@ -26,7 +28,7 @@ class TestWsmeModels(FunctionalTest):
         sql_flavor.ram = 1
         sql_flavor.visibility = 'visibility'
         sql_flavor.vcpus = 1
-        sql_flavor.series = "p1"
+        sql_flavor.series = cfg.CONF.fms.flavor_series[0]
         sql_flavor.swap = 1
         sql_flavor.disk = 1
         sql_flavor.name = 'name'
@@ -58,14 +60,15 @@ class TestWsmeModels(FunctionalTest):
         flavor_wrapper.flavor.swap = '1'
         flavor_wrapper.flavor.disk = '1'
         flavor_wrapper.flavor.name = 'name'
-        flavor_wrapper.flavor.series = 'p1'
+        flavor_wrapper.flavor.series = cfg.CONF.fms.flavor_series[0]
 
         sql_flavor = flavor_wrapper.to_db_model()
 
         self.assertEqual(len(sql_flavor.flavor_regions), 2)
         self.assertEqual(len(sql_flavor.flavor_tenants), 2)
 
-        spec = next(s for s in sql_flavor.flavor_extra_specs if s.key_name == 'key1')
+        spec = next(
+            s for s in sql_flavor.flavor_extra_specs if s.key_name == 'key1')
         self.assertEqual(spec.key_value, 'val1')
 
     def test_flavor_summary_from_db_model(self):
