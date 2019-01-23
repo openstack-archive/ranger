@@ -1,13 +1,16 @@
-from orm.services.flavor_manager.fms_rest.data.sql_alchemy.db_models import FlavorRegion, FlavorTenant
-from orm.services.flavor_manager.fms_rest.data.wsme.models import (ExtraSpecsWrapper, Flavor,
-                                                                   FlavorListFullResponse, FlavorWrapper,
-                                                                   Region, RegionWrapper, TagsWrapper,
-                                                                   TenantWrapper)
+from orm.services.flavor_manager.fms_rest.data.sql_alchemy.db_models import (
+    FlavorRegion, FlavorTenant)
+from orm.services.flavor_manager.fms_rest.data.wsme.models import (
+    ExtraSpecsWrapper, Flavor,
+    FlavorListFullResponse, FlavorWrapper,
+    Region, RegionWrapper, TagsWrapper,
+    TenantWrapper)
 from orm.services.flavor_manager.fms_rest.logger import get_logger
-from orm.services.flavor_manager.fms_rest.logic.error_base import ConflictError, ErrorStatus, NotFoundError
+from orm.services.flavor_manager.fms_rest.logic.error_base import (
+    ConflictError, ErrorStatus, NotFoundError)
 from orm.common.orm_common.injector import injector
 
-from pecan import conf
+from oslo_config import cfg
 
 LOG = get_logger(__name__)
 
@@ -35,9 +38,10 @@ def create_flavor(flavor, flavor_uuid, transaction_id):
         datamanager.begin_transaction()
 
         flavor_rec.insert(sql_flavor)
-        datamanager.flush()  # i want to get any exception created by this insert
+        datamanager.flush()  # Get any exception created by this insert
         existing_region_names = []
-        send_to_rds_if_needed(sql_flavor, existing_region_names, "post", transaction_id)
+        send_to_rds_if_needed(
+            sql_flavor, existing_region_names, "post", transaction_id)
 
         datamanager.commit()
 
@@ -45,25 +49,33 @@ def create_flavor(flavor, flavor_uuid, transaction_id):
         return ret_flavor
 
     except Exception as exp:
-        LOG.log_exception("FlavorLogic - Failed to CreateFlavor", str(exp.args))
+        LOG.log_exception("FlavorLogic - Failed to CreateFlavor",
+                          str(exp.args))
         datamanager.rollback()
         if "Duplicate entry" in exp.args:
-            raise ConflictError(409, "Flavor {} already exists".format(flavor.flavor.name))
+            raise ConflictError(
+                409,
+                "Flavor {} already exists".format(flavor.flavor.name))
         raise
     finally:
         datamanager.close()
 
 
 @di.dependsOn('rds_proxy')
-def send_to_rds_if_needed(sql_flavor, existing_region_names, http_action, transaction_id):
+def send_to_rds_if_needed(sql_flavor,
+                          existing_region_names,
+                          http_action,
+                          transaction_id):
     rds_proxy = di.resolver.unpack(send_to_rds_if_needed)
-    if (sql_flavor.flavor_regions and len(sql_flavor.flavor_regions) > 0) or len(existing_region_names) > 0:
+    if (sql_flavor.flavor_regions and len(sql_flavor.flavor_regions) > 0) \
+            or len(existing_region_names) > 0:
         flavor_dict = sql_flavor.todict()
         update_region_actions(flavor_dict, existing_region_names, http_action)
         LOG.debug("Flavor is valid to send to RDS - sending to RDS Proxy ")
         rds_proxy.send_flavor(flavor_dict, transaction_id, http_action)
     else:
-        LOG.debug("Flavor with no regions - wasn't sent to RDS Proxy " + str(sql_flavor))
+        LOG.debug("Flavor with no regions - wasn't sent to RDS Proxy " +
+                  str(sql_flavor))
 
 
 @di.dependsOn('data_manager')
@@ -91,9 +103,11 @@ def update_flavor(flavor, flavor_uuid, transaction_id):  # pragma: no cover
         del(db_flavor)
 
         flavor_rec.insert(sql_flavor)
-        datamanager.flush()  # i want to get any exception created by this insert method
+        # get any exception created by this insert method
+        datamanager.flush()
 
-        send_to_rds_if_needed(sql_flavor, existing_region_names, "put", transaction_id)
+        send_to_rds_if_needed(
+            sql_flavor, existing_region_names, "put", transaction_id)
 
         datamanager.commit()
 
@@ -120,7 +134,8 @@ def delete_flavor_by_uuid(flavor_uuid):  # , transaction_id):
 
         sql_flavor = flavor_rec.get_flavor_by_id(flavor_uuid)
         if sql_flavor is None:
-            raise NotFoundError(message="Flavor '{}' not found".format(flavor_uuid))
+            raise NotFoundError(
+                message="Flavor '{}' not found".format(flavor_uuid))
 
         existing_region_names = sql_flavor.get_existing_region_names()
         if len(existing_region_names) > 0:
@@ -139,7 +154,7 @@ def delete_flavor_by_uuid(flavor_uuid):  # , transaction_id):
                 status_resp = resp.json()
                 if 'status' in status_resp.keys():
                     LOG.debug(
-                        'RDS returned status: {}'.format(status_resp['status']))
+                        'RDS returned status:{}'.format(status_resp['status']))
                     status = status_resp['status']
                 else:
                     # Invalid response from RDS
@@ -158,7 +173,8 @@ def delete_flavor_by_uuid(flavor_uuid):  # , transaction_id):
 
             if status == invalid_status:
                 LOG.error('Invalid flavor status received from RDS')
-                raise ErrorStatus(500, "Invalid flavor status received from RDS")
+                raise ErrorStatus(500,
+                                  "Invalid flavor status received from RDS")
             elif status != expected_status:
                 msg = "The flavor has not been deleted " \
                       "successfully from all of its regions " \
@@ -170,7 +186,8 @@ def delete_flavor_by_uuid(flavor_uuid):  # , transaction_id):
         # OK to delete
         flavor_rec.delete_by_uuid(flavor_uuid)
 
-        datamanager.flush()  # i want to get any exception created by this delete
+        # get any exception created by this delete
+        datamanager.flush()
         datamanager.commit()
     except Exception as exp:
         LOG.log_exception("FlavorLogic - Failed to delete flavor", exp)
@@ -189,7 +206,8 @@ def add_regions(flavor_uuid, regions, transaction_id):
         flavor_rec = datamanager.get_record('flavor')
         sql_flavor = flavor_rec.get_flavor_by_id(flavor_uuid)
         if not sql_flavor:
-            raise ErrorStatus(404, 'flavor id {0} not found'.format(flavor_uuid))
+            raise ErrorStatus(404,
+                              'flavor id {0} not found'.format(flavor_uuid))
 
         existing_region_names = sql_flavor.get_existing_region_names()
 
@@ -197,13 +215,18 @@ def add_regions(flavor_uuid, regions, transaction_id):
             if region.name == '' or region.name.isspace():
                 raise ErrorStatus(400, 'Cannot add region with an empty name')
             if region.type == "group":
-                raise ErrorStatus(400, 'Adding \'group\' type region is supported only when creating a flavor')
-            db_region = FlavorRegion(region_name=region.name, region_type='single')
+                raise ErrorStatus(400,
+                                  "Adding \'group\' type region is supported"
+                                  " only when creating a flavor")
+            db_region = FlavorRegion(region_name=region.name,
+                                     region_type='single')
             sql_flavor.add_region(db_region)
 
-        datamanager.flush()  # i want to get any exception created by previous actions against the database
+        # get any exception created by previous actions against the database
+        datamanager.flush()
 
-        send_to_rds_if_needed(sql_flavor, existing_region_names, "put", transaction_id)
+        send_to_rds_if_needed(
+            sql_flavor, existing_region_names, "put", transaction_id)
 
         datamanager.commit()
 
@@ -219,7 +242,8 @@ def add_regions(flavor_uuid, regions, transaction_id):
         LOG.log_exception("FlavorLogic - Failed to add regions", exp)
         datamanager.rollback()
         if "conflicts with persistent instance" in str(exp.args):
-            raise ConflictError(409, "One or more regions already exists in Flavor")
+            raise ConflictError(409,
+                                "One or more regions already exists in Flavor")
         raise exp
     finally:
         datamanager.close()
@@ -237,12 +261,14 @@ def delete_region(flavor_uuid, region_name, transaction_id, on_success_by_rds,
         if not sql_flavor and on_success_by_rds:
             return
         if not sql_flavor:
-            raise ErrorStatus(404, 'flavor id {0} not found'.format(flavor_uuid))
+            raise ErrorStatus(404,
+                              'flavor id {0} not found'.format(flavor_uuid))
 
         existing_region_names = sql_flavor.get_existing_region_names()
         sql_flavor.remove_region(region_name)
 
-        datamanager.flush()  # Get any exception created by previous actions against the database
+        # get any exception created by previous actions against the database
+        datamanager.flush()
         if on_success_by_rds:
             datamanager.commit()
         else:
@@ -276,7 +302,8 @@ def add_tenants(flavor_uuid, tenants, transaction_id):
         flavor_rec = datamanager.get_record('flavor')
         sql_flavor = flavor_rec.get_flavor_by_id(flavor_uuid)
         if not sql_flavor:
-            raise ErrorStatus(404, 'Flavor id {0} not found'.format(flavor_uuid))
+            raise ErrorStatus(404,
+                              'Flavor id {0} not found'.format(flavor_uuid))
 
         if sql_flavor.visibility == "public":
             raise ErrorStatus(405, 'Cannot add tenant to a public flavor')
@@ -285,13 +312,15 @@ def add_tenants(flavor_uuid, tenants, transaction_id):
 
         for tenant in tenants.tenants:
             if not isinstance(tenant, basestring):
-                raise ValueError("tenant type must be a string type, got {} type".format(type(tenant)))
+                raise ValueError("tenant type must be a string type,"
+                                 " got {} type".format(type(tenant)))
 
             db_tenant = FlavorTenant(tenant_id=tenant)
             sql_flavor.add_tenant(db_tenant)
-
-        datamanager.flush()  # i want to get any exception created by previous actions against the database
-        send_to_rds_if_needed(sql_flavor, existing_region_names, "put", transaction_id)
+        # get any exception created by previous actions against the database
+        datamanager.flush()
+        send_to_rds_if_needed(
+            sql_flavor, existing_region_names, "put", transaction_id)
         datamanager.commit()
 
         flavor = get_flavor_by_uuid(flavor_uuid)
@@ -321,20 +350,24 @@ def delete_tenant(flavor_uuid, tenant_id, transaction_id):
         flavor_rec = datamanager.get_record('flavor')
         sql_flavor = flavor_rec.get_flavor_by_id(flavor_uuid)
         if not sql_flavor:
-            raise ErrorStatus(404, 'flavor id {0} not found'.format(flavor_uuid))
+            raise ErrorStatus(404,
+                              'flavor id {0} not found'.format(flavor_uuid))
         # if trying to delete the only one tenant then return value error
         if sql_flavor.visibility == "public":
-            raise ValueError("{} is a public flavor, delete tenant action is not relevant".format(flavor_uuid))
+            raise ValueError("{} is a public flavor, delete tenant"
+                             " action is not relevant".format(flavor_uuid))
 
-        if len(sql_flavor.flavor_tenants) == 1 and sql_flavor.flavor_tenants[0].tenant_id == tenant_id:
+        if len(sql_flavor.flavor_tenants) == 1 \
+                and sql_flavor.flavor_tenants[0].tenant_id == tenant_id:
             raise ValueError(
                 'Private flavor must have at least one tenant')
 
         existing_region_names = sql_flavor.get_existing_region_names()
         sql_flavor.remove_tenant(tenant_id)
-
-        datamanager.flush()  # i want to get any exception created by previous actions against the database
-        send_to_rds_if_needed(sql_flavor, existing_region_names, "put", transaction_id)
+        # get any exception created by previous actions against the database
+        datamanager.flush()
+        send_to_rds_if_needed(
+            sql_flavor, existing_region_names, "put", transaction_id)
         datamanager.commit()
     except NotFoundError as exp:
         datamanager.rollback()
@@ -407,7 +440,6 @@ def delete_extra_specs(flavor_id, transaction_id, extra_spec=None):
 
         flavor_rec = datamanager.get_record("flavor")
         sql_flavor = flavor_rec.get_flavor_by_id(flavor_id)
-
         if not sql_flavor:
             raise NotFoundError(404, 'flavor id {0} not found'.format(
                 flavor_id))
@@ -426,8 +458,8 @@ def delete_extra_specs(flavor_id, transaction_id, extra_spec=None):
         else:
             sql_flavor.delete_all_extra_specs()
             sql_flavor.add_extra_specs(default_extra_specs)
-
-        datamanager.flush()  # i want to get any exception created by previous actions against the database
+        # get any exception created by previous actions against the database
+        datamanager.flush()
         send_to_rds_if_needed(sql_flavor, existing_region_names, "put",
                               transaction_id)
         datamanager.commit()
@@ -443,7 +475,8 @@ def delete_extra_specs(flavor_id, transaction_id, extra_spec=None):
             LOG.log_exception("FlavorLogic - extra specs not found", exp)
             raise
         else:
-            LOG.log_exception("FlavorLogic - failed to delete extra specs", exp)
+            LOG.log_exception("FlavorLogic - failed to delete extra specs",
+                              exp)
             raise
 
     except Exception as exp:
@@ -488,7 +521,8 @@ def delete_tags(flavor_id, tag, transaction_id):
         sql_flavor = flavor_rec.get_flavor_by_id(flavor_id)
 
         if not sql_flavor:
-            raise NotFoundError(404, 'flavor id {0} not found'.format(flavor_id))
+            raise NotFoundError(404,
+                                'flavor id {0} not found'.format(flavor_id))
 
         if tag:
             sql_flavor.remove_tag(tag)
@@ -577,7 +611,8 @@ def add_extra_specs(flavor_id, extra_specs, transaction_id):
         extra_specs_model = extra_specs.to_db_model()
 
         sql_flavor.add_extra_specs(extra_specs_model)
-        datamanager.flush()  # i want to get any exception created by previous actions against the database
+        # get any exception created by previous actions against the database
+        datamanager.flush()
         send_to_rds_if_needed(sql_flavor, existing_region_names, "put",
                               transaction_id)
         datamanager.commit()
@@ -592,7 +627,10 @@ def add_extra_specs(flavor_id, extra_specs, transaction_id):
     except Exception as exp:
         datamanager.rollback()
         if "conflicts with persistent instance" in str(exp.args):
-            raise ConflictError(409, "one or all extra specs {} already exists".format(extra_specs.os_extra_specs))
+            raise ConflictError(
+                409,
+                "one or all extra specs {} already"
+                " exists".format(extra_specs.os_extra_specs))
         LOG.log_exception("FlavorLogic - fail to add extra spec", exp)
         raise
     finally:
@@ -704,8 +742,8 @@ def add_tags(flavor_id, tags, transaction_id):
     except Exception as exp:
         datamanager.rollback()
         if "conflicts with persistent instance" in str(exp.args):
-            raise ConflictError(409, "one or all tags {} already exists".format(
-                tags.tags))
+            raise ConflictError(
+                409, "one or all tags {} already exists".format(tags.tags))
         LOG.log_exception("FlavorLogic - fail to add tags", exp)
         raise
     finally:
@@ -724,10 +762,13 @@ def get_flavor_by_uuid_or_name(flavor_uuid_or_name):
 
         flavor_record = datamanager.get_record('flavor')
 
-        sql_flavor = flavor_record.get_flavor_by_id_or_name(flavor_uuid_or_name)
+        sql_flavor = flavor_record.get_flavor_by_id_or_name(
+            flavor_uuid_or_name)
 
         if not sql_flavor:
-            raise ErrorStatus(404, 'flavor with id or name {0} not found'.format(flavor_uuid_or_name))
+            raise ErrorStatus(
+                404,
+                'flavor id or name {0} not found'.format(flavor_uuid_or_name))
 
         flavor_wrapper = FlavorWrapper.from_db_model(sql_flavor)
 
@@ -744,9 +785,10 @@ def get_flavor_by_uuid_or_name(flavor_uuid_or_name):
 @di.dependsOn('rds_proxy')
 def update_region_statuses(flavor, sql_flavor):
     rds_proxy = di.resolver.unpack(update_region_statuses)
-    # remove the regions comes from database and return the regions which return from rds,
-    # because there might be group region there (in the db) and in the response from the
-    # rds we will have a list of all regions belong to this group
+    # remove the regions comes from database and return the regions which
+    # return from rds, because there might be group region there (in the db)
+    # and in the response from the rds we will have a list of all regions
+    # belong to this group
     flavor.regions[:] = []
     resp = rds_proxy.get_status(sql_flavor.id)
     if resp.status_code == 200:
@@ -759,7 +801,8 @@ def update_region_statuses(flavor, sql_flavor):
         # get region status if region in flavor_regions_list
         if flavor_regions_list and 'regions' in rds_status_resp.keys():
             for rds_region_status in rds_status_resp['regions']:
-                # check that the region read from RDS is in the flavor_regions_list
+                # check that the region read from RDS is in the
+                # flavor_regions_list
                 if rds_region_status['region'] in flavor_regions_list:
                     flavor.regions.append(
                         Region(name=rds_region_status['region'], type="single",
@@ -767,7 +810,8 @@ def update_region_statuses(flavor, sql_flavor):
                                error_message=rds_region_status['error_msg']))
 
         if 'status' in rds_status_resp.keys():
-            # if flavor not assigned to region set flavor.status to 'no regions'
+            # if flavor not assigned to region set flavor.status to
+            # 'no regions'
             if flavor_regions_list:
                 flavor.status = rds_status_resp['status']
             else:
@@ -790,37 +834,47 @@ def get_flavor_list_by_params(visibility, region, tenant, series, vm_type,
 
     try:
         flavor_record = datamanager.get_record('flavor')
-        sql_flavors = flavor_record.get_flavors_by_criteria(visibility=visibility,
-                                                            region=region,
-                                                            tenant=tenant,
-                                                            series=series,
-                                                            vm_type=vm_type,
-                                                            vnf_name=vnf_name,
-                                                            starts_with=starts_with,
-                                                            contains=contains,
-                                                            alias=alias)
+        sql_flavors = flavor_record.get_flavors_by_criteria(
+            visibility=visibility,
+            region=region,
+            tenant=tenant,
+            series=series,
+            vm_type=vm_type,
+            vnf_name=vnf_name,
+            starts_with=starts_with,
+            contains=contains,
+            alias=alias)
 
         response = FlavorListFullResponse()
         if sql_flavors:
             uuids = ','.join(str("\'" + sql_flavor.id + "\'")
-                             for sql_flavor in sql_flavors if sql_flavor and sql_flavor.id)
-            resource_status_dict = flavor_record.get_flavors_status_by_uuids(uuids)
+                             for sql_flavor in sql_flavors
+                             if sql_flavor and sql_flavor.id)
+
+            resource_status_dict = flavor_record.get_flavors_status_by_uuids(
+                uuids)
 
             for sql_flavor in sql_flavors:
                 flavor = Flavor.from_db_model(sql_flavor)
                 if sql_flavor.id:
-                    # rds_region_list contains tuples - each containing the region associated
-                    # with the flavor along with the region status
+                    # rds_region_list contains tuples - each containing the
+                    # region associated with the flavor along with the region
+                    # status
                     rds_region_list = resource_status_dict.get(sql_flavor.id)
 
-                    # determine flavor overall status by checking its region statuses:
+                    # determine flavor overall status by checking its region
+                    # statuses:
                     if rds_region_list and flavor.regions:
-                        # set image.status to 'error' if any of the regions has an 'Error' status'
-                        # else, if any region status shows 'Submitted' then set image status to 'Pending'
+                        # set image.status to 'error' if any of the regions has
+                        # an 'Error' status' else, if any region status shows
+                        # 'Submitted' then set image status to 'Pending'
                         # otherwise image status = 'Success'
-                        error_status = [item for item in rds_region_list if item[1] == 'Error']
-                        submitted_status = [item for item in rds_region_list if item[1] == 'Submitted']
-                        success_status = [item for item in rds_region_list if item[1] == 'Success']
+                        error_status = [item for item in rds_region_list
+                                        if item[1] == 'Error']
+                        submitted_status = [item for item in rds_region_list
+                                            if item[1] == 'Submitted']
+                        success_status = [item for item in rds_region_list
+                                          if item[1] == 'Success']
 
                         if len(error_status) > 0:
                             flavor.status = 'Error'
@@ -829,7 +883,8 @@ def get_flavor_list_by_params(visibility, region, tenant, series, vm_type,
                         elif len(success_status) > 0:
                             flavor.status = 'Success'
 
-                        # use rds_region_list to format the regions' statuses in flavor record
+                        # use rds_region_list to format the regions' statuses
+                        # in flavor record
                         for rgn in flavor.regions:
                             for rds_row_items in rds_region_list:
                                 if rgn.name == rds_row_items[0]:
@@ -851,43 +906,31 @@ def get_flavor_list_by_params(visibility, region, tenant, series, vm_type,
 def calculate_name(flavor):
 
     """ calculate_name function returns the ranger flavor_name:
-    Ranger flavor name  is made up of the following components, each separated by a DOT separator:
+    Ranger flavor name  is made up of the following components, each separated
+    by a DOT separator:
         - flavor series
         - flavor attributes (cores, ram, disk, swap file, ephemeral disks)
         - flavor options (OPTIONAL)
 
         Following is a sample flavor name:
-        name = p1.c1r1d1s4e5.i2n0
+        name = xx.c1r1d1s4e5.i2n0
 
-    where p1 : flavor series name of 'p1'
+    where xx : flavor series name
           c1 : number of cores (or cpu); sample shows vcpu = 1
           r1 : RAM value divided by units of 1024 MB; sample ram = 1024 (in MB)
           d3 : disk value measured in units of GB; sample shows disk = 3
-          s4 : (optional)  swap disk value divided by units of 1024 MB; sample swap value = 4096 (in MB)
-          e5 : (optional)  ephemeral disk measured in units of GB - sample shows ephemeral = 5 (in GB)
+          s4 : (optional)  swap disk value divided by units of 1024 MB;
+                           sample swap value = 4096 (in MB)
+          e5 : (optional)  ephemeral disk measured in units of GB -
+                           sample shows ephemeral = 5 (in GB)
 
-          Anything after the second dot separator are flavor options 'i2' and 'n0' - flavor options are OPTIONAL
+          Anything after the second dot separator are flavor options 'i2'
+          and 'n0' - flavor options are OPTIONAL
     """
-
-    valid_p1_opts = conf.flavor_options.valid_p1_opt_values[:]
 
     name = "{0}.c{1}r{2}d{3}".format(flavor.flavor.series, flavor.flavor.vcpus,
                                      int(flavor.flavor.ram) / 1024,
                                      flavor.flavor.disk)
-    series = name[:2]
-
-    # validate if a flavor is assigned with incompatible or invalid flavor options
-    n0_in = True
-
-    if series in 'p1':
-        if ({'n0'}.issubset(flavor.flavor.options.keys()) and
-                flavor.flavor.options['n0'].lower() == 'false') or \
-                not ({'n0'}.issubset(flavor.flavor.options.keys())):
-            n0_in = False
-
-        if {'i2'}.issubset(flavor.flavor.options.keys()) and not n0_in:
-            raise ConflictError(409, "Flavor option i2 must be used with "
-                                "flavor option 'n0' set to 'true'")
 
     # add swap disk info to flavor name IF provided
     swap = getattr(flavor.flavor, 'swap', 0)
@@ -900,13 +943,22 @@ def calculate_name(flavor):
         name += '{}{}'.format('e', ephemeral)
 
     # add the valid option keys to the flavor name
-    if len(flavor.flavor.options) > 0:
-        for key in sorted(flavor.flavor.options):
-            # only include valid option parameters in flavor name
-            if series == 'p1' and key in valid_p1_opts and n0_in:
-                if name.count('.') < 2:
-                    name += '.'
-                name += key
+    series_metadata = cfg.CONF['flavor_series_metadata'][flavor.flavor.series]
+
+    valid_options = [series_metadata[x] for x in
+                     series_metadata if x.startswith("valid_options_")]
+
+    options = [n for n in valid_options if n in
+               flavor.flavor.options.keys() and
+               flavor.flavor.options[n].lower() == 'true']
+
+    if 'i2' in options and 'n0' not in options:
+        options.remove('i2')
+
+    if options:
+        name += '.'
+        for key in sorted(options):
+            name += key
 
     return name
 
@@ -925,10 +977,12 @@ def update_region_actions(flavor_dict, existing_region_names, action="put"):
 
         # add deleted regions
         for exist_region_name in existing_region_names:
-            if region_name_exist_in_regions(exist_region_name, flavor_dict["regions"]):
+            if region_name_exist_in_regions(exist_region_name,
+                                            flavor_dict["regions"]):
                 continue
             else:
-                flavor_dict["regions"].append({"name": exist_region_name, "action": "delete"})
+                flavor_dict["regions"].append({"name": exist_region_name,
+                                              "action": "delete"})
 
 
 def region_name_exist_in_regions(region_name, regions):

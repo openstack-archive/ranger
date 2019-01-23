@@ -59,37 +59,6 @@ database = {
 
 }
 
-flavor_series = {
-    'valid_series': [
-        'p1'
-    ]
-}
-
-# valid_flavor_options
-flavor_options = {
-
-    'valid_p1_numa_value': 'n0',
-    'valid_p1_opt_values': [
-        'n0', 'i2'
-    ]
-}
-
-# this table is for calculating default extra specs needed
-extra_spec_needed_table = {
-    "p1": {
-        "aggregate_instance_extra_specs____p1": "true",
-        "hw____mem_page_size": "large"
-    }
-}
-
-# any key will be added to extra_spec_needed_table need to be added here
-default_extra_spec_calculated_table = {
-    "aggregate_instance_extra_specs____p1": "",
-    "hw____mem_page_size": "",
-    "hw____cpu_policy": "",
-    "hw____numa_nodes": ""
-}
-
 database['connection_string'] = 'mysql://{0}:{1}@{2}:3306/{3}'.format(database['username'],
                                                                       database['password'],
                                                                       database['host'],
