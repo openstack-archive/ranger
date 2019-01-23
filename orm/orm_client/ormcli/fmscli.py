@@ -1,4 +1,9 @@
 #!/usr/bin/python
+
+#from oslo_config import cfg
+#cfg.CONF([], project='ranger', validate_default_values=True)
+#print cfg.CONF.config_file
+
 import argparse
 import cli_common
 import config
@@ -161,7 +166,7 @@ def add_to_parser(service_sub):
 
     h1, h2 = ('[<"X-RANGER-Client" header>]',
               '[--visibility <public|private>] [--region <name>] [--tenant '
-              '<id>] [--series {gv,nv,ns,nd,ss}] [--alias <alias>] '
+              '<id>] [--series <series_name>] [--alias <alias>] '
               '[--starts_with <name>] [--contains <name>] '
               '[--vm_type <vm_type>] [--vnf_name <vnf_name>]')
     parser_list_flavor = subparsers.add_parser('list_flavors',
@@ -175,8 +180,7 @@ def add_to_parser(service_sub):
                                     help='flavor name starts with *')
     parser_list_flavor.add_argument('--contains', type=str,
                                     help='* contains in flavor name')
-    parser_list_flavor.add_argument('--series', type=str,
-                                    choices=['gv', 'nv', 'ns', 'nd', 'ss'])
+    parser_list_flavor.add_argument('--series', type=str, help='series name')
     parser_list_flavor.add_argument('--alias', type=str, help='flavor alias')
     parser_list_flavor.add_argument('--vm_type', type=str, help='vm type')
     parser_list_flavor.add_argument('--vnf_name', type=str, help='vnf name')
@@ -342,7 +346,11 @@ def get_token(timeout, args, host):
             'Failed in get_token, host: {}, region: {}'.format(host,
                                                                auth_region))
     url = url % (keystone_ep,)
-    data = data % (base_config.user_domain_name, username, password, tenant_name, base_config.project_domain_name,)
+    data = data % (base_config.user_domain_name,
+                   username,
+                   password,
+                   tenant_name,
+                   base_config.project_domain_name,)
 
     if args.verbose:
         print(
@@ -370,8 +378,11 @@ def get_environment_variable(argument):
 
 
 def run(args):
-    rms_url = args.rms_base_url if args.rms_base_url else base_config.rms['base_url']
-    host = args.fms_base_url if args.fms_base_url else base_config.fms['base_url']
+    rms_url = args.rms_base_url if args.rms_base_url else \
+        base_config.rms['base_url']
+    host = args.fms_base_url if args.fms_base_url else \
+        base_config.fms['base_url']
+
     port = args.port if args.port else base_config.fms['port']
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
