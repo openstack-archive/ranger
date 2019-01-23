@@ -3,8 +3,8 @@ from __builtin__ import reversed
 from orm.services.flavor_manager.fms_rest.logger import get_logger
 from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
 
+from oslo_config import cfg
 from oslo_db.sqlalchemy import models
-from pecan import conf
 from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, validates
@@ -32,8 +32,9 @@ class FMSBaseModel(models.ModelBase):
 
 
 class Flavor(Base, FMSBaseModel):
-    '''Flavor is a DataObject contains all the fields defined in Flavor table record.
-    defined as SqlAlchemy model map to a table
+    '''Flavor is a DataObject contains all the fields defined
+    'in Flavor table record.
+    'defined as SqlAlchemy model map to a table
     '''
     __tablename__ = "flavor"
 
@@ -61,10 +62,11 @@ class Flavor(Base, FMSBaseModel):
                                   cascade="all, delete, delete-orphan")
 
     def __repr__(self):
-        text = "Flavor(internal_id={}, id={}, name={}, alias={}, description={}, " \
-               "series={}, ram={}, vcpus={}, disk={}, swap={}, ephemeral={}," \
-               "visibility={}, flavor_extra_specs={}, flavor_tags={}," \
-               "flavor_options={},  flavor_regions={}, flavor_tenants={})". \
+        text = "Flavor(internal_id={}, id={}, name={}, alias={}, " \
+               "description={}, series={}, ram={}, vcpus={}, disk={}, " \
+               "swap={}, ephemeral={}, visibility={}, " \
+               "flavor_extra_specs={}, flavor_tags={}, flavor_options={}, " \
+               "flavor_regions={}, flavor_tenants={})". \
             format(self.internal_id,
                    self.id,
                    self.name,
@@ -124,9 +126,10 @@ class Flavor(Base, FMSBaseModel):
 
     @validates("series")
     def validate_series(self, key, series):
-        valid_flvr_series = conf.flavor_series.valid_series
+        valid_flvr_series = cfg.CONF.fms.flavor_series
         if series not in valid_flvr_series:
-            raise ValueError("Series must be one of {}:".format(str(valid_flvr_series)))
+            raise ValueError(
+                "Series must be one of {}:".format(str(valid_flvr_series)))
 
         return series
 
@@ -155,9 +158,10 @@ class Flavor(Base, FMSBaseModel):
                     region_deleted_flag = True
 
             if not region_deleted_flag:
-                raise ErrorStatus(404,
-                                  "Failed to remove region {0} from flavor id {1}".format(
-                                      region_name, str(self.id)))
+                raise ErrorStatus(
+                    404,
+                    "Failed to remove region {0} from flavor id {1}".format(
+                        region_name, str(self.id)))
 
         except ErrorStatus as e:
             raise
@@ -169,7 +173,8 @@ class Flavor(Base, FMSBaseModel):
             raise
 
     def add_tags(self, flavor_tags):
-        assert isinstance(flavor_tags, list) and all(isinstance(ft, FlavorTag) for ft in flavor_tags)
+        assert isinstance(flavor_tags, list) \
+            and all(isinstance(ft, FlavorTag) for ft in flavor_tags)
         try:
             LOG.debug("add tags {0} to flavor {1}".format(str(flavor_tags),
                                                           str(self)))
@@ -182,16 +187,18 @@ class Flavor(Base, FMSBaseModel):
             raise
 
     def replace_tags(self, flavor_tags):
-        assert isinstance(flavor_tags, list) and all(isinstance(ft, FlavorTag) for ft in flavor_tags)
+        assert isinstance(flavor_tags, list) \
+            and all(isinstance(ft, FlavorTag) for ft in flavor_tags)
         try:
-            LOG.debug("replace tags {0} for flavor {1}".format(str(flavor_tags),
-                                                               str(self)))
+            LOG.debug("replace tags {0} for flavor {1}".format(
+                str(flavor_tags), str(self)))
             self.remove_all_tags()
             self.add_tags(flavor_tags)
 
         except Exception as exception:
-            LOG.log_exception("Failed to replace tags {0} to flavor {1}".format(
-                str(flavor_tags), str(self)), exception)
+            LOG.log_exception(
+                "Failed to replace tags {0} to flavor {1}".format(
+                    str(flavor_tags), str(self)), exception)
             raise
 
     def remove_all_tags(self):
@@ -199,7 +206,9 @@ class Flavor(Base, FMSBaseModel):
             LOG.debug("remove all tags from flavor {}".format(str(self)))
             self.flavor_tags = []
         except Exception as exception:
-            LOG.log_exception("Failed to remove all tags from flavor {}".format(str(self)), exception)
+            LOG.log_exception(
+                "Failed to remove all tags from flavor {}".format(
+                    str(self)), exception)
             raise
 
     def remove_tag(self, tag_name):
@@ -215,9 +224,10 @@ class Flavor(Base, FMSBaseModel):
                     deleted_flag = True
 
             if not deleted_flag:
-                raise ErrorStatus(404,
-                                  "Failed to remove tag {0} from flavor id {1}".format(
-                                      tag_name, str(self.id)))
+                raise ErrorStatus(
+                    404,
+                    "Failed to remove tag {0} from flavor id {1}".format(
+                        tag_name, str(self.id)))
 
         except ErrorStatus as e:
             raise
@@ -254,9 +264,10 @@ class Flavor(Base, FMSBaseModel):
                     deleted_flag = True
 
             if not deleted_flag:
-                raise ErrorStatus(404,
-                                  "tenant {0} does not exist for flavor id {1}".format(
-                                      tenant_id, str(self.id)))
+                raise ErrorStatus(
+                    404,
+                    "tenant {0} does not exist for flavor id {1}".format(
+                        tenant_id, str(self.id)))
 
         except Exception as exception:
             LOG.log_exception(
@@ -293,8 +304,8 @@ class Flavor(Base, FMSBaseModel):
         deleted_flag = False
         assert isinstance(extra_spec_key_name, basestring)
         try:
-            LOG.debug("remove extra_spec {} from flavor {}".format(extra_spec_key_name,
-                                                                   str(self)))
+            LOG.debug("remove extra_spec {} from flavor {}".format(
+                extra_spec_key_name, str(self)))
 
             for extra_spec in reversed(self.flavor_extra_specs):
                 if extra_spec.key_name == extra_spec_key_name:
@@ -302,16 +313,18 @@ class Flavor(Base, FMSBaseModel):
                     deleted_flag = True
 
             if not deleted_flag:
-                raise ErrorStatus(404,
-                                  "extra spec {0} does not exist for flavor id {1}".format(
-                                      extra_spec_key_name, str(self.id)))
+                raise ErrorStatus(
+                    404,
+                    "extra spec {0} does not exist for flavor id {1}".format(
+                        extra_spec_key_name, str(self.id)))
 
         except ErrorStatus as e:
             raise
 
         except Exception as exception:
             LOG.log_exception(
-                "Failed to remove extra_spec {0} from flavor {1}".format(extra_spec_key_name, str(self)), exception)
+                "Failed to remove extra_spec {0} from flavor {1}".format(
+                    extra_spec_key_name, str(self)), exception)
             raise
 
     def validate(self, type):
@@ -319,7 +332,8 @@ class Flavor(Base, FMSBaseModel):
         '''
 
         if self.visibility == "public" and len(self.flavor_tenants) > 0:
-            raise ValueError("tenants should not be specified for a public flavor")
+            raise ValueError(
+                "tenants should not be specified for a public flavor")
         elif self.visibility == "private" and len(self.flavor_tenants) == 0:
             raise ValueError("Tenants must be specified for a private flavor")
         elif self.visibility not in ["private", "public"]:
@@ -336,8 +350,8 @@ class Flavor(Base, FMSBaseModel):
 
 
 '''
-' FlavorExtraSpec is a DataObject contains all fields defined in FlavorExtraSpec
-' defined as SqlAlchemy model map to a table
+' FlavorExtraSpec is a DataObject contains all fields defined in
+' FlavorExtraSpec defined as SqlAlchemy model map to a table
 '''
 
 
@@ -345,9 +359,13 @@ class FlavorExtraSpec(Base, FMSBaseModel):
 
     def __init__(self,
                  key_name=None,
-                 key_value=None):
+                 key_value=None,
+                 key_name_value=None):
 
         Base.__init__(self)
+        if key_name_value:
+            key_name, key_value = key_name_value.split(': ')
+
         self.key_name = key_name
         self.key_value = key_value
 
@@ -465,10 +483,10 @@ class FlavorRegion(Base, FMSBaseModel):
     region_type = Column(String)
 
     def __repr__(self):
-        text = "FlavorRegion(flavor_internal_id='{}', region_name='{}', region_type='{}')".format(self.flavor_internal_id,
-                                                                                                  self.region_name,
-                                                                                                  self.region_type
-                                                                                                  )
+        text = "FlavorRegion(flavor_internal_id='{}', region_name='{}', " \
+               "region_type='{}')".format(self.flavor_internal_id,
+                                          self.region_name,
+                                          self.region_type)
         return text
 
     def todict(self):

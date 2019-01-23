@@ -9,6 +9,8 @@ from orm.tests.unit.fms import FunctionalTest
 from sqlalchemy.orm import exc
 from mock import MagicMock, patch
 
+from oslo_config import cfg
+
 
 class OES():
 
@@ -62,7 +64,7 @@ class TestFlavorLogic(FunctionalTest):
         self.assertEqual(res_flavor.flavor.profile, 'N1')
         self.assertEqual(res_flavor.flavor.ram, '1024')
         self.assertEqual(res_flavor.flavor.vcpus, '1')
-        self.assertEqual(res_flavor.flavor.series, 'p1')
+        self.assertEqual(res_flavor.flavor.series, cfg.CONF.fms.flavor_series[0])
         self.assertEqual(res_flavor.flavor.id, 'g')
 
         flavor = get_flavor_mock()
@@ -75,8 +77,8 @@ class TestFlavorLogic(FunctionalTest):
                                                 'transaction')
         self.assertEqual(res_flavor.flavor.profile, 'N1')
         self.assertEqual(res_flavor.flavor.ram, '1024')
-        self.assertEqual(res_flavor   .flavor.vcpus, '1')
-        self.assertEqual(res_flavor.flavor.series, 'p1')
+        self.assertEqual(res_flavor.flavor.vcpus, '1')
+        self.assertEqual(res_flavor.flavor.series, cfg.CONF.fms.flavor_series[0])
         self.assertEqual(res_flavor.flavor.id, 'g')
 
     #
@@ -719,7 +721,10 @@ def get_rds_proxy_mock():
 
 def get_flavor_mock():
     flavor_mock = FlavorWrapper()
-    flavor_mock.flavor = Flavor(ram='1024', vcpus='1', series='p1', id='g')
+    flavor_mock.flavor = Flavor(ram='1024',
+                                vcpus='1',
+                                series=cfg.CONF.fms.flavor_series[0],
+                                id='g')
     flavor_mock.flavor.profile = 'N1'
 
     return flavor_mock
