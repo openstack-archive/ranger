@@ -1,10 +1,10 @@
 {
     "default": "!",
 
-    "admin": "role:admin and tenant:admin or role:admin and tenant:services",
-    "admin_support": "role:admin_support and tenant:admin or role:admin_support and tenant:services",
-    "admin_viewer": "role:admin_viewer and tenant:admin or role:admin_viewer and tenant:services",
-    "creator": "role:ranger_customer_creator and tenant:admin or role:ranger_customer_creator and tenant:services",
+    "admin": "role:admin and tenant:admin or role:admin and tenant:service",
+    "admin_support": "role:admin_support and tenant:admin or role:admin_support and tenant:service",
+    "admin_viewer": "role:admin_viewer and tenant:admin or role:admin_viewer and tenant:service",
+    "creator": "role:ranger_customer_creator and tenant:admin or role:ranger_customer_creator and tenant:service",
 
     "admin_or_creator": "rule:admin or rule:creator",
 
