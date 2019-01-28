@@ -21,6 +21,8 @@ from tempest.lib.common.utils import data_utils
 from tempest.lib import decorators
 from tempest.lib import exceptions
 
+import uuid
+
 CONF = config.CONF
 
 
@@ -358,3 +360,89 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
         self._del_flv_and_validate_deletion_on_dcp_and_lcp(test_flvr_id)
         self.assertRaises(exceptions.NotFound, self.client.get_flavor,
                           test_flvr_id)
+
+    @decorators.idempotent_id('2a1240d8-ae30-4c37-b99f-af961a5e16cb')
+    def test_create_flavor_with_swap_and_ephemeral(self):
+        post_body = self._get_flavor_params()
+
+        # set swap and ephemeral size
+        swap = ephemeral = 1024
+        # update swap and ephemeral
+        post_body['ephemeral'] = swap
+        post_body['swap'] = ephemeral
+        flavor = self._data_setup(post_body)
+        test_flvr_id = flavor['id']
+        # verify flavor record created successfully
+        flavor_details = self._get_flavor_details(test_flvr_id)
+        self.assertEqual(flavor_details["status"], "Success")
+        self.assertEqual(flavor_details["swap"], swap)
+        self.assertEqual(flavor_details["ephemeral"], ephemeral)
+
+    @decorators.idempotent_id('53275983-6999-42f2-8ce5-6a83ade3980f')
+    def test_create_flavor_with_disk(self):
+        post_body = self._get_flavor_params()
+
+        # set disk size
+        disk = 100
+        # update disk
+        post_body['disk'] = disk
+        flavor = self._data_setup(post_body)
+        test_flvr_id = flavor['id']
+        # verify flavor record created successfully
+        flavor_details = self._get_flavor_details(test_flvr_id)
+        self.assertEqual(flavor_details["status"], "Success")
+        self.assertEqual(flavor_details["disk"], disk)
+
+    @decorators.idempotent_id('2178be75-c36b-4cfe-9df7-8a4bff6e7f83')
+    def test_list_flavor_with_additional_field(self):
+        _, body = self.client.list_flavors()
+
+        fields = [
+            'id',
+            'description',
+            'series',
+            'ram',
+            'vcpus',
+            'disk',
+            'swap',
+            'ephemeral',
+            'extra-specs',
+            'options',
+            'tag',
+            'regions',
+            'visibility',
+            'tenants',
+        ]
+
+        # check if it has minimum one value
+        if body["flavors"]:
+            flavor = body["flavors"][0]
+            # check fields is present in response dict as keys
+            self.assertTrue(set(fields).issubset(set(flavor.keys())))
+
+    @decorators.idempotent_id('997ca03c-4176-4632-a0c9-7e943b03306c')
+    def test_create_flavor_with_region_group(self):
+        post_body = self._get_flavor_params()
+
+        # region group
+        region_group = {'name': 'NCLargetest', 'type': 'group'}
+        # update region_group to regions
+        post_body['regions'].append(region_group)
+        flavor = self._data_setup(post_body)
+        test_flvr_id = flavor['id']
+        # verify flavor record created successfully
+        flavor_details = self._get_flavor_details(test_flvr_id)
+        self.assertEqual(flavor_details["status"], "Success")
+        self.assertDictEqual(flavor["regions"][1], region_group)
+
+    @decorators.idempotent_id('997ca03c-4176-4632-a0c9-7e943b03306d')
+    def test_create_flavor_with_uuid(self):
+        post_body = self._get_flavor_params()
+        # update uuid
+        str_uuid = uuid.uuid4().hex
+        post_body['id'] = str_uuid
+        flavor = self._data_setup(post_body)
+        # verify flavor record created successfully
+        flavor_details = self._get_flavor_details(str_uuid)
+        self.assertEqual(flavor_details["status"], "Success")
+        self.assertDictEqual(flavor["id"][1], str_uuid)
