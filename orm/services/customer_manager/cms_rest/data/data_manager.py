@@ -1,8 +1,10 @@
 import logging
 
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.customer_record import CustomerRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.group_record import GroupRecord
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.customer_region_record import CustomerRegionRecord
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import (CmsRole, CmsUser, Customer,
+                                                                            Groups,
                                                                             CustomerRegion, Quota,
                                                                             QuotaFieldDetail, Region,
                                                                             UserRole)
@@ -106,6 +108,13 @@ class DataManager(object):
 
         return customer.first()
 
+    def get_group_by_uuid_or_name(self, grp):
+        group = self.session.query(Groups).filter(
+            or_(Groups.uuid == grp,
+                Groups.name == grp))
+
+        return group.first()
+
     def get_quota_by_id(self, quota_id):
         quota = self.session.query(Quota).filter(Quota.id == quota_id)
         return quota.first()
@@ -115,6 +124,11 @@ class DataManager(object):
             if not hasattr(self, "customer_record"):
                 self.customer_record = CustomerRecord(self.session)
             return self.customer_record
+
+        if record_name == "Group" or record_name == "group":
+            if not hasattr(self, "group_record"):
+                self.group_record = GroupRecord(self.session)
+            return self.group_record
 
         if record_name == "CustomerRegion" or record_name == "customer_region":
             if not hasattr(self, "customer_region_record"):
@@ -192,6 +206,19 @@ class DataManager(object):
         self.flush()
 
         return sql_customer
+
+    def add_group(self, group, uuid):
+        sql_group = Groups(
+            uuid=uuid,
+            name=group.name,
+            domain_id=1,
+            description=group.description
+        )
+
+        self.session.add(sql_group)
+        self.flush()
+
+        return sql_group
 
     def add_user_role(self, user_id, role_id, customer_id, region_id,
                       adding=False):

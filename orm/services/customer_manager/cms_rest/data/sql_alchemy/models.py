@@ -1,5 +1,6 @@
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.base import Base
 import orm.services.customer_manager.cms_rest.model.Models as WsmeModels
+import orm.services.customer_manager.cms_rest.model.GroupModels as GroupWsmeModels
 from oslo_db.sqlalchemy import models
 
 from sqlalchemy import Column, ForeignKey, Integer, SmallInteger, String
@@ -12,6 +13,72 @@ class CMSBaseModel(models.ModelBase):
 
     __table_args__ = {'mysql_engine': 'InnoDB'}
 
+'''
+' CmsDomain is a DataObject and contains all the fields defined in cms_domain table record.
+' defined as SqlAlchemy model map to a table
+'''
+
+
+class CmsDomain(Base, CMSBaseModel):
+    __tablename__ = 'cms_domain'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(64), nullable=False)
+
+    def __json__(self):
+        return dict(
+            id=self.id,
+            name=self.name
+        )
+
+
+'''
+' Groups is a DataObject and contains all the fields defined in Groups table record.
+' defined as SqlAlchemy model map to a table
+'''
+
+
+class Groups(Base, CMSBaseModel):
+    __tablename__ = 'groups'
+
+    id = Column(Integer, primary_key=True)
+    uuid = Column(String(64), nullable=False, unique=True)
+    domain_id = Column(Integer, ForeignKey('cms_domain.id'), primary_key=True, nullable=False)
+    name = Column(String(64), nullable=False, unique=True)
+    description = Column(String(255), nullable=True)
+
+    def __json__(self):
+        return dict(
+            uuid=self.uuid,
+            name=self.name,
+            description=self.description,
+            domain_id=self.domain_id
+        )
+
+    def get_dict(self):
+        return self.__json__()
+
+    def get_proxy_dict(self):
+        proxy_dict = {
+            "uuid": self.uuid,
+            "name": self.name,
+            "domain_id": self.domain_id,
+            "description": self.description
+        }
+
+        return proxy_dict
+
+    def to_wsme(self):
+        uuid = self.uuid
+        name = self.name
+        domainId = self.domain_id
+        description = self.description
+
+        result = GroupWsmeModels.Group(description=description,
+                                   name=name,
+                                   uuid=uuid,
+                                   domainId=domainId)
+        return result
 
 '''
 ' CmsUser is a DataObject and contains all the fields defined in CmsUser table record.
