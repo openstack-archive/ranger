@@ -94,3 +94,21 @@ create or replace view rds_resource_status_view AS
     (
         SELECT id, resource_id, region, status,
         err_code, operation from resource_status);
+
+create table if not exists cms_domain
+   (
+         id integer auto_increment not null,
+         name varchar(64) not null,
+         primary key (id),
+         unique name_idx (name));
+
+create table if not exists groups
+   (
+         id integer auto_increment not null,
+         uuid varchar(64) not null,
+         domain_id integer not null,
+         name varchar(64) not null,
+         description varchar(255) not null,
+         primary key (id),
+         foreign key (`domain_id`) references `cms_domain` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         unique uuid_idx (uuid));
