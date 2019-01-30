@@ -44,7 +44,8 @@ class FmsBaseOrmTest(base.BaseOrmTest):
             cls.os_alt.credentials.project_name)
 
     @classmethod
-    def _get_flavor_params(cls, set_region=True, single_tenant=True):
+    def _get_flavor_params(cls, set_region=True,
+                           single_tenant=True, series='', options={}):
         post_body, region = {}, {}
         region["name"] = CONF.identity.region
         ram = random.randint(1, 4) * 1024
@@ -53,7 +54,6 @@ class FmsBaseOrmTest(base.BaseOrmTest):
         disk = random.randint(2, 102)
         post_body["description"] = \
             "orm-plugin-BaseORMTest-flavor"
-        post_body["series"] = random.choice(["ns", "nd", "gv", "nv"])
         post_body["alias"] = "flavor_alias"
         post_body["ram"] = str(ram)
         post_body["vcpus"] = str(vcpus)
@@ -63,11 +63,40 @@ class FmsBaseOrmTest(base.BaseOrmTest):
         post_body["regions"] = [region] if set_region else []
         post_body["visibility"] = "private"
 
+        if series:
+            post_body["series"] = series
+        else:
+            post_body["series"] = random.choice(["ns", "nd", "gv", "nv"])
+
         if single_tenant:
             post_body["tenants"] = [cls.tenant_id]
         else:
             post_body["tenants"] = [cls.tenant_id, cls.alt_tenant_id]
+
+        if options:
+            post_body["options"] = options
+
         return post_body
+
+    @classmethod
+    def _get_flavor_name(cls, body):
+        """ Calculate expected flavor name from POST body
+
+        Ranger generates flavor name in a standard format based on
+        options provided while creating.
+        <series>.c<cores>r<ram(GB)>d<disk(GB)>e<ephemeral(GB)>s<swap(GB)>
+        Eg: p1.c2.r2d10e10s1
+
+        """
+        temp = {}
+        name_template = '{series}.c{vcpus}.r{ram}d{disk}e{ephemeral}s{swap}'
+        temp['series'] = body['series']
+        temp['disk'] = body['disk']
+        temp['vcpus'] = body['vcpus']
+        temp['ram'] = body['ram'] / 1024
+        temp['ephemeral'] = body['ephemeral'] / 1024
+        temp['swap'] = body['swap'] / 1024
+        return name_template.format(**temp)
 
     @classmethod
     def _create_flv_and_validate_creation_on_dcp_and_lcp(cls, **kwargs):
