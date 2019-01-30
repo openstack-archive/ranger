@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import uuid
+
 from ranger_tempest_plugin.tests.api import ims_base
 from tempest import config
 from tempest.lib import decorators
@@ -64,7 +66,8 @@ class TestTempestIms(ims_base.ImsBaseOrmTest):
 
     @decorators.idempotent_id('2b1bb28b-4151-4e75-ae1b-d21089c3418c')
     def test_get_image(self):
-        """ Execute 'get_image' using the following options:
+        """Execute 'get_image' using the following options:
+
         -  get image by id   (using cust_id parameter)
         -  get image by name (using cust_name parameter)
         """
@@ -76,7 +79,8 @@ class TestTempestIms(ims_base.ImsBaseOrmTest):
 
     @decorators.idempotent_id('6072c438-1e45-4c0b-97a6-e5127bd33d90')
     def test_list_images_with_filters(self):
-        """ This function executes 'list customer' with all available filters:
+        """This function executes 'list customer' with all available filters:
+
         -  no filter  (i.e.  list all images)
         -  filter by region
         -  filter by customer
@@ -96,8 +100,7 @@ class TestTempestIms(ims_base.ImsBaseOrmTest):
 
     @decorators.idempotent_id('eae7ca20-5383-4579-9f73-0138b8b3ec85')
     def test_list_public_images(self):
-        """ List images with visibility = 'public'
-        """
+        """List images with visibility = 'public'"""
         # set_private = False to create image with visibility = 'public'
         post_body = self._get_image_params(set_private=False)
         image = self._data_setup(post_body)
@@ -113,8 +116,7 @@ class TestTempestIms(ims_base.ImsBaseOrmTest):
 
     @decorators.idempotent_id('dc321d60-f3bd-477c-b7bf-1594626f0a12')
     def test_list_private_images(self):
-        """ List images with visibility = 'private'
-        """
+        """List images with visibility = 'private' """
         # image data created with visibility = private set by default
         post_body = self._get_image_params()
         image = self._data_setup(post_body)
@@ -298,3 +300,104 @@ class TestTempestIms(ims_base.ImsBaseOrmTest):
         self._del_img_validate_deletion_on_dcp_and_lcp(test_image_id)
         self.assertRaises(exceptions.NotFound, self.client.get_image,
                           test_image_id)
+
+    @decorators.idempotent_id('59887b26-8e73-4781-87a4-3b505ece0021')
+    def test_create_image_protected_true(self):
+        post_body = self._get_image_params()
+        # set Protected True
+        post_body['protected'] = True
+        # call client create_IMAGE and wait till status equals 'Success'
+        _, body = self.client.create_image(**post_body)
+        image = body["image"]
+        test_image_id = image["id"]
+        self._wait_for_image_status_on_dcp(test_image_id, 'Success')
+
+        # do not forget to add this account to addCleanUp
+        self.addCleanup(self._del_img_validate_deletion_on_dcp_and_lcp,
+                        test_image_id)
+        # verify image record created successfully
+        _, body = self.client.get_image(test_image_id)
+        image = body["image"]
+        self.assertEqual(image["regions"][0]["name"], CONF.identity.region)
+
+    @decorators.idempotent_id('56cd1de0-3908-41d5-af98-45ad95463817')
+    def test_create_image_with_tags_properties(self):
+        post_body = self._get_image_params()
+        # set tags and properties
+        tags = ["brocade", "vyatta", "vCEImage", "mediumImage"]
+        properties = {
+            "Application-Name": "Vyatta",
+            "Application-Type": "VCE",
+            "Application-Vendor": "Brocade",
+            "Application-Version": "3.5.R5.att-V6.0",
+            "hw_vif_model": "VirtualVmxnet3",
+            "OS": "Debian",
+            "OS-Version": "7",
+            "Post-Processing-Networking": "None",
+            "Post-Processing-Tools": "None",
+            "vmware-adaptertype": "ide",
+            "vmware-disktype": "sparse"
+        }
+        post_body["tags"] = tags
+        post_body["properties"] = properties
+
+        # call client create_IMAGE and wait till status equals 'Success'
+        _, body = self.client.create_image(**post_body)
+        image = body["image"]
+        test_image_id = image["id"]
+        self._wait_for_image_status_on_dcp(test_image_id, 'Success')
+
+        # do not forget to add this account to addCleanUp
+        self.addCleanup(self._del_img_validate_deletion_on_dcp_and_lcp,
+                        test_image_id)
+        # verify image record created successfully
+        _, body = self.client.get_image(test_image_id)
+        image = body["image"]
+        self.assertListEqual(image["regions"][0]["tags"], tags)
+        self.assertDictEqual(image["regions"][0]["properties"], properties)
+
+    @decorators.idempotent_id('67aa7014-4dbb-4d66-bc7b-1a95a57494f8')
+    def test_create_image_with_uuid(self):
+        post_body = self._get_image_params()
+        # set uuid
+        str_uuid = uuid.uuid4().hex
+        post_body['id'] = str_uuid
+        # call client create_IMAGE and wait till status equals 'Success'
+        _, body = self.client.create_image(**post_body)
+        image = body["image"]
+        test_image_id = image["id"]
+        self._wait_for_image_status_on_dcp(test_image_id, 'Success')
+
+        # do not forget to add this account to addCleanUp
+        self.addCleanup(self._del_img_validate_deletion_on_dcp_and_lcp,
+                        test_image_id)
+        # verify image record created successfully
+        _, body = self.client.get_image(test_image_id)
+        image = body["image"]
+        self.assertEqual(image["regions"][0]["id"], str_uuid)
+
+    @decorators.idempotent_id('ae1223b5-cb75-442b-82eb-488969acc978')
+    def test_create_flavor_with_region_group(self):
+        post_body = self._get_image_params()
+        # region group
+        region_group = {"name": "NCLargetest", "type": "group"}
+        # update region_group to regions
+        post_body["regions"].append(region_group)
+        # call client create_IMAGE and wait till status equals 'Success'
+        _, body = self.client.create_image(**post_body)
+        image = body["image"]
+        test_image_id = image["id"]
+        self._wait_for_image_status_on_dcp(test_image_id, 'Success')
+
+        # do not forget to add this account to addCleanUp
+        self.addCleanup(self._del_img_validate_deletion_on_dcp_and_lcp,
+                        test_image_id)
+        # verify image record created successfully
+        _, body = self.client.get_image(test_image_id)
+        image = body["image"]
+        # Aggregate Status
+        self.assertEqual(image["status"], 'Success')
+        # Region Status
+        self.assertEqual(image["regions"][1]["status"], 'Success')
+        # region group
+        self.assertDictEqual(image["regions"][1]["name"], "NCLargetest")
