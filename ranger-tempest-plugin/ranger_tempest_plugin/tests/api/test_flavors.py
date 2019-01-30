@@ -13,6 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import sys
 import json
 
 from ranger_tempest_plugin.tests.api import fms_base
@@ -20,6 +21,8 @@ from tempest import config
 from tempest.lib.common.utils import data_utils
 from tempest.lib import decorators
 from tempest.lib import exceptions
+from testtools.matchers import MatchesException
+
 
 CONF = config.CONF
 
@@ -406,3 +409,159 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
         self._del_flv_and_validate_deletion_on_dcp_and_lcp(test_flvr_id)
         self.assertRaises(exceptions.NotFound, self.client.get_flavor,
                           test_flvr_id)
+
+    @decorators.idempotent_id('7b9d1f91-a8a4-458d-aaad-a98b5bf033b4')
+    def test_create_flavor_wrong_series(self):
+        post_body = self._get_flavor_params()
+        exc_info = None
+        try:
+            _, body = self.client.create_flavor(**post_body)
+            flavor = body['flavor']
+            self._wait_for_flavor_status_on_dcp(flavor['id'], 'Success')
+            self.addCleanup(
+                self._del_flv_and_validate_deletion_on_dcp_and_lcp,
+                flavor['id'])
+        except:
+            # TODO: Need to verify whether it errors out here
+            # or status goes to error on a lab
+            exc_info = sys.exc_info()
+
+        self.assertIsNot(
+            exc_info, None,
+            'options %s with %s: %s did not fail as expected' % (
+                options,
+                prop,
+                limit
+            )
+        )
+
+    @decorators.idempotent_id('872548a2-7de4-4ea1-a783-3e6a0e33bdb8')
+    def test_created_flavor_name(self):
+        post_body = self._get_flavor_params(series='p1')
+        # call client create_flavor and wait till status equals 'Success'
+        _, body = self.client.create_flavor(**post_body)
+
+        expected = self._get_flavor_name(post_body)
+
+        flavor = body["flavor"]
+        test_flvr_id = flavor['id']
+        self._wait_for_flavor_status_on_dcp(flavor["id"], 'Success')
+
+        # do not forget to add this account to addCleanUp
+        self.addCleanup(self._del_flv_and_validate_deletion_on_dcp_and_lcp,
+                        flavor["id"])
+
+        flavor = self._get_flavor_details(test_flvr_id)
+        actual = flavor['name']
+        self.assertEqual(expected, actual,
+                         'Flavor name did not match with expected')
+
+    @decorators.idempotent_id('4126de48-3922-470e-9eb9-3f2902e346fa')
+    def test_created_flavor_extra_specs(self):
+        expected = [
+            {
+                'options': {'n0': 'true'},
+                'specs': {
+                    'aggregate_instance_extra_specs:p1': 'true',
+                    'hw:cpu_policy': 'dedicated',
+                    'hw:mem_page_size': 'large',
+                    'hw:numa_nodes': '2'
+                }
+            },
+            {
+                'options': {'n0': 'false'},
+                'specs': {
+                    'aggregate_instance_extra_specs:p1': 'true',
+                    'hw:cpu_policy': 'dedicated',
+                    'hw:mem_page_size': 'large',
+                    'hw:numa_nodes': '1'
+                }
+            },
+            {
+                'options': {'n0': 'true', 'i2': 'true'},
+                'specs': {
+                    'aggregate_instance_extra_specs:p1': 'true',
+                    'hw:pci_numa_affinity_policy': 'dedicated',
+                    'hw:cpu_policy': 'dedicated',
+                    'hw:mem_page_size': 'large',
+                    'hw:numa_nodes': '0'
+                }
+            },
+        ]
+
+        for data in expected:
+            options = data['options']
+            post_body = self._get_flavor_params(series='p1', options=options)
+            # call client create_flavor and wait till status equals 'Success'
+            _, body = self.client.create_flavor(**post_body)
+
+            expected = self._get_flavor_name(post_body)
+
+            flavor = body["flavor"]
+            test_flvr_id = flavor['id']
+            self._wait_for_flavor_status_on_dcp(flavor["id"], 'Success')
+
+            # do not forget to add this account to addCleanUp
+            self.addCleanup(self._del_flv_and_validate_deletion_on_dcp_and_lcp,
+                            flavor["id"])
+
+            flavor = self._get_flavor_details(test_flvr_id)
+            actual = flavor['name']
+
+            self.assertEqual(data['specs'], flavor['extra-specs'],
+                             'Extra specs did not match with expected')
+
+    @decorators.idempotent_id('905f8842-7d98-4c3d-bcf5-242936716410')
+    def test_created_flavor_extra_specs_limit(self):
+        expected = [
+            {
+                'options': {'n0': 'true'},
+                'limits': {
+                    'ram': 321 * 1024,
+                    'vcpus': 81,
+                    'swap': 321 * 1024,
+                    'ephemeral': 3 * 1024 * 1024
+                }
+            },
+            {
+                'options': {'n0': 'false'},
+                'limits': {
+                    'ram': 161 * 1024,
+                    'vcpus': 41,
+                    'swap': 321 * 1024,
+                    'ephemeral': 3 * 1024 * 1024
+                }
+            },
+        ]
+        for data in expected:
+            options = data['options']
+            post_body = self._get_flavor_params(series='p1', options=options)
+            for prop, limit in data['limits'].iteritems():
+                post_body[prop] = limit
+                exc_info = None
+                try:
+                    _, body = self.client.create_flavor(**post_body)
+                    flavor = body['flavor']
+                    self._wait_for_flavor_status_on_dcp(flavor["id"], 'Success')
+                    self.addCleanup(
+                        self._del_flv_and_validate_deletion_on_dcp_and_lcp,
+                        flavor["id"])
+                except exceptions.BadRequest:
+                    exc_info = sys.exc_info()
+
+                self.assertIsNot(
+                    exc_info, None,
+                    'options %s with %s: %s did not fail as expected' % (
+                        options,
+                        prop,
+                        limit
+                    )
+                )
+                self.assertThat(
+                    exc_info, MatchesException(exceptions.BadRequest),
+                    'options %s with %s: %s did not fail with Bad request' % (
+                        options,
+                        prop,
+                        limit
+                    )
+                )
