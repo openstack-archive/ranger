@@ -118,6 +118,15 @@ class TestTempestRegion(rms_base.RmsBaseOrmTest):
         filter = {'vlcp_name': self.region_1['vlcpName']}
         self._list_regions_with_filter(filter, 'vlcpName')
 
+    @decorators.idempotent_id('77257e0c-e2f8-4b98-886c-359508a4a73d')
+    def test_list_multiple_filter(self):
+        filter = {
+            'vlcp_name': self.region_1['vlcpName'],
+            'status': self.region_1['status'],
+            'regionname': self.region_1['name']
+        }
+        self._list_regions_with_filter(filter, 'name')
+
     @decorators.idempotent_id('358f3cbc-4ae5-4b43-be36-6df55eae8fd9')
     def test_get_region(self):
         _, body = self.client.get_region(self.region_1['id'])
