@@ -21,7 +21,7 @@ LABEL                      ?= commit-id
 PROXY                      ?= http://proxy.foo.com:8000
 NO_PROXY                   ?= localhost,127.0.0.1,.svc.cluster.local
 USE_PROXY                  ?= true
-USER                       := ranger
+RANGER_USER                := ranger
 
 IMAGE := ${DOCKER_REGISTRY}/${IMAGE_PREFIX}/${IMAGE_NAME}:${IMAGE_TAG}
 IMAGE_DIR:=images/$(IMAGE_NAME)
@@ -57,7 +57,7 @@ build_ranger:
 
 ifeq ($(USE_PROXY), true)
 	docker build --network host -t $(IMAGE) --label $(LABEL) -f $(IMAGE_DIR)/Dockerfile \
-                --build-arg user=$(USER) \
+                --build-arg user=$(RANGER_USER) \
 		--build-arg http_proxy=$(PROXY) \
 		--build-arg https_proxy=$(PROXY) \
 		--build-arg HTTP_PROXY=$(PROXY) \
@@ -65,7 +65,7 @@ ifeq ($(USE_PROXY), true)
 		--build-arg no_proxy=$(NO_PROXY) \
 		--build-arg NO_PROXY=$(NO_PROXY) .
 else
-	docker build --network host -t $(IMAGE) --label $(LABEL) -f $(IMAGE_DIR)/Dockerfile --build-arg user=$(USER) .
+	docker build --network host -t $(IMAGE) --label $(LABEL) -f $(IMAGE_DIR)/Dockerfile --build-arg user=$(RANGER_USER) .
 endif
 
 .PHONY: build_rangercli
