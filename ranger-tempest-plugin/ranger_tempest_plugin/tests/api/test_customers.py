@@ -62,7 +62,8 @@ class TestTempestCms(cms_base.CmsBaseOrmTest):
     def test_list_customers_with_filters(self):
         """ This function executes 'list customer' with all available filters:
         -  no filter  (i.e.  list all customers)
-        -  filter by metadata key
+        -  filter by tags key
+        -  filter by tags key value pairs
         -  filter by region
         -  filter by default user id
         -  customer name contains a substring
@@ -76,19 +77,22 @@ class TestTempestCms(cms_base.CmsBaseOrmTest):
         cust_name = self.setup_customer['name']
         substr_name = random.randint(0, len(cust_name))
 
-        # get the first key from metadata as the metadata key filter
-        metadata_key = list(self.setup_customer['metadata'].keys())[0]
+        # get the first key from tag as the tag key filter
+        tag_key = list(self.setup_customer['tags'].keys())[0]
+        tag_value = self.setup_customer['tags'][tag_key]
 
         # define the list customer filters to be used for this test
         no_filter = None
-        metadata_filter = {'metadata': metadata_key}
+        tags_filter = {'tags': tag_key}
+        tag_keyvalue_filter = {'tag': '%s:%s' % (tag_key, tag_value)}
         region_filter = {'region': region_name[0]}
         user_filter = {'user': userid[0]}
         contains_filter = {'contains': cust_name[substr_name:]}
         startswith_filter = {'starts_with': cust_name[:substr_name]}
+        status = {'status': 'Success'}
 
         # execute list_customers with the available filters
-        for list_filter in [no_filter, metadata_filter, region_filter,
+        for list_filter in [no_filter, tag_filter, region_filter,
                             user_filter, contains_filter, startswith_filter]:
             _, body = self.client.list_customers(list_filter)
             customers = [cust['id'] for cust in body['customers']]
@@ -110,6 +114,20 @@ class TestTempestCms(cms_base.CmsBaseOrmTest):
         self._wait_for_status(test_customer_id, 'Success')
         _, body = self.client.get_customer(test_customer_id)
         self.assertTrue(body['enabled'])
+
+    @decorators.idempotent_id('edf3a30a-fca8-49d0-acc6-c3190c6feb43')
+    def test_disable_customer(self):
+        post_body = self._get_customer_params()
+        test_customer_id = self._create_cust_validate_creation_on_dcp_and_lcp(
+            **post_body)
+        self.addCleanup(self._del_cust_validate_deletion_on_dcp_and_lcp,
+                        test_customer_id)
+        _, body = self.client.get_customer(test_customer_id)
+        self.assertTrue(body['enabled'])
+        self.client.enable_customer(test_customer_id, False)
+        self._wait_for_status(test_customer_id, 'Success')
+        _, body = self.client.get_customer(test_customer_id)
+        self.assertFalse(body['enabled'])
 
     @decorators.idempotent_id('7dfd5f7e-7031-4ee1-b355-cd5cdeb21bd1')
     def test_add_default_user(self):
@@ -258,22 +276,22 @@ class TestTempestCms(cms_base.CmsBaseOrmTest):
                       for x in customer["regions"][0]['users']])
 
     @decorators.idempotent_id('f1444965-c711-438d-ab86-a2412acbe8e0')
-    def test_replace_metadata(self):
-        metadata = {'metadata': {'replace_key': 'replace_value'}}
-        _, body = self.client.replace_metadata(self.setup_customer_id,
-                                               metadata)
+    def test_replace_tags(self):
+        tags = {'tags': {'replace_key': 'replace_value'}}
+        _, body = self.client.replace_tags(self.setup_customer_id,
+                                               tags)
         self._wait_for_status(self.setup_customer_id, 'Success')
-        _, body = self.client.list_customers({'metadata': 'replace_key'})
+        _, body = self.client.list_customers({'tags': 'replace_key'})
         self.assertIn(self.setup_customer_id,
                       [x['id'] for x in body['customers']])
 
     @decorators.idempotent_id('80713a87-8e95-481f-a198-6b4515d48362')
-    def test_add_metadata(self):
-        metadata = {'metadata': {'add_key': 'add_value'}}
-        _, body = self.client.add_metadata(self.setup_customer_id,
-                                           metadata)
+    def test_add_tags(self):
+        tags = {'tags': {'add_key': 'add_value'}}
+        _, body = self.client.add_tags(self.setup_customer_id,
+                                           tags)
         self._wait_for_status(self.setup_customer_id, 'Success')
-        _, body = self.client.list_customers({'metadata': 'add_key'})
+        _, body = self.client.list_customers({'tags': 'add_key'})
         self.assertIn(self.setup_customer_id,
                       [x['id'] for x in body['customers']])
 
@@ -306,15 +324,21 @@ class TestTempestCms(cms_base.CmsBaseOrmTest):
 
     @decorators.idempotent_id('c7a24667-2a99-41ac-a42d-6c1163ef48af')
     def test_create_customer(self):
-        post_body = self._get_customer_params(quota=False)
-        test_cust_name = post_body['name']
-        _, body = self.client.create_customer(**post_body)
-        test_customer_id = body['customer']['id']
-        self.addCleanup(self._del_cust_validate_deletion_on_dcp_and_lcp,
-                        test_customer_id)
-        self._wait_for_status(test_customer_id, 'Success')
-        _, body = self.client.get_customer(test_cust_name)
-        self.assertIn(test_customer_id, body['uuid'])
+        payloads = [
+            # For customer with region type single
+            self._get_customer_params(quota=False),
+            # For customer with region type group
+            self._get_customer_params(quota=False, region_type='group')
+        ]
+        for payload in payloads:
+            test_cust_name = payload['name']
+            _, body = self.client.create_customer(**payload)
+            test_customer_id = body['customer']['id']
+            self.addCleanup(self._del_cust_validate_deletion_on_dcp_and_lcp,
+                            test_customer_id)
+            self._wait_for_status(test_customer_id, 'Success')
+            _, body = self.client.get_customer(test_cust_name)
+            self.assertIn(test_customer_id, body['uuid'])
 
     @decorators.idempotent_id('43785f87-27d5-408d-997f-de602caeb698')
     def test_replace_customer(self):
@@ -328,6 +352,25 @@ class TestTempestCms(cms_base.CmsBaseOrmTest):
         self.assertExpected(customer, body, ['name', 'regions'])
         for region in customer['regions']:
             self.assertIn(region['name'], [x['name'] for x in body['regions']])
+
+    @decorators.idempotent_id('c59b0ecd-6c77-4fd4-a3ab-0a639241d528')
+    def test_replace_customer_quota(self):
+        post_body = self._get_customer_params(quota=False)
+        _, body = self.client.create_customer(**post_body)
+        test_customer_id = body['customer']['id']
+        test_customer_name = post_body['name']
+        self.addCleanup(self._del_cust_validate_deletion_on_dcp_and_lcp,
+                        test_customer_id)
+        self._wait_for_status(test_customer_id, 'Success')
+        put_body = self._get_customer_quota(test_customer_name)
+        expected = self._get_quota()
+        _, body = self.client.update_customer(test_customer_id,
+                                              put_body)
+        self._wait_for_status(self.setup_customer_id, 'Success')
+        _, body = self.client.get_customer(test_customer_id)
+        actual = body['regions'][0]['quotas']
+        self.assertEqual(expected, actual,
+                         'Quota for customer did not got updated')
 
     @decorators.idempotent_id('e8b9077a-d45c-4e24-a433-e7dfa07486b9')
     def test_delete_customer(self):

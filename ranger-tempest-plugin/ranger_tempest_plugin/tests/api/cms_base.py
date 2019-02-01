@@ -81,25 +81,33 @@ class CmsBaseOrmTest(base.BaseOrmTest):
         return quota
 
     @classmethod
+    def _get_customer_quota(cls, name):
+        payload = {}
+        payload['name'] = name
+        payload['type'] = single
+        payload['quotas'] = [cls._get_quota()]
+        return payload
+
+    @classmethod
     def _get_customer_params(cls, quota=None, enabled=True, region_users=True,
-                             default_users=True):
-        region, user, metadata, payload = {}, {}, {}, {}
+                             default_users=True, region_type='single'):
+        region, user, tags, payload = {}, {}, {}, {}
         cust_name = data_utils.rand_name('ormTempestCms')
         if not quota:
             quota = cls._get_quota()
         region['name'] = CONF.identity.region
-        region['type'] = 'single'
+        region['type'] = region_type
         region['quotas'] = [quota]
         user['id'] = cls.os_primary.credentials.username
         user['role'] = ["admin"]
         region["users"] = [user] if region_users else []
         regions = [region]
-        metadata['my_server_name'] = cust_name
-        metadata['ocx_cust'] = random.randint(0, 999999999)
+        tags['my_server_name'] = cust_name
+        tags['ocx_cust'] = random.randint(0, 999999999)
         payload["description"] = cust_name
         payload["enabled"] = True if enabled else False
         payload["name"] = cust_name
-        payload['metadata'] = metadata
+        payload['tags'] = tags
         payload["regions"] = regions
         payload["defaultQuotas"] = [quota]
         payload['users'] = [user] if default_users else []
@@ -143,7 +151,7 @@ class CmsBaseOrmTest(base.BaseOrmTest):
         - name
         - description
         - enabled
-        - metadata
+        - tags
         - regions
         - defaultQuotas
         - ephemeral
