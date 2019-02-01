@@ -54,11 +54,11 @@ class CmsClient(base_client.RangerClientBase):
         post_body = json.dumps(args)
         return self.post_request(uri, post_body, schema.add_users)
 
-    def add_metadata(self, customer_id, metadata):
-        uri = '%s/%s/orm/customers/%s/metadata' \
+    def add_tags(self, customer_id, tags):
+        uri = '%s/%s/orm/customers/%s/tags' \
             % (self.cms_url, self.version, customer_id)
-        post_body = json.dumps(metadata)
-        return self.post_request(uri, post_body, schema.add_metadata)
+        post_body = json.dumps(tags)
+        return self.post_request(uri, post_body, schema.add_tags)
 
     # PUT
 
@@ -83,15 +83,20 @@ class CmsClient(base_client.RangerClientBase):
     def replace_region_user(self, customer_id, region_id, *args):
         uri = '%s/%s/orm/customers/%s/regions/%s/users' \
             % (self.cms_url, self.version, customer_id, region_id)
-
         put_body = json.dumps(args)
         return self.put_request(uri, put_body, schema.replace_users)
 
-    def replace_metadata(self, customer_id, metadata):
-        uri = '%s/%s/orm/customers/%s/metadata' \
+    def replace_tags(self, customer_id, tags):
+        uri = '%s/%s/orm/customers/%s/tags' \
             % (self.cms_url, self.version, customer_id)
-        put_body = json.dumps(metadata)
-        return self.put_request(uri, put_body, schema.replace_metadata)
+        put_body = json.dumps(tags)
+        return self.put_request(uri, put_body, schema.replace_tags)
+
+    def update_customer_region(self, customer_id, customer):
+        uri_template = '%s/%s/orm/customers/%s/regions'
+        uri = uri_template % (self.cms_url, self.version, customer_id)
+        put_body = json.dumps(customer)
+        return self.put_request(uri, put_body, schema.update_customer)
 
     # GET
 

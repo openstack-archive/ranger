@@ -112,7 +112,7 @@ add_users = {
 
 replace_users = add_users
 
-add_metadata = {
+add_tags = {
     'status_code': [200],
     'response_body': {
         'type': 'object',
@@ -124,9 +124,9 @@ add_metadata = {
     }
 }
 
-replace_metadata = add_metadata
+replace_tags = add_tags
 
-enable_customer = add_metadata
+enable_customer = add_tags
 
 get_customer = {
     'status_code': [200],
@@ -142,10 +142,10 @@ get_customer = {
             'name': {'type': 'string'},
             'regions': {'type': 'array'},
             'custId': {'type': 'string'},
-            'metadata': {'type': 'object'}
+            'tags': {'type': 'object'}
         },
         'required': ['status', 'uuid', 'users', 'description', 'enabled',
-                     'defaultQuotas', 'name', 'regions', 'custId', 'metadata']
+                     'defaultQuotas', 'name', 'regions', 'custId', 'tags']
     }
 }
 
