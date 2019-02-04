@@ -13,13 +13,13 @@
 
     "region:get_one": "",
     "region:get_all": "",
-    "region:create": "rule:admin_or_support",
+    "region:create": "",
     "region:update": "rule:admin",
     "region:delete": "rule:admin",
 
     "group:get_one": "",
     "group:get_all": "",
-    "group:create": "rule:admin_or_support",
+    "group:create": "",
     "group:update": "rule:admin",
     "group:delete": "rule:admin",
 
