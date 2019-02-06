@@ -15,6 +15,7 @@
 
 from ranger_tempest_plugin.tests.api import ims_base
 from tempest import config
+from tempest.lib.common.utils import data_utils
 from tempest.lib import decorators
 from tempest.lib import exceptions
 
@@ -298,3 +299,63 @@ class TestTempestIms(ims_base.ImsBaseOrmTest):
         self._del_img_validate_deletion_on_dcp_and_lcp(test_image_id)
         self.assertRaises(exceptions.NotFound, self.client.get_image,
                           test_image_id)
+
+    @decorators.idempotent_id('e642fa39-1b69-4d17-8bd1-aee90ea042a3')
+    def test_image_while_region_down(self):
+        # create region with status down
+        _, region = self.client.create_region(
+            **{
+                'name': data_utils.rand_name(),
+                'status': 'down',
+            }
+        )
+
+        # create image within that newly created region
+        post_body = self._get_image_params()
+        post_body['region']=[region]
+        image = self._data_setup(post_body)
+        test_image_id = image['id']
+        _, image = self.client.get_image(test_image_id)
+        # assert status show error
+        self.assertEqual(image['id'], test_image_id)
+        self.assertEqual(image['status'], 'Error')
+
+    @decorators.idempotent_id('a1fee342-3000-41a6-97f9-b33fd2734e4d')
+    def test_image_while_region_building(self):
+        # create region with status building
+        _, region = self.client.create_region(
+            **{
+                'name': data_utils.rand_name(),
+                'status': 'building',
+            }
+        )
+
+        # create image within that newly created region
+        post_body = self._get_image_params()
+        post_body['region']=[region]
+        image = self._data_setup(post_body)
+        test_image_id = image['id']
+        _, image = self.client.get_image(test_image_id)
+        # assert status
+        self.assertEqual(image['id'], test_image_id)
+        self.assertEqual(image['status'], 'Success')
+
+    @decorators.idempotent_id('b967ce58-5d24-4af2-8416-a336772c8087')
+    def test_image_while_region_maintenance(self):
+        # create region with status maintenance
+        _, region = self.client.create_region(
+            **{
+                'name': data_utils.rand_name(),
+                'status': 'maintenance',
+            }
+        )
+
+        # create image within that newly created region
+        post_body = self._get_image_params()
+        post_body['region']=[region]
+        image = self._data_setup(post_body)
+        test_image_id = image['id']
+        _, image = self.client.get_image(test_image_id)
+        # assert status
+        self.assertEqual(image['id'], test_image_id)
+        self.assertEqual(image['status'], 'Success')

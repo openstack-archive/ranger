@@ -406,3 +406,63 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
         self._del_flv_and_validate_deletion_on_dcp_and_lcp(test_flvr_id)
         self.assertRaises(exceptions.NotFound, self.client.get_flavor,
                           test_flvr_id)
+
+    @decorators.idempotent_id('37f1909f-3ba2-403c-ba0c-0a11b869d6a1')
+    def test_flavor_while_region_down(self):
+        # create region with status down
+        _, region = self.client.create_region(
+            **{
+                'name': data_utils.rand_name(),
+                'status': 'down',
+            }
+        )
+
+        # create flavor within that newly created region
+        post_body = self._get_flavor_params()
+        post_body['region'] = [region]
+        flavor = self._data_setup(post_body)
+        test_flvr_id = flavor['id']
+        flavor = self._get_flavor_details(test_flvr_id)
+        # assert status show error
+        self.assertEqual(flavor['id'], test_flvr_id)
+        self.assertEqual(flavor['status'], 'Error')
+
+    @decorators.idempotent_id('1c6a24d3-345e-46d4-aaa0-127b7fc8a42d')
+    def test_flavor_while_region_building(self):
+        # create region with status down
+        _, region = self.client.create_region(
+            **{
+                'name': data_utils.rand_name(),
+                'status': 'building',
+            }
+        )
+
+        # create flavor within that newly created region
+        post_body = self._get_flavor_params()
+        post_body['region'] = [region]
+        flavor = self._data_setup(post_body)
+        test_flvr_id = flavor['id']
+        flavor = self._get_flavor_details(test_flvr_id)
+        # assert status show error
+        self.assertEqual(flavor['id'], test_flvr_id)
+        self.assertEqual(flavor['status'], 'Success')
+
+    @decorators.idempotent_id('e17dab64-c900-4a19-a7a2-96a0bf4af0f8')
+    def test_flavor_while_region_maintenance(self):
+        # create region with status maintenance
+        _, region = self.client.create_region(
+            **{
+                'name': data_utils.rand_name(),
+                'status': 'maintenance',
+            }
+        )
+
+        # create flavor within that newly created region
+        post_body = self._get_flavor_params()
+        post_body['region'] = [region]
+        flavor = self._data_setup(post_body)
+        test_flvr_id = flavor['id']
+        flavor = self._get_flavor_details(test_flvr_id)
+        # assert status
+        self.assertEqual(flavor['id'], test_flvr_id)
+        self.assertEqual(flavor['status'], 'Success')

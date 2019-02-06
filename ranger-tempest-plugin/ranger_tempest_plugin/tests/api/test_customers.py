@@ -17,6 +17,7 @@ import random
 
 from ranger_tempest_plugin.tests.api import cms_base
 from tempest import config
+from tempest.lib.common.utils import data_utils
 from tempest.lib import decorators
 from tempest.lib import exceptions
 
@@ -340,3 +341,66 @@ class TestTempestCms(cms_base.CmsBaseOrmTest):
         self._del_cust_validate_deletion_on_dcp_and_lcp(test_customer_id)
         self.assertRaises(exceptions.NotFound, self.client.get_customer,
                           test_customer_id)
+
+    @decorators.idempotent_id('b8493b3f-e64d-448e-a965-b0eeff415981')
+    def test_customer_while_region_down(self):
+        # create region with status down
+        _, region = self.client.create_region(
+            **{
+                'name': data_utils.rand_name(),
+                'status': 'down',
+            }
+        )
+
+        # create customer within that newly created region
+        cust_body = self._get_customer_params()
+        cust_body['region'] = [region]
+        customer_id = self._create_cust_validate_creation_on_dcp_and_lcp(
+            **cust_body
+        )
+        _, body = self.client.get_customer(customer_id)
+        # assert status show error
+        self.assertEqual(customer_id, body['id'])
+        self.assertEqual(body['status'], 'Error')
+
+    @decorators.idempotent_id('1aa52c36-4b1e-459e-9633-12b6cbd53ae7')
+    def test_customer_while_region_building(self):
+        # create region with status building
+        _, region = self.client.create_region(
+            **{
+                'name': data_utils.rand_name(),
+                'status': 'building',
+            }
+        )
+
+        # create customer within that newly created region
+        cust_body = self._get_customer_params()
+        cust_body['region'] = [region]
+        customer_id = self._create_cust_validate_creation_on_dcp_and_lcp(
+            **cust_body
+        )
+        _, body = self.client.get_customer(customer_id)
+        # assert status
+        self.assertEqual(customer_id, body['id'])
+        self.assertEqual(body['status'], 'Success')
+
+    @decorators.idempotent_id('d3cd949e-7895-421c-aeee-2c3d862c391f')
+    def test_customer_while_region_maintenance(self):
+        # create region with status maintenance
+        _, region = self.client.create_region(
+            **{
+                'name': data_utils.rand_name(),
+                'status': 'maintenance',
+            }
+        )
+
+        # create customer within that newly created region
+        cust_body = self._get_customer_params()
+        cust_body['region'] = [region]
+        customer_id = self._create_cust_validate_creation_on_dcp_and_lcp(
+            **cust_body
+        )
+        _, body = self.client.get_customer(customer_id)
+        # assert status
+        self.assertEqual(customer_id, body['id'])
+        self.assertEqual(body['status'], 'Success')
