@@ -99,10 +99,10 @@ yaml_configs = {
         },
         'cms_quota': {
             'resource_quotas': {
-                'quota_supported_params': ['vips', 'members', 'pools',
-                                           'nat_instance', 'route_table',
-                                           'health_monitors', 'loadbalancer',
-                                           'listener']
+                'quota_unsupported_params': ['vip', 'member', 'pool',
+                                             'nat_instance', 'route_table',
+                                             'health_monitor', 'loadbalancer',
+                                             'listener']
             }
         }
     },

@@ -137,8 +137,8 @@ def yamlbuilder(alldata, region):
                "network": ["neutron_quota", "OS::Neutron::Quota\n"],
                "storage": ["cinder_quota", "OS::Cinder::Quota\n"]}
 
-    adjust_quota_resource = CMSAdjustResource(region['rangerAgentVersion'])
-    adjust_quota_resource.fix_quota_resource_item(alldata['uuid'], quotas, resources, options)
+    adjust_resource = CMSAdjustResource()
+    adjust_resource.fix_quota_resource_item(alldata['uuid'], quotas, resources, options)
 
     # putting all parts together for full yaml
     yamldata = create_final_yaml(title, description, resources, outputs)
@@ -147,8 +147,8 @@ def yamlbuilder(alldata, region):
     return yamldata
 
 
-class CMSAdjustResource(object):
-    def __init__(self, rangerAgentVersion):
+class CMSAdjustResource():
+    def __init__(self):
         self.adjust_quota_parameters = CMSAdjustQuotaResource().adjust_quota_parameters
 
     def fix_quota_resource_item(self, uuid, quotas, resources, options):
@@ -157,13 +157,15 @@ class CMSAdjustResource(object):
             for items in quotas:
                 for item in items:
 
-                    # these lines added to check if got excpected keys if not they will be replaced
-                    for ite in items[item].keys()[:]:
-                        if ite in quotas_keys:
-                            items[item][quotas_keys[ite]] = items[item][ite]
-                            del items[item][ite]
+                    # rename quota keys as needed
+                    for quota_item in items[item].keys()[:]:
+                        if quota_item in quotas_keys:
+                            items[item][quotas_keys[quota_item]] = items[item][quota_item]
+                            new_quota_item_key = quotas_keys[quota_item]
+                            del items[item][quota_item]
+                            quota_item = new_quota_item_key
 
-                        self.adjust_quota_parameters(ite, items[item])
+                        self.adjust_quota_parameters(quota_item, items[item])
 
                     # adding project to each quota
                     items[item]['project'] = \
@@ -172,11 +174,13 @@ class CMSAdjustResource(object):
                         {"type": options[item][1], "properties": items[item]}
 
 
-class CMSAdjustQuotaResource(object):
+class CMSAdjustQuotaResource():
 
     def __init__(self):
-        self.supported_new_params = conf.yaml_configs.customer_yaml.cms_quota.resource_quotas.quota_supported_params
+        self.unsupported_quotas = conf.yaml_configs.customer_yaml.cms_quota.resource_quotas.quota_unsupported_params
 
     def adjust_quota_parameters(self, key, item):
-        if key in self.supported_new_params:
-            logger.debug("New quota parameter {} is added to quota resource".format(key))
+        if key in self.unsupported_quotas:
+            del item[key]
+            logger.warning("Region does not support Quota Parameter {}."
+                           " removed from resource".format(key))
