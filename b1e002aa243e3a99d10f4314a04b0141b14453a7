@@ -1,0 +1,10 @@
+Code-Review+2: Chi Lo <cl566n@att.com>
+Code-Review+1: James Quigley <jq1581@att.com>
+Workflow+1: Aaron McLean <am9518@att.com>
+Code-Review+2: Aaron McLean <am9518@att.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 08 Feb 2019 20:51:06 +0000
+Reviewed-on: https://review.openstack.org/635914
+Project: openstack/ranger
+Branch: refs/heads/master
