@@ -63,6 +63,8 @@ def main(argv=None):
         '/orm/services/customer_manager/scripts/db_scripts/ranger_cms_update_db.sql',
         CONF.ranger_base +
         '/orm/services/flavor_manager/scripts/db_scripts/ranger_fms_create_db.sql',
+        CONF.ranger_base +
+        '/orm/services/flavor_manager/scripts/db_scripts/ranger_fms_update_db.sql',
         CONF.ranger_base + '/orm/services/image_manager/scripts/db_scripts/create_db.sql'
     ]
 

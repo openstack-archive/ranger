@@ -1,4 +1,3 @@
-import ast
 import wsme
 
 from orm.common.orm_common.utils.cross_api_utils import (set_utils_conf,
@@ -8,6 +7,7 @@ from orm.services.flavor_manager.fms_rest.data.sql_alchemy import db_models
 from orm.services.flavor_manager.fms_rest.data.wsme.model import Model
 from orm.services.flavor_manager.fms_rest.logic.error_base import ErrorStatus
 
+from oslo_config import cfg
 from pecan import conf, request
 
 
@@ -45,8 +45,9 @@ class ExtraSpecsWrapper(Model):
 
     def to_db_model(self):
         extra_spec = []
+        autogen_es = cfg.CONF.flavor_series_metadata.autogen_extra_specs
         for key, value in self.os_extra_specs.iteritems():
-            if Flavor.ignore_extra_specs_input(key.replace(":", "____")):
+            if key in autogen_es:
                 continue
             extra_spec_rec = db_models.FlavorExtraSpec()
             extra_spec_rec.key_name = key
@@ -65,7 +66,9 @@ class ExtraSpecsWrapper(Model):
         extra_specs = ExtraSpecsWrapper()
         setattr(extra_specs, extra_spec_method, {})
         for extra_spec in os_extra_specs:
-            getattr(extra_specs, extra_spec_method, None)[extra_spec.key_name] = extra_spec.key_value
+            getattr(extra_specs,
+                    extra_spec_method,
+                    None)[extra_spec.key_name] = extra_spec.key_value
         return extra_specs
 
 
@@ -228,48 +231,65 @@ class Flavor(Model):
         self.status = status
 
     def validate_model(self, context=None):
+        series_metadata = {}
+        valid_numa = []
+        valid_vnf = []
 
-        bundle = ['b1', 'b2']
-        numa = ['n0']
-        vlan = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']
+        if self.series:
+            valid_flavor_series = cfg.CONF.fms.flavor_series
+            if self.series not in valid_flavor_series:
+                raise ErrorStatus(400, "Series possible values are {}".format(
+                                  valid_flavor_series))
+        else:
+            raise ErrorStatus(400, "Series not specified.")
+
+        if self.series in cfg.CONF['flavor_series_metadata']:
+            series_metadata = cfg.CONF['flavor_series_metadata'][self.series]
+        else:
+            raise ErrorStatus(400, "Cannot retrieve requested flavor"
+                              " series metadata.")
+
+        if 'valid_options_numa' in series_metadata:
+            valid_numa = [x for x in
+                          series_metadata['valid_options_numa'].split(',')]
+
+        if 'valid_options_vnf' in series_metadata:
+            valid_vnf = [x for x in
+                         series_metadata['valid_options_vnf'].split(',')]
 
         # validate that input entries are valid
         try:
             # flavor option values must be either 'true' or 'false' (in quotes)
-            bools = ['true', 'false']
 
             if self.options:
                 option_values = self.options.values()
                 invalid_opt_vals = [x for x in option_values if (x.lower()
-                                    not in bools)]
+                                    not in ['true', 'false'])]
                 if invalid_opt_vals:
                     raise ErrorStatus(400, "All flavor option values must have"
                                       " a value of 'true' or 'false'")
 
-            # validate series and set flavor limits
-            if self.series:
-                valid_flavor_series = conf.flavor_series.valid_series
-                if self.series not in valid_flavor_series:
-                    raise ErrorStatus(400, "series possible values are {}".format(
-                                      valid_flavor_series))
+            # validate series and set flavor vcpu and vram limits
+            requested_numa = [n for n in valid_numa if n in
+                              self.options.keys() and
+                              self.options[n].lower() == 'true']
 
-                if self.series == 'p1':
-                    if {'n0'}.issubset(self.options.keys()) and \
-                            ast.literal_eval(self.options.get('n0').lower().capitalize()):
-                        vcpu_limit = int(conf.flavor_limits.p1_n0_vcpu_limit)
-                        vram_limit = int(conf.flavor_limits.p1_n0_vram_limit)
-                    else:
-                        vcpu_limit = int(conf.flavor_limits.p1_nx_vcpu_limit)
-                        vram_limit = int(conf.flavor_limits.p1_nx_vram_limit)
+            if requested_numa:
+                vcpu_limit = int(series_metadata['vcpu_limit'])
+                vram_limit = int(series_metadata['vram_limit'])
+            else:
+                vcpu_limit = int(series_metadata['alt_vcpu_limit'])
+                vram_limit = int(series_metadata['alt_vram_limit'])
 
             # determine other flavor limits
-            swap_file_limit = int(conf.flavor_limits.swap_file_limit)
-            ephemeral_limit = int(conf.flavor_limits.ephemeral_limit)
+            swap_file_limit = cfg.CONF.fms.flavor_swap_file_limit
+            ephemeral_limit = cfg.CONF.fms.flavor_ephemeral_limit
 
             isValid = validate_description(self.description)
             if not isValid:
-                raise ErrorStatus(400, "Flavor description does not allow special characters :"
-                                       " only dashes, commas, and period allowed.")
+                raise ErrorStatus(400, "Flavor description does not allow"
+                                  " special characters: only dashes,"
+                                  " commas, and period allowed.")
             if not self.ram.isdigit():
                 raise ErrorStatus(400, "ram must be a number")
             if not self.vcpus.isdigit():
@@ -282,47 +302,53 @@ class Flavor(Model):
                 raise ErrorStatus(400, "ephemeral must be a number")
             if int(self.ram) not in range(1024, vram_limit + 1, 1024):
                 raise ErrorStatus(400,
-                                  "ram value is out of range. Expected range is 1024(1GB)-"
-                                  "%6d(%3dGB) and must be a multiple of 1024" %
+                                  "ram value is out of range. Expected range"
+                                  " is 1024(1GB)-%6d(%3dGB) and must be a"
+                                  " multiple of 1024" %
                                   (vram_limit, vram_limit / 1024))
             if int(self.vcpus) not in range(1, vcpu_limit + 1):
-                raise ErrorStatus(400, "vcpus value is out of range. Expected range is 1-"
-                                  "%2d" % (vcpu_limit))
+                raise ErrorStatus(400, "vcpus value is out of range. Expected"
+                                  "range is 1-%2d" % (vcpu_limit))
             if int(self.disk) < 0:
                 raise ErrorStatus(400, "disk cannot be less than zero")
 
             if not self.ephemeral:
                 self.ephemeral = "0"
-            elif self.ephemeral and int(self.ephemeral) not in range(0, ephemeral_limit + 1):
-                raise ErrorStatus(400, "ephemeral value is out of range. Expected range is 0-"
-                                       "%5d(%2dTB)" % (ephemeral_limit, ephemeral_limit / 1000))
+            elif (self.ephemeral and
+                  int(self.ephemeral) not in range(0, ephemeral_limit + 1)):
+                raise ErrorStatus(400,
+                                  "ephemeral value is out of range. Expected"
+                                  " range is 0-%5d(%2dTB)" %
+                                  (ephemeral_limit, ephemeral_limit / 1000))
 
             if int(self.swap) not in range(0, swap_file_limit + 1, 1024):
                 raise ErrorStatus(400,
-                                  "swap value is out of range. Expected range is 0-"
-                                  "%6d(%3dGB) and must be a multiple of 1024" %
+                                  "swap value is out of range. Expected"
+                                  " range is 0-%6d(%3dGB) and must be a"
+                                  " multiple of 1024" %
                                   (swap_file_limit, swap_file_limit / 1024))
         except ValueError:
-            raise ErrorStatus(400, "ram, vcpus, disk, ephemeral and swap must be integers")
+            raise ErrorStatus(400, "ram, vcpus, disk, ephemeral and swap must"
+                              " be integers")
 
         for symbol, value in self.extra_specs.iteritems():
-            if symbol == 'bundle' and value not in bundle:
+            if symbol == 'numa_override' and value not in valid_numa:
                 raise ErrorStatus(400,
-                                  "Invalid value. bundle possible values: " + str(bundle))
-            if symbol == 'numa_override' and value not in numa:
+                                  "Invalid value. numa_override possible"
+                                  " values: " + str(valid_numa))
+            if symbol == 'vlan_category' and value not in valid_vnf:
                 raise ErrorStatus(400,
-                                  "Invalid value. numa_override possible values: " + str(numa))
-            if symbol == 'vlan_category' and value not in vlan:
-                raise ErrorStatus(400,
-                                  "Invalid value. vlan_category possible values: " + str(vlan))
+                                  "Invalid value. vlan_category possible"
+                                  " values: " + str(valid_vnf))
 
-        # region type can be group only in create flavor!!
+        # region  type can be group only in create flavor!!
         if not context == "create":
             for region in self.regions:
                 if region.type == "group":
                     raise ErrorStatus(400,
-                                      "region type \'group\' is invalid in this "
-                                      "action, \'group\' can be only in create flavor action")
+                                      "region type \'group\' is invalid in"
+                                      " this action, \'group\' can be only"
+                                      " in create flavor action")
 
     def to_db_model(self):
         flavor = db_models.Flavor()
@@ -331,9 +357,10 @@ class Flavor(Model):
         options = []
         regions = []
         tenants = []
+        autogen_es = cfg.CONF.flavor_series_metadata.autogen_extra_specs
 
         for symbol, value in self.extra_specs.iteritems():
-            if self.ignore_extra_specs_input(symbol.replace(":", "____")):
+            if symbol in autogen_es:
                 continue
             es = db_models.FlavorExtraSpec()
             es.key_name = symbol
@@ -385,15 +412,6 @@ class Flavor(Model):
         return flavor
 
     @staticmethod
-    def ignore_extra_specs_input(symbol):
-        ignore_keys = conf.default_extra_spec_calculated_table.to_dict()
-        if symbol in ignore_keys:
-            return True
-        if len(symbol) == 36 and symbol[0:35] in ignore_keys and symbol[35].isdigit() and 1 <= int(symbol[35]) <= 8:
-            return True
-        return False
-
-    @staticmethod
     def from_db_model(sql_flavor):
         flavor = Flavor()
         flavor.id = sql_flavor.id
@@ -429,62 +447,71 @@ class Flavor(Model):
 
         return flavor
 
-    @staticmethod
-    def ignore_extra_specs_input(symbol):
-        ignore_keys = conf.default_extra_spec_calculated_table.to_dict()
-        if symbol in ignore_keys:
-            return True
-        if len(symbol) == 36 and symbol[0:35] in ignore_keys and symbol[35].isdigit() and 1 <= int(symbol[35]) <= 8:
-            return True
-        return False
-
     def get_extra_spec_needed(self):
         extra_spec_needed = []
-        items = conf.extra_spec_needed_table.to_dict()
-        for symbol, value in items[self.series].iteritems():
-            es = db_models.FlavorExtraSpec()
-            es.key_name = symbol.replace("____", ":")
-            es.key_value = value
+        requested_options = []
+        mixed_options = {}
+        series_metadata = cfg.CONF['flavor_series_metadata'][self.series]
 
-            extra_spec_needed.append(es)
+        # Retreive default extra specs and mixed options for series
+        for f_key, f_val in series_metadata.items():
+            if f_key.startswith("es_default_"):
+                es = db_models.FlavorExtraSpec(key_name_value=f_val)
+                extra_spec_needed.append(es)
+            if f_key.startswith("es_mixed_"):
+                mixed_es_trimmed = f_key.replace('es_mixed_', '')
+                mixed_options[mixed_es_trimmed] = f_val
 
-        options_items = self.options
-        # check some keys if they exist in option add values to extra specs
-        if self.series in 'p1':
-            n0_in = False
-            for symbol, value in options_items.iteritems():
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "aggregate_instance_extra_specs:%s" % symbol
-                es.key_value = "true"
-                # format numa node extra spec as appropriate
-                if symbol == "n0" and options_items[symbol].lower() == "true":
-                    n0_in = True
-                    es.key_value = 2
-                    es.key_name = "hw:numa_nodes"
-                    extra_spec_needed.append(es)
+        # Evaluate numa options
+        if 'valid_options_numa' in series_metadata:
+            valid_numa = [x for x in
+                          series_metadata['valid_options_numa'].split(',')]
 
-            # add the default extra specs
-            es = db_models.FlavorExtraSpec()
-            es.key_name = "hw:cpu_policy"
-            es.key_value = "dedicated"
-            extra_spec_needed.append(es)
+            option_numa = [n for n in valid_numa if n in
+                           self.options.keys() and
+                           self.options[n].lower() == 'true']
 
-            if not n0_in:
-                es = db_models.FlavorExtraSpec()
-                es.key_value = 1
-                es.key_name = "hw:numa_nodes"
+            if not option_numa:
+                es = db_models.FlavorExtraSpec(
+                    key_name_value=series_metadata['es_alt_numa_nodes'])
+                extra_spec_needed.append(es)
+            else:
+                es = db_models.FlavorExtraSpec(
+                    key_name_value=series_metadata['es_numa_nodes'])
+                extra_spec_needed.append(es)
+                requested_options.extend(option_numa)
+
+        # Evaluate pci options
+        if 'valid_options_pci' in series_metadata:
+            valid_pci = [x for x in
+                         series_metadata['valid_options_pci'].split(',')]
+
+            option_pci = [n for n in valid_pci if n in
+                          self.options.keys() and
+                          self.options[n].lower() == 'true']
+
+            if option_pci:
+                requested_options.extend(option_pci)
+
+        # Evalulate mixed options
+        assorted_opts = []
+        for mixed_key, mixed_value in mixed_options.items():
+            assorted_opts = [z for z in mixed_key.split('_')]
+
+            mixed_present = True
+            for opt in assorted_opts:
+                mixed_present &= True if opt in requested_options else False
+
+            if mixed_present:
+                es = db_models.FlavorExtraSpec(key_name_value=mixed_value)
                 extra_spec_needed.append(es)
 
-            if self.series in ['p1'] and {'i2'}.issubset(options_items.keys()):
-                es = db_models.FlavorExtraSpec()
-                es.key_name = "hw:pci_numa_affinity_policy"
-                es.key_value = "dedicated"
-                extra_spec_needed.append(es)
-
-        # convert the key_value to a string to avoid/fix pecan json rendering error in update extra_specs
+        # convert the key_value to a string to avoid/fix pecan json
+        # rendering error in update extra_specs
         i = 0
         while i < len(extra_spec_needed):
-            extra_spec_needed[i].key_value = str(extra_spec_needed[i].key_value)
+            extra_spec_needed[i].key_value = str(
+                extra_spec_needed[i].key_value)
             i += 1
 
         return extra_spec_needed
@@ -498,18 +525,19 @@ class Flavor(Model):
 
     def handle_region_groups(self):
         regions_to_add = []
-        for region in self.regions[:]:  # get copy of it to be able to delete from the origin
+        # get copy of it to be able to delete from the origin
+        for region in self.regions[:]:
             if region.type == "group":
                 group_regions = self.get_regions_for_group(region.name)
                 if group_regions is None:
                     raise ValueError("Group {} not found".format(region.name))
-                # if len(group_regions) == 0:
-                #    raise ValueError("Group {} is empty, no region was assigned to it".format(region.name))
                 for group_region in group_regions:
-                    regions_to_add.append(Region(name=group_region, type='single'))
+                    regions_to_add.append(Region(name=group_region,
+                                                 type='single'))
                 self.regions.remove(region)
 
-        self.regions.extend(set(regions_to_add))  # remove duplicates if exist
+        # remove duplicates if exist
+        self.regions.extend(set(regions_to_add))
 
     def get_regions_for_group(self, group_name):
         set_utils_conf(conf)
