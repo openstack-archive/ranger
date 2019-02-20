@@ -33,6 +33,7 @@ libssl-dev --no-install-recommends \
      /usr/share/doc-base
 RUN pip install -U setuptools --user
 RUN pip install wheel --user
+RUN pip install --upgrade six
 # RUN pip install virtualenv
 
 
