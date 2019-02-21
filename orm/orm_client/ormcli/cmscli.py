@@ -456,7 +456,7 @@ def run(args):
         exit(1)
 
     if not 200 <= resp.status_code < 300:
-        content = resp.json() if resp.status_code == 500 else ''
+        content = resp.content
         print 'API error: %s %s (Reason: %d)\n%s' % (
             rest_cmd.func_name.upper(), url, resp.status_code, content)
         exit(1)
