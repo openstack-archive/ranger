@@ -59,10 +59,7 @@ _flavor = {
                 "alias": {"type": "string"},
                 "description": {"type": "string"},
                 "tags": _tags,
-                "series": {
-                    "type": "string",
-                    "enum": ["gv", "nd", "ns", "nv", "ss"]
-                },
+                "series": {"type": "string"},
                 "extra-specs": _extra_specs,
                 "ram": {
                     "type": "string",
@@ -135,10 +132,7 @@ list_flavors = {
                         "status": {"type": "string"},
                         "description": {"type": "string"},
                         "tags": _tags,
-                        "series": {
-                            "type": "string",
-                            "enum": ["gv", "nd", "ns", "nv", "ss"]
-                        },
+                        "series": {"type": "string"},
                         "extra-specs": _extra_specs,
                         "ram": {
                             "type": "string",
