@@ -52,12 +52,19 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
         cls.region_id = CONF.identity.region
         cls.alias = cls.flavor['alias']
         cls.dflt_ex_specs = cls.flavor['extra-specs']
+
+        cls.tags = cls.flavor['tag']
+
+        # add custom extra specs
+        cls.custom_es = {'os_extra_specs': {'g': 'guava', 'h': 'honeydew'}}
+        cls.client.add_extra_specs(cls.flavor_id, cls.custom_es)
+        cls._wait_for_flavor_status_on_dcp(cls.flavor_id, 'Success')
+
         super(TestTempestFms, cls).resource_setup()
 
     def _get_flavor_details(self, flavor_id):
         _, body = self.client.get_flavor(flavor_id)
-        flavor = body["flavor"]
-        return flavor
+        return body["flavor"]
 
     def _data_setup(self, post_body):
         flavor = self._create_flv_and_validate_creation_on_dcp_and_lcp(
@@ -90,6 +97,23 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
             _, body = self.client.delete_extra_specs(flavor_id, para)
 
         self._wait_for_flavor_status_on_dcp(flavor_id, 'Success')
+
+    def _restore_default_tags(self, flavor_id):
+        tag_body = {"tags": self.tags}
+        _, body = self.client.update_tags(flavor_id, tag_body)
+        self._wait_for_flavor_status_on_dcp(flavor_id, 'Success')
+
+        _, tag_body = self.client.get_tags(flavor_id)
+        self.assertDictEqual(self.tags, body.get("tags"))
+
+    def _restore_custom_es(self, flavor_id):
+        _, body = self.client.update_extra_specs(flavor_id, self.custom_es)
+        self._wait_for_flavor_status_on_dcp(flavor_id, 'Success')
+
+        _, es = self.client.get_extra_specs(flavor_id)
+        es_expected = self.custom_es.get("os_extra_specs")
+        es_expected.update(self.dflt_ex_specs)
+        self.assertDictEqual(es_expected, es.get("os_extra_specs"))
 
     @classmethod
     def resource_cleanup(cls):
@@ -145,13 +169,12 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
         post_body = self._get_flavor_params()
         # call client create_flavor and wait till status equals 'Success'
         _, body = self.client.create_flavor(**post_body)
-        flavor = body["flavor"]
-        test_flvr_id = flavor['id']
-        self._wait_for_flavor_status_on_dcp(flavor["id"], 'Success')
+        test_flvr_id = body["flavor"]['id']
+        self._wait_for_flavor_status_on_dcp(test_flvr_id, 'Success')
 
         # do not forget to add this account to addCleanUp
         self.addCleanup(self._del_flv_and_validate_deletion_on_dcp_and_lcp,
-                        flavor["id"])
+                        test_flvr_id)
 
         # verify flavor record created successfully
         flavor = self._get_flavor_details(test_flvr_id)
@@ -161,81 +184,56 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
 
     @decorators.idempotent_id('4cad10ce-67d2-4633-b347-2c16783a31b9')
     def test_add_flvr_tags(self):
-        # setup data for test case
-        post_body = self._get_flavor_params()
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
-
         # test add_tags command with two sets of key:values
-        add_tag_body = {"tags": {"a": "b", "c": "d"}}
-        self._exec_tags_function(test_flvr_id, add_tag_body, 'add', None)
-        _, tag_body = self.client.get_tags(test_flvr_id)
-        self.assertDictEqual(add_tag_body.get("tags"), tag_body.get("tags"))
+        add_tag_body = {"tags": {"aa": "bb", "cc": "dd"}}
+        self._exec_tags_function(self.flavor_id, add_tag_body, 'add', None)
+        _, tag_body = self.client.get_tags(self.flavor_id)
+
+        subset = {k: v for k, v in tag_body.get("tags").items()
+                  if k in add_tag_body.get("tags")}
+
+        self.assertDictEqual(add_tag_body.get("tags"), subset)
 
     @decorators.idempotent_id('db8e5c0f-0041-45d4-9939-e079296123d8')
     def test_replace_flvr_tags(self):
-        # setup data for test case and assign two tags
-        post_body = self._get_flavor_params()
-        tags = {}
-        tags["a"] = "b"
-        tags["c"] = "d"
-        post_body["tag"] = tags
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
-
         # test replace_tags command
-        replace_tag_body = {"tags": {"e": "f", "g": "h"}}
-        self._exec_tags_function(test_flvr_id, replace_tag_body,
+        replace_tag_body = {"tags": {"ee": "ff", "gg": "hh"}}
+        self._exec_tags_function(self.flavor_id, replace_tag_body,
                                  'update', None)
-        _, tag_body = self.client.get_tags(test_flvr_id)
+        self.addCleanup(self._restore_default_tags, self.flavor_id)
+        _, tag_body = self.client.get_tags(self.flavor_id)
         self.assertDictEqual(replace_tag_body.get("tags"),
                              tag_body.get("tags"))
 
     @decorators.idempotent_id('e0a0eca6-e120-45ab-a1a4-f5b95fdf97f1')
     def test_delete_flvr_tag(self):
-        # setup data for test case and assign two tags
-        post_body = self._get_flavor_params()
-        tags = {}
-        tags["e"] = "f"
-        tags["g"] = "h"
-        post_body["tag"] = test_tag_body = tags
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
-
-        # test delete_tag command - delete the first key in tags body
-        delete_tag_key_e = "e"
-        self._exec_tags_function(test_flvr_id, None, 'delete',
-                                 delete_tag_key_e)
-        # do get_tag and confirm that resp body["tag"] now contains only
-        # second keypair
-        _, tag_body = self.client.get_tags(test_flvr_id)
-        test_tag_body.pop(delete_tag_key_e)
-        self.assertDictEqual(test_tag_body, tag_body.get("tags"))
+        # test delete_tag command - delete a tag from tags body
+        delete_tag_key = "a"
+        self._exec_tags_function(self.flavor_id, None, 'delete',
+                                 delete_tag_key)
+        # do get_tag and tries to retrieve the deleted tag
+        _, tag_body = self.client.get_tags(self.flavor_id)
+        tag_present = tag_body.get("tags").get(delete_tag_key, None)
+        self.assertEqual(None, tag_present)
 
     @decorators.idempotent_id('9c511020-53ed-4139-8c53-451cb0ea8c75')
     def test_delete_all_flvr_tags(self):
-        # setup data for test case
-        post_body = self._get_flavor_params()
-        tags = {}
-        tags["i"] = "j"
-        tags["k"] = "l"
-        post_body["tag"] = test_tag_body = tags
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
+        # ensure there is at least a tag
+        _, tag_body = self.client.get_tags(self.flavor_id)
+        tags = tag_body.get("tags")
+        self.assertTrue(True if tag_body.get("tags") else False)
 
-        # before execute test, check that "tag" body is populated correctly
-        _, tag_body = self.client.get_tags(test_flvr_id)
-        self.assertDictEqual(test_tag_body, tag_body.get("tags"))
         # test delete_all_tags command - run get_tag again and confirm
         # that the tag dict is now empty
-        self._exec_tags_function(test_flvr_id, None, 'delete', None)
-        _, tag_body = self.client.get_tags(test_flvr_id)
+        self._exec_tags_function(self.flavor_id, None, 'delete', None)
+        self.addCleanup(self._restore_default_tags, self.flavor_id)
+        _, tag_body = self.client.get_tags(self.flavor_id)
         # assert that tag_body contains nothing
         self.assertFalse(tag_body["tags"])
 
     @decorators.idempotent_id('ec74d68f-b42a-41a8-9685-ff5eca25ea0c')
-    def test_add_flvr_region(self):
-        # setup data for test case
+    def test_add_delete_flvr_region(self):
+        # setup data to add region
         post_body = self._get_flavor_params(set_region=False)
         flavor = self._data_setup(post_body)
         test_flvr_id = flavor['id']
@@ -249,14 +247,7 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
         self.assertEqual(body["flavor"]["regions"][0]["name"],
                          post_region_body["regions"][0]["name"])
 
-    @decorators.idempotent_id('5c7e6a94-89d2-4851-bf57-26371da7f47a')
-    def test_delete_flvr_region(self):
-        # setup data for test case
-        post_body = self._get_flavor_params()
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
-
-        # delete the region then check to confirm flavor status
+        # remove added region and then check to confirm flavor status
         _, body = self.client.delete_flvr_region(test_flvr_id,
                                                  self.region_id)
         # flavor status must show 'no regions' when it has no region assigned
@@ -267,95 +258,64 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
 
     @decorators.idempotent_id('71404409-5d95-472c-8dac-b49a1c0c4b37')
     def test_add_flvr_extra_specs(self):
-        # setup data for test case
-        post_body = self._get_flavor_params()
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
-        test_dflt_ex_specs = flavor['extra-specs']
+        # get extra specs before the add
+        _, es_body = self.client.get_extra_specs(self.flavor_id)
+        es_expected = es_body.get("os_extra_specs")
 
-        # add a custom extra spec
-        add_es_body = {"os_extra_specs": {"a": "apple"}}
-        self._exec_ex_spec_function(test_flvr_id, add_es_body, 'add',
-                                    None)
+        # add custom extra specs
+        add_es_body = {"os_extra_specs": {"a": "apple", "b": "banana"}}
+        self._exec_ex_spec_function(self.flavor_id, add_es_body, 'add', None)
+        _, es = self.client.get_extra_specs(self.flavor_id)
+
         # assert extra specs add results match expected
-        test_dflt_ex_specs.update(add_es_body["os_extra_specs"])
-        _, flvr_ex_specs = self.client.get_extra_specs(test_flvr_id)
-        self.assertDictEqual(test_dflt_ex_specs,
-                             flvr_ex_specs.get("os_extra_specs"))
+        es_expected.update(add_es_body["os_extra_specs"])
+        self.assertDictEqual(es_expected, es.get("os_extra_specs"))
 
     @decorators.idempotent_id('043948fd-125b-4d96-bf40-42464066a7e1')
     def test_update_flvr_extra_specs(self):
-        # setup data for test case
-        post_body = self._get_flavor_params()
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
-        test_dflt_ex_specs = flavor['extra-specs']
-
-        # run the test
-        add_es_body = {"os_extra_specs": {"a": "apple"}}
-        replace_es_body = {"os_extra_specs": {"a": "apple", "b": "banana"}}
-
-        # add one custom extra spec , then replace with additional extra spec
-        self._exec_ex_spec_function(test_flvr_id, add_es_body, 'add', None)
-        # then add another custom extra spec using update_extra_spec
-        self._exec_ex_spec_function(test_flvr_id, replace_es_body, 'update',
+        # add  custom extra spec using update_extra_spec
+        replace_es_body = {"os_extra_specs": {"z": "zebra", "x": "xray"}}
+        self._exec_ex_spec_function(self.flavor_id, replace_es_body, 'update',
                                     None)
+        self.addCleanup(self._restore_custom_es, self.flavor_id)
+
         # assert extra specs update results match expected
-        test_dflt_ex_specs.update(replace_es_body["os_extra_specs"])
-        _, flvr_ex_specs = self.client.get_extra_specs(test_flvr_id)
-        self.assertDictEqual(test_dflt_ex_specs,
-                             flvr_ex_specs.get("os_extra_specs"))
+        _, flvr_ex_specs = self.client.get_extra_specs(self.flavor_id)
+
+        es_expected = replace_es_body.get("os_extra_specs")
+        es_expected.update(self.dflt_ex_specs)
+        self.assertDictEqual(es_expected, flvr_ex_specs.get("os_extra_specs"))
 
     @decorators.idempotent_id('df83e2cd-d202-4b2f-8459-391a73067ec5')
     def test_delete_flvr_extra_spec(self):
-        # setup data for test case
-        post_body = self._get_flavor_params()
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
+        # get extra specs before the delete
+        _, es_body = self.client.get_extra_specs(self.flavor_id)
 
-        # run the test
-        add_es_body = {"os_extra_specs": {"g": "guava", "h": "honeydew"}}
-        delete_es_key_h = "h"
-        # add two custom extra specs then do get_extra_specs to save off
-        # the extra_spec add results
-        self._exec_ex_spec_function(test_flvr_id, add_es_body, 'add', None)
-        _, test_ex_specs = self.client.get_extra_specs(test_flvr_id)
         # now delete one of the custom extra specs
-        self._exec_ex_spec_function(test_flvr_id, None, 'delete',
+        delete_es_key_h = "h"
+        self._exec_ex_spec_function(self.flavor_id, None, 'delete',
                                     delete_es_key_h)
+
         # assert extra specs update results match expected
-        test_ex_specs["os_extra_specs"].pop(delete_es_key_h)
-        _, flvr_ex_specs = self.client.get_extra_specs(test_flvr_id)
-        self.assertDictEqual(test_ex_specs["os_extra_specs"],
+        es_body["os_extra_specs"].pop(delete_es_key_h)
+        _, flvr_ex_specs = self.client.get_extra_specs(self.flavor_id)
+        self.assertDictEqual(es_body["os_extra_specs"],
                              flvr_ex_specs.get("os_extra_specs"))
 
     @decorators.idempotent_id('e3fc7ce3-c8fe-4805-8ad3-7be2c94fe7ad')
     def test_delete_all_flvr_extra_specs(self):
-        # setup data for test case
-        post_body = self._get_flavor_params()
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
-        test_dflt_ex_specs = flavor['extra-specs']
-
-        # run the test
-        # add custom extra specs, then validate extra-spec add result
-        add_es_body = {"os_extra_specs": {"c": "carrots"}}
-        self._exec_ex_spec_function(test_flvr_id, add_es_body, 'add', None)
-        _, ex_specs_add_results = self.client.get_extra_specs(test_flvr_id)
-        self.assertIn("c", ex_specs_add_results["os_extra_specs"])
-        self.assertEqual("carrots",
-                         ex_specs_add_results["os_extra_specs"]["c"])
         # run delete ALL extra specs - note that this will only
         # delete custom extra specs, NOT the default extra specs
-        self._exec_ex_spec_function(test_flvr_id, None, 'delete', None)
-        _, flvr_ex_specs = self.client.get_extra_specs(test_flvr_id)
+        self._exec_ex_spec_function(self.flavor_id, None, 'delete', None)
+        self.addCleanup(self._restore_custom_es, self.flavor_id)
+        _, flvr_ex_specs = self.client.get_extra_specs(self.flavor_id)
         # assert that flavor extra specs now contains only
         # the default extra specs
-        self.assertDictEqual(test_dflt_ex_specs,
+        self.assertDictEqual(self.dflt_ex_specs,
                              flvr_ex_specs.get("os_extra_specs"))
 
     @decorators.idempotent_id('187195b5-adfb-4c73-a2f5-42117021f5f2')
-    def test_add_flvr_tenant(self):
+    def test_add_delete_flvr_tenant(self):
         # setup data for test case
         post_body = self._get_flavor_params()
         flavor = self._data_setup(post_body)
@@ -364,6 +324,7 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
         # check that flavor contains one tenant before testing add_flvr_tenant
         flavor = self._get_flavor_details(test_flvr_id)
         self.assertEqual(len(flavor["tenants"]), 1)
+        self.assertEqual(flavor["tenants"][0], self.tenant_id)
 
         # test add_flvr_tenant by adding one more tenant
         post_tenant_body = '{"tenants": ["%s"]}' % (self.alt_tenant_id)
@@ -374,17 +335,7 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
         # get flavor on same flavor id and confirm we have two tenants now
         flavor = self._get_flavor_details(test_flvr_id)
         self.assertEqual(len(flavor["tenants"]), 2)
-
-    @decorators.idempotent_id('a7c976cd-6064-4279-ab64-2575d091cdae')
-    def test_delete_flvr_tenant(self):
-        # setup data for test case and assign two tags
-        post_body = self._get_flavor_params(single_tenant=False)
-        flavor = self._data_setup(post_body)
-        test_flvr_id = flavor['id']
-
-        # checking that flavor created contains two tenants
-        flavor = self._get_flavor_details(test_flvr_id)
-        self.assertEqual(len(flavor["tenants"]), 2)
+        self.assertIn(self.alt_tenant_id, flavor["tenants"])
 
         # delete one tenant, then wait until status = 'Success'
         _, body = self.client.delete_flvr_tenant(test_flvr_id,
@@ -393,6 +344,7 @@ class TestTempestFms(fms_base.FmsBaseOrmTest):
         # get flavor to confirm flavor["tenants"] now shows one tenant only
         flavor = self._get_flavor_details(test_flvr_id)
         self.assertEqual(len(flavor["tenants"]), 1)
+        self.assertEqual(flavor["tenants"][0], self.tenant_id)
 
     @decorators.idempotent_id('36958bba-673e-4397-85a9-fddb01e9ca0d')
     def test_delete_flavor(self):

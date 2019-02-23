@@ -51,5 +51,8 @@ OrmGroup = [
                default='8084',
                help="ims port of the orm url."),
     cfg.StrOpt("image_url",
-               help="swift container url where image is located")
+               help="swift container url where image is located"),
+    cfg.ListOpt("flavor_series",
+                default=['xx'],
+                help="Supported flavor series")
 ]
