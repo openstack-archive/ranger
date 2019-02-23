@@ -49,11 +49,11 @@ class FmsBaseOrmTest(base.BaseOrmTest):
         region["name"] = CONF.identity.region
         ram = random.randint(1, 4) * 1024
         swap = random.randint(1, 40) * 1024
-        vcpus = random.randint(2, 46)
+        vcpus = random.randint(2, 40)
         disk = random.randint(2, 102)
         post_body["description"] = \
             "orm-plugin-BaseORMTest-flavor"
-        post_body["series"] = random.choice(["ns", "nd", "gv", "nv"])
+        post_body["series"] = random.choice(CONF.ranger.flavor_series)
         post_body["alias"] = "flavor_alias"
         post_body["ram"] = str(ram)
         post_body["vcpus"] = str(vcpus)
@@ -62,6 +62,7 @@ class FmsBaseOrmTest(base.BaseOrmTest):
         post_body["ephemeral"] = "1024"
         post_body["regions"] = [region] if set_region else []
         post_body["visibility"] = "private"
+        post_body['tag'] = {'a': 'b', 'c': 'd'}
 
         if single_tenant:
             post_body["tenants"] = [cls.tenant_id]
@@ -115,13 +116,13 @@ class FmsBaseOrmTest(base.BaseOrmTest):
             flavor_status = flavor["status"]
             if flavor_status == 'Error':
                 message = ('flavor %s failed to reach %s status'
-                           ' and is in ERROR status on orm' %
+                           ' and is in ERROR status' %
                            (flavor_id, status))
                 raise exceptions.TempestException(message)
             if int(time.time()) - start >= cls.build_timeout:
                 message =\
                     'flavor %s failed to reach %s status within'
-                ' the required time (%s s) on orm and is in'
+                ' the required time (%s s) and is in'
                 '%s status.' % (flavor_id, status,
                                 cls.build_timeout, flavor_status)
                 raise exceptions.TimeoutException(message)
@@ -166,6 +167,7 @@ class FmsBaseOrmTest(base.BaseOrmTest):
     def _del_flv_and_validate_deletion_on_dcp_and_lcp(cls, flavor_id):
         _, body = cls.client.get_flavor(flavor_id)
         regions_on_flavor = [region for region in body["flavor"]["regions"]]
+
         if regions_on_flavor:
             region_name_on_flavor = regions_on_flavor[0]["name"]
             cls._delete_region_from_flavor_and_validate_deletion(
