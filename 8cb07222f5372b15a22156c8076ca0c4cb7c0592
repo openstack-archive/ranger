@@ -1,0 +1,9 @@
+Code-Review+2: STEW TY <st3wty@att.com>
+Code-Review+2: James Quigley <jq1581@att.com>
+Workflow+1: STEW TY <st3wty@att.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 25 Feb 2019 20:11:20 +0000
+Reviewed-on: https://review.openstack.org/638789
+Project: openstack/ranger
+Branch: refs/heads/master
