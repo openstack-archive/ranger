@@ -77,6 +77,7 @@ RUN pip install -r /tempest/test-requirements.txt
 RUN mkdir -p /tempest/logs \
     && mkdir -p /tempest/tempest_lock \
     && mkdir -p /tempest/images \
+    && mkdir -p /var/log/tempest \
     && rm -rf /tempest/.stestr
 
 # copy tempest test setup files 
