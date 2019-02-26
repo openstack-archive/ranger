@@ -69,7 +69,7 @@ RUN grep -q 'os-testr.*' /tempest/requirements.txt \
     && sed -i 's/os-testr.*/os-testr==0.8.0/' /tempest/requirements.txt \
     || sed -i '/PrettyTable.*/a os-testr==0.8.0' /tempest/requirements.txt
 
-### now run 'pip install -r requirements'  
+### now run 'pip install -r requirements'
 RUN pip install -r /tempest/requirements.txt
 RUN pip install -r /tempest/test-requirements.txt
 
@@ -77,16 +77,17 @@ RUN pip install -r /tempest/test-requirements.txt
 RUN mkdir -p /tempest/logs \
     && mkdir -p /tempest/tempest_lock \
     && mkdir -p /tempest/images \
+    && mkdir -p /var/log/tempest \
     && rm -rf /tempest/.stestr
 
-# copy tempest test setup files 
+# copy tempest test setup files
 COPY tempest_setup/.testr.conf  /tempest/
 COPY tempest_setup/create_tenant.sh  /tempest/
 COPY tempest_setup/accounts.yaml  /tempest/etc
 COPY tempest_setup/tempest.conf  /tempest/etc
 
 ##########################################################################
-### END OF  openstack tempest setup teps 
+### END OF  openstack tempest setup steps
 ##########################################################################
 
 ##########################################################################
