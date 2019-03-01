@@ -3,10 +3,11 @@ from pecan import request
 from orm.common.orm_common.utils import utils
 from orm.services.customer_manager.cms_rest.data.data_manager import DataManager
 from orm.services.customer_manager.cms_rest.logger import get_logger
-from orm.services.customer_manager.cms_rest.logic.error_base import (ErrorStatus)
+from orm.services.customer_manager.cms_rest.logic.error_base import (DuplicateEntryError, ErrorStatus)
 from orm.services.customer_manager.cms_rest.model.GroupModels import (GroupResultWrapper, GroupSummary,
                                                                       GroupSummaryResponse)
 
+from orm.services.customer_manager.cms_rest.rds_proxy import RdsProxy
 LOG = get_logger(__name__)
 
 
@@ -21,7 +22,24 @@ class GroupLogic(object):
 
         sql_group = datamanager.add_group(group, uuid)
 
+        sql_group_id = sql_group.uuid
+        datamanager.add_group_region(sql_group_id, -1)
+
+        self.add_regions_to_db(group.regions, sql_group_id, datamanager)
+
         return sql_group
+
+    def add_regions_to_db(self, regions, sql_group_id, datamanager, default_users=[]):
+        for region in regions:
+
+            sql_region = datamanager.add_region(region)
+            try:
+                datamanager.add_group_region(sql_group_id, sql_region.id)
+            except Exception as ex:
+                if hasattr(ex, 'orig') and ex.orig[0] == 1062:
+                    raise DuplicateEntryError(
+                        'Error, duplicate entry, region ' + region.name + ' already associated with group')
+                raise ex
 
     def create_group(self, group, uuid, transaction_id):
         datamanager = DataManager()
@@ -29,6 +47,16 @@ class GroupLogic(object):
             group.handle_region_group()
             sql_group = self.build_full_group(group, uuid, datamanager)
             group_result_wrapper = build_response(uuid, transaction_id, 'create')
+
+            if sql_group.group_regions and len(sql_group.group_regions) > 1:
+                group_dict = sql_group.get_proxy_dict()
+                for region in group_dict["regions"]:
+                    region["action"] = "create"
+
+                datamanager.flush()  # i want to get any exception created by this insert
+                RdsProxy.send_group_dict(group_dict, transaction_id, "POST")
+            else:
+                LOG.debug("Group with no regions - wasn't send to RDS Proxy " + str(group))
 
             datamanager.commit()
 
