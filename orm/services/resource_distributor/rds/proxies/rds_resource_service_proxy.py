@@ -36,10 +36,10 @@ def invoke_resources_region_delete(resource_type, region, resource_id):
             response = requests.delete(
                 conf.cms.base_url + (conf.cms.delete_region).format(resource_id, region),
                 headers=headers, verify=conf.verify)
-        elif resource_type == "flavor":
+        elif resource_type == "group":
             logger.debug("sending the data to {} server delete method ".format(resource_type))
             response = requests.delete(
-                conf.fms.base_url + (conf.fms.delete_region).format(resource_id, region),
+                conf.cms.base_url + (conf.cms.delete_region).format(resource_id, region),
                 headers=headers, verify=conf.verify)
         elif resource_type == "image":
             logger.debug("sending the data to {} server delete method ".format(resource_type))
