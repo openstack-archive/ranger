@@ -114,7 +114,7 @@ create table if not exists groups
          unique uuid_idx (uuid));
 
 
-create table if not exists group_region
+create table if not exists groups_region
    (
          region_id integer not null,
          group_id integer not null,
