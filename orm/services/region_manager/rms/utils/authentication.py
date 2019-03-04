@@ -19,8 +19,8 @@ def get_keystone_ep(auth_region):
     return None
 
 
-def authorize(request, action):
-    if not _is_authorization_enabled(conf):
+def authorize(request, action, skip_auth=False):
+    if not _is_authorization_enabled(conf) or skip_auth:
         return
 
     auth_region = request.headers.get('X-Auth-Region')
