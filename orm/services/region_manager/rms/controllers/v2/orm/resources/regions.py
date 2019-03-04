@@ -240,7 +240,7 @@ class RegionsController(rest.RestController):
         :exception: EntityNotFoundError 404
         """
         logger.info("Entered Get Regions")
-        authentication.authorize(request, 'region:get_all')
+        #authentication.authorize(request, 'region:get_all')
 
         url_args = {'type': type, 'status': status, 'metadata': metadata,
                     'rangerAgentVersion': rangerAgentVersion, 'clli': clli, 'regionname': regionname,
@@ -274,7 +274,7 @@ class RegionsController(rest.RestController):
     @wsexpose(RegionsData, str, status_code=200, rest_content_types='json')
     def get_one(self, id_or_name):
         logger.info("API: Entered get region by id or name: {}".format(id_or_name))
-        authentication.authorize(request, 'region:get_one')
+        # authentication.authorize(request, 'region:get_one')
 
         try:
             result = RegionService.get_region_by_id_or_name(id_or_name)
