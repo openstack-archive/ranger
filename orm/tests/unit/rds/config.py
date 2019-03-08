@@ -58,6 +58,7 @@ UUID_URL = 'http://127.0.0.1:8090/v1/uuids'
 
 yaml_configs = {
     'customer_yaml': {
+        'customer_domain': 'default',
         'yaml_version': '2014-10-16',
         'yaml_options': {
             'quotas': True,

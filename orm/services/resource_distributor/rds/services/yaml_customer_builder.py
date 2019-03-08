@@ -61,6 +61,7 @@ def yamlbuilder(alldata, region):
     resources = {}
     yaml_version = conf.yaml_configs.customer_yaml.yaml_version
     yaml_type = conf.yaml_configs.customer_yaml.yaml_options.type
+    domain = conf.yaml_configs.customer_yaml.customer_domain
     title = {'heat_template_version': yaml_version}
     description = {'description': 'yaml file for region - %s' % region['name']}
     jsondata = alldata
@@ -78,6 +79,7 @@ def yamlbuilder(alldata, region):
          'properties': {'name': "%s" % project_name,
                         'project_id': alldata['uuid'],
                         'description': project_description,
+                        'domain': domain,
                         'tags': _metadata_to_tags(alldata['metadata']),
                         'enabled': status}}
 
@@ -111,11 +113,11 @@ def yamlbuilder(alldata, region):
             resources['resources'][group_name] = \
                 {'type': 'OS::Keystone::Group\n',
                  'properties': {'name': "%s" % group_name,
-                                'domain': 'default',
+                                'domain': domain,
                                 'description': 'dummy',
                                 'roles': any_role}}
 
-            # remove groupe section when type is ldap
+            # remove group section when type is ldap
             # create users :: added the hard coded groupe
             user_group = ["{'get_resource': '%s'}" % group_name]
             resources['resources'][user['id']] = \
