@@ -75,6 +75,7 @@ UUID_URL = config.uuid['base_url'] + 'v1/uuids'
 # yaml configurations
 yaml_configs = {
     'customer_yaml': {
+        'customer_domain': config.rds['customer_domain'],
         'yaml_version': '2014-10-16',
         'yaml_options': {
             'quotas': True,

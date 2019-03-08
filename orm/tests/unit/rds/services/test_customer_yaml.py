@@ -89,7 +89,7 @@ fullyaml_with_users_quotasoff = \
     '{get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId2_group}\n      name: userId2\n      roles:\n      ' \
     '- project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n        role: storage\n' \
     '    type: OS::Keystone::User\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n      ' \
-    'description: this is a description\n      enabled: true\n      ' \
+    'description: this is a description\n      domain: default\n      enabled: true\n      ' \
     'tags: [my_server_name=Apache1,ocx_cust=123456889]\n      ' \
     'name: welcome_man\n      project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    type: OS::Keystone::Project\n\n      ' \
     '\n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group:\n    properties:\n      description: dummy\n      ' \
@@ -117,8 +117,9 @@ fullyaml_no_users_quotasoff = \
     '        role: storagezzzzz\n    type: OS::Keystone::User\n\n      ' \
     '\n  1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n      description: this is a description\n' \
     '      tags: [my_server_name=Apache1,ocx_cust=123456889]\n' \
-    '      enabled: true\n      name: welcome_man\n    ' \
-    '  project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    type: OS::Keystone::Project\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1zzzz_group:\n    ' \
+    '      enabled: true\n      name: welcome_man\n' \
+    '      domain: default\n      ' \
+    'project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    type: OS::Keystone::Project\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1zzzz_group:\n    ' \
     'properties:\n      description: dummy\n      domain: default\n      ' \
     'name: 1e24981a-fa51-11e5-86aa-5e5517507c66_userId1zzzz_group\n      roles:\n      - project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n' \
     '        role: {get_resource: otherzzzzz}\n    type: OS::Keystone::Group\n\n' \
@@ -152,6 +153,7 @@ full_yaml_default_quotas = 'heat_template_version: 2015-1-1\n\ndescription: yaml
                            'name: userId2\n      roles:\n      - project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n' \
                            '        role: storage\n    type: OS::Keystone::User\n\n      ' \
                            '\n  1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n      description: this is a description\n' \
+                           '      domain: default\n' \
                            '      tags: [my_server_name=Apache1,ocx_cust=123456889]\n' \
                            '      enabled: true\n      name: welcome_man\n' \
                            '      project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    ' \
@@ -192,6 +194,7 @@ full_yaml_quotas = 'heat_template_version: 2015-1-1\n\ndescription: yaml file fo
                    'role: storagezzzzz\n    type: OS::Keystone::User\n\n' \
                    '      \n  1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n      ' \
                    'description: this is a description\n      ' \
+                   'domain: default\n      ' \
                    'tags: [my_server_name=Apache1,ocx_cust=123456889]\n      ' \
                    'enabled: true\n      name: welcome_man\n      ' \
                    'project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    ' \
@@ -223,6 +226,7 @@ full_yaml_ldap = 'heat_template_version: 2015-1-2\n\ndescription: yaml file' \
                  'type: OS::Keystone::UserRoleAssignment\n\n      \n  ' \
                  '1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n      ' \
                  'description: this is a description\n      ' \
+                 'domain: default\n      ' \
                  'tags: [my_server_name=Apache1,ocx_cust=123456889]\n      ' \
                  'enabled: true\n      name: welcome_man\n      ' \
                  'project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n    ' \
@@ -236,7 +240,7 @@ fullyaml_aic4 = \
     'heat_template_version: 2015-1-2\n\n'\
     'description: yaml file for region - regionname\n\nresources:\n'\
     '  1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n'\
-    '      description: "this is a description"\n      enabled: true\n'\
+    '      description: "this is a description"\n      domain: default\n      enabled: true\n'\
     '      name: welcome_man\n      project_id: 1e24981a-fa51-11e5-86aa-5e5517507c66\n'\
     '      tags: [my_server_name=Apache1,ocx_cust=123456889]\n'\
     '    type: OS::Keystone::Project\n\n      \n  1e24981a-fa51-11e5-86aa-5e5517507c66_userId1_group:\n'\
@@ -280,6 +284,7 @@ class CreateResource(unittest.TestCase):
     def test_create_customer_yaml_nousers(self, mock_conf):
         """test valid dict to yaml output as expected without users."""
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-1'
+        domain = mock_conf.yaml_configs.customer_yaml.customer_domain = 'default'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = False
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_quotas)
         yamlfile_as_json = yaml.safe_load(yamlfile)
@@ -290,6 +295,7 @@ class CreateResource(unittest.TestCase):
     def test_create_flavor_yaml_noquotas(self, mock_conf):
         """test valid dict to yaml output as expected with users."""
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-2'
+        domain = mock_conf.yaml_configs.customer_yaml.customer_domain = 'default'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = False
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_users)
         yamlfile_as_json = yaml.safe_load(yamlfile)
@@ -300,6 +306,7 @@ class CreateResource(unittest.TestCase):
     def test_create_customer_yaml_noquotas_on(self, mock_conf):
         """test valid dict to yaml output as expected with default regions."""
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-1'
+        domain = mock_conf.yaml_configs.customer_yaml.customer_domain = 'default'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = True
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_users)
         yamlfile_as_json = yaml.safe_load(yamlfile)
@@ -310,6 +317,7 @@ class CreateResource(unittest.TestCase):
     def test_create_customer_yaml_withquotas_on(self, mock_conf):
         """valid dict to yaml output as expect with regions default users."""
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-1'
+        domain = mock_conf.yaml_configs.customer_yaml.customer_domain = 'default'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = True
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_quotas)
         yamlfile_as_json = yaml.safe_load(yamlfile)
@@ -320,16 +328,19 @@ class CreateResource(unittest.TestCase):
     def test_create_flavor_yaml_ldap(self, mock_conf):
         """test valid dict to yaml output as expected with ldap system."""
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-2'
+        domain = mock_conf.yaml_configs.customer_yaml.customer_domain = 'default'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = False
         mock_conf.yaml_configs.customer_yaml.yaml_options.type = "ldap"
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_users)
         yamlfile_as_json = yaml.safe_load(yamlfile)
         self.assertEqual(yamlfile_as_json['heat_template_version'], ver)
+
         self.assertEqual(yaml.safe_load(yamlfile), yaml.safe_load(full_yaml_ldap))
 
     @patch.object(CustomerBuild, 'conf')
     def test_create_aicV4_customer_yaml(self, mock_conf):
         ver = mock_conf.yaml_configs.customer_yaml.yaml_version = '2015-1-2'
+        domain = mock_conf.yaml_configs.customer_yaml.customer_domain = 'default'
         mock_conf.yaml_configs.customer_yaml.yaml_options.quotas = True
         yamlfile = CustomerBuild.yamlbuilder(alldata, region_users_v4)
         yamlfile_as_json = yaml.safe_load(yamlfile)

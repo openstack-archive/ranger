@@ -289,6 +289,9 @@ OrmRdsGroup = [
     cfg.StrOpt('repo_email',
                default='orm@test.com',
                help='Repo email address.'),
+    cfg.StrOpt('customer_domain',
+               default='Default',
+               help='Keystone project domain'),
     cfg.StrOpt('log',
                default='rds.log',
                help='Rds log name.')
@@ -376,6 +379,7 @@ rds = {'port': CONF.rds.port,
        'repo_remote_location': CONF.rds.repo_remote_location,
        'repo_user': CONF.rds.repo_user,
        'repo_email': CONF.rds.repo_email,
+       'customer_domain': CONF.rds.customer_domain,
        'base_url': '{}://{}:{}/'.format(protocol, orm_host, CONF.rds.port),
        'log': '{}/{}'.format(CONF.log_location, CONF.rds.log)}
 
