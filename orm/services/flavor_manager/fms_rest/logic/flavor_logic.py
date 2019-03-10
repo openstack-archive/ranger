@@ -954,6 +954,8 @@ def calculate_name(flavor):
 
     if 'i2' in options and 'n0' not in options:
         options.remove('i2')
+    if 't0' in options and flavor.flavor.visibility.lower() != 'private':
+        options.remove('t0')
 
     if options:
         name += '.'

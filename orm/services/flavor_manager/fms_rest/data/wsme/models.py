@@ -493,6 +493,22 @@ class Flavor(Model):
             if option_pci:
                 requested_options.extend(option_pci)
 
+        # Evaluate thread options
+        if 'valid_options_thread' in series_metadata:
+            valid_thread = [x for x in
+                            series_metadata['valid_options_thread'].split(',')]
+
+            option_thread = [n for n in valid_thread if n in
+                             self.options.keys() and
+                             self.options[n].lower() == 'true' and
+                             self.visibility.lower() == 'private']
+
+            if option_thread:
+                es = db_models.FlavorExtraSpec(
+                    key_name_value=series_metadata['es_thread_policy'])
+                extra_spec_needed.append(es)
+                requested_options.extend(option_thread)
+
         # Evalulate mixed options
         assorted_opts = []
         for mixed_key, mixed_value in mixed_options.items():
