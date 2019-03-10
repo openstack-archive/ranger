@@ -73,10 +73,11 @@ class Result(wtypes.DynamicBase):
     """class method, json header."""
 
     customer = wsme.wsattr(CreatedResource, mandatory=False)
+    group = wsme.wsattr(CreatedResource, mandatory=False)
     flavor = wsme.wsattr(CreatedResource, mandatory=False)
     image = wsme.wsattr(CreatedResource, mandatory=False)
 
-    def __init__(self, customer=None,
+    def __init__(self, customer=None, group=None,
                  flavor=None, image=None):
         """init function.
 
@@ -85,6 +86,8 @@ class Result(wtypes.DynamicBase):
         """
         if customer is not None:
             self.customer = customer
+        if group is not None:
+            self.group = group
         if flavor is not None:
             self.flavor = flavor
         if image is not None:

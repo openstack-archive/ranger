@@ -212,7 +212,7 @@ def notify_ord(transaction_id,
     :param transaction_id: The transaction id under which the resource was
     updated
     :param tracking_id: The tracking ID of the whole operation
-    :param resource_type: The resource type ("customer" | "image" | "flavor")
+    :param resource_type: The resource type ("customer" | "group" | "image" | "flavor")
     :param resource_template_version: The version id of the change in git
     :param resource_name: The updated resource name
     :param resource_id: The updated resource ID
