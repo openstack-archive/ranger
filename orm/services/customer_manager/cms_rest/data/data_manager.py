@@ -4,7 +4,7 @@ from orm.services.customer_manager.cms_rest.data.sql_alchemy.customer_record imp
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.customer_region_record import CustomerRegionRecord
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.group_record import GroupRecord
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import (CmsRole, CmsUser, Customer,
-                                                                            Groups,
+                                                                            Groups, GroupRegion,
                                                                             CustomerRegion, Quota,
                                                                             QuotaFieldDetail, Region,
                                                                             UserRole)
@@ -212,6 +212,7 @@ class DataManager(object):
             uuid=uuid,
             name=group.name,
             domain_id=1,
+            enabled=group.enabled,
             description=group.description
         )
 
@@ -254,6 +255,27 @@ class DataManager(object):
         )
 
         self.session.add(customer_region)
+        self.flush()
+
+    def add_region(self, region):
+        db_region = self.session.query(Region).filter(
+            Region.name == region.name).first()
+        if not (db_region is None):
+            return db_region
+
+        db_region = Region(name=region.name, type=region.type)
+        self.session.add(db_region)
+        self.flush()
+
+        return db_region
+
+    def add_group_region(self, group_id, region_id):
+        group_region = GroupRegion(
+            group_id=group_id,
+            region_id=region_id
+        )
+
+        self.session.add(group_region)
         self.flush()
 
     def add_region(self, region):

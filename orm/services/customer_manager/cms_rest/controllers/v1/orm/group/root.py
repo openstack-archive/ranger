@@ -108,7 +108,6 @@ class GroupController(rest.RestController):
         LOG.info("GroupController - GetGrouplist")
         authentication.authorize(request, 'groups:get_all')
 
-        # This shouldn't be necessary, but apparently is on mtn29
         start = 0 if start is None else start
         limit = 0 if limit is None else limit
 
