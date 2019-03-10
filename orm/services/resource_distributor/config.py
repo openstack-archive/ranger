@@ -115,6 +115,9 @@ yaml_configs = {
     },
     'image_yaml': {
         'yaml_version': '2014-10-16'
+    },
+    'group_yaml': {
+        'yaml_version': '2014-10-16'
     }
 }
 
@@ -148,13 +151,15 @@ region_resource_id_status = {
     {
         'customer',
         'image',
-        'flavor'
+        'flavor',
+        'group'
     },
     'allowed_ranger_agent_resource_version':
     {
         'customer': '1.0',
         'image': '1.0',
-        'flavor': '1.0'
+        'flavor': '1.0',
+        'group': '1.0'
     }
 }
 
