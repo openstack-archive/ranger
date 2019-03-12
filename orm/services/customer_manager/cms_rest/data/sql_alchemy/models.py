@@ -33,8 +33,8 @@ class CmsDomain(Base, CMSBaseModel):
 
 
 '''
-' Groups is a DataObject and contains all the fields defined in Groups table record.
-' defined as SqlAlchemy model map to a table
+' Groups is a DataObject and contains all the fields defined in Groups
+' table record, defined as SqlAlchemy model map to a table
 '''
 
 
@@ -43,16 +43,21 @@ class Groups(Base, CMSBaseModel):
 
     id = Column(Integer, primary_key=True)
     uuid = Column(String(64), nullable=False, unique=True)
-    domain_id = Column(Integer, ForeignKey('cms_domain.id'), primary_key=True, nullable=False)
+    domain_name = Column(String(64), ForeignKey('cms_domain.name'), nullable=False)
     name = Column(String(64), nullable=False, unique=True)
     description = Column(String(255), nullable=True)
+    enabled = Column(SmallInteger, nullable=False)
+    group_regions = relationship("GroupRegion", cascade="all, delete, delete-orphan")
 
     def __json__(self):
         return dict(
             uuid=self.uuid,
             name=self.name,
             description=self.description,
-            domain_id=self.domain_id
+            domain_name=self.domain_name,
+            enabled=self.enabled,
+            group_regions=[group_region.__json__() for group_region in
+                           self.group_regions]
         )
 
     def get_dict(self):
@@ -62,23 +67,72 @@ class Groups(Base, CMSBaseModel):
         proxy_dict = {
             "uuid": self.uuid,
             "name": self.name,
-            "domain_id": self.domain_id,
-            "description": self.description
+            "domain_name": self.domain_name,
+            "description": self.description,
+            "enabled": 1 if self.enabled else 0
+        }
+        group_regions = self.get_group_regions()
+        proxy_dict["regions"] = [group_region.get_proxy_dict() for group_region in group_regions]
+
+        return proxy_dict
+
+    def get_group_regions(self):
+        group_regions = []
+        for group_region in self.group_regions:
+            if group_region.region_id != -1:
+                group_regions.append(group_region)
+        return group_regions
+
+    def to_wsme(self):
+        uuid = self.uuid
+        name = self.name
+        domain_name = self.domain_name
+        description = self.description
+        enabled = True if self.enabled else False
+        regions = [group_region.to_wsme() for group_region in self.group_regions if
+                   group_region.region_id != -1]
+        result = GroupWsmeModels.Group(description=description,
+                                       name=name,
+                                       uuid=uuid,
+                                       regions=regions,
+                                       enabled=enabled,
+                                       domain_name=domain_name)
+        return result
+
+'''
+' GroupRegion is a DataObject and contains all the fields defined in GroupRegion table record.
+' defined as SqlAlchemy model map to a table
+'''
+
+
+class GroupRegion(Base, CMSBaseModel):
+    __tablename__ = "groups_region"
+
+    group_id = Column(String(64), ForeignKey('groups.uuid'), primary_key=True, nullable=False, index=True)
+    region_id = Column(Integer, ForeignKey('cms_region.id'), primary_key=True, nullable=False, index=True)
+
+    region = relationship("Region", viewonly=True)
+
+    def __json__(self):
+        return dict(
+            group_id=self.group_id,
+            region_id=self.region_id
+        )
+
+    def get_proxy_dict(self):
+        proxy_dict = {
+            "name": self.region.name,
+            "action": "modify"
         }
 
         return proxy_dict
 
     def to_wsme(self):
-        uuid = self.uuid
-        name = self.name
-        domainId = self.domain_id
-        description = self.description
-
-        result = GroupWsmeModels.Group(description=description,
-                                       name=name,
-                                       uuid=uuid,
-                                       domainId=domainId)
-        return result
+        name = self.region.name
+        type = self.region.type
+        region = GroupWsmeModels.Region(name=name,
+                                        type=type)
+        return region
 
 '''
 ' CmsUser is a DataObject and contains all the fields defined in CmsUser table record.
