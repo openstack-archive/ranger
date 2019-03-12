@@ -1,6 +1,9 @@
 from __builtin__ import int
 
-from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import (Groups)
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import (
+    Groups,
+    Region,
+    GroupRegion)
 from orm.services.customer_manager.cms_rest.logger import get_logger
 
 LOG = get_logger(__name__)
@@ -9,7 +12,8 @@ LOG = get_logger(__name__)
 class GroupRecord:
     def __init__(self, session):
 
-        # this model is uses only for the parameters of access mothods, not an instance of model in the database
+        # this model is uses only for the parameters of access mothods,
+        # not an instance of model in the database
         self.__groups = Groups()
         self.__TableName = "groups"
 
@@ -31,11 +35,13 @@ class GroupRecord:
         try:
             self.session.add(groups)
         except Exception as exception:
-            LOG.log_exception("Failed to insert Group" + str(groups), exception)
+            LOG.log_exception("Failed to insert Group" + str(groups),
+                              exception)
             raise
 
     def delete_by_primary_key(self, group_id):
-        result = self.session.connection().execute("delete from groups where id = {}".format(group_id))    # nosec
+        cmd = 'DELETE FROM groups WHERE id = %s'
+        result = self.session.connection().execute(cmd, (group_id))
         return result
 
     def read_by_primary_key(self):
@@ -44,7 +50,7 @@ class GroupRecord:
     def read_groups(self, group_id):
         try:
             groups = self.session.query(Groups).filter(Groups.id == group_id)
-            return group.first()
+            return groups.first()
 
         except Exception as exception:
             message = "Failed to read_groups:group_id: %d " % (group_id)
@@ -53,7 +59,8 @@ class GroupRecord:
 
     def read_group_by_uuid(self, group_uuid):
         try:
-            groups = self.session.query(Groups).filter(Groups.uuid == group_uuid)
+            groups = self.session.query(Groups).filter(
+                Groups.uuid == group_uuid)
             return groups.first()
 
         except Exception as exception:
@@ -61,13 +68,34 @@ class GroupRecord:
             LOG.log_exception(message, exception)
             raise
 
-    def get_group_id_from_uuid(self, uuid):
-        result = self.session.connection().scalar("SELECT id from groups WHERE uuid = \"{}\"".format(uuid))  # nosec
+    def get_group_id_from_uuid(self, group_uuid):
+        cmd = "SELECT id from groups WHERE uuid = %s"
+        result = self.session.connection().scalar(cmd, (group_uuid))
 
         if result:
             return int(result)
         else:
             return None
+
+    def get_groups_status_by_uuids(self, uuid_str):
+        cmd = "SELECT id, resource_id, region, status FROM " \
+            "rds_resource_status_view WHERE resource_id IN (%s)"
+        results = self.session.connection().execute(cmd, (uuid_str))
+
+        group_region = {}
+        if results:
+            resource_status = dict(
+                (id, (resource_id, region, status))
+                for id, resource_id, region, status in results)
+            # using resource_status, create group_region with resource_id
+            # as key and (region, status) as value
+            for v in resource_status.values():
+                if v[0] in group_region:
+                    group_region[v[0]].append(v[1:])
+                else:
+                    group_region[v[0]] = [v[1:]]
+            results.close()
+        return group_region
 
     def delete_group_by_uuid(self, uuid):
         try:
@@ -85,9 +113,8 @@ class GroupRecord:
         try:
             LOG.info("get_groups_by_criteria: criteria: {0}".format(criteria))
             region = criteria['region'] if 'region' in criteria else None
-            user = criteria['user'] if 'user' in criteria else None
-            rgroup = criteria['rgroup'] if 'rgroup' in criteria else None
-            starts_with = criteria['starts_with'] if 'starts_with' in criteria else None
+            starts_with = criteria['starts_with'] if 'starts_with' in \
+                criteria else None
             contains = criteria['contains'] if 'contains' in criteria else None
 
             query = self.session.query(Groups)
@@ -100,11 +127,20 @@ class GroupRecord:
                 query = query.filter(
                     Groups.name.ilike("%{}%".format(contains)))
 
+            if region:
+                query = query.join(GroupRegion).filter(
+                    GroupRegion.group_id == Groups.uuid)
+                query = query.join(Region).filter(
+                    Region.id == GroupRegion.region_id,
+                    Region.type == 'single',
+                    Region.name == region)
+
             query = self.customise_query(query, criteria)
             return query.all()
 
         except Exception as exception:
-            message = "Failed to get_groups_by_criteria: criteria: {0}".format(criteria)
+            message = "Failed to get_groups_by_criteria: " \
+                "criteria: {0}".format(criteria)
             LOG.log_exception(message, exception)
             raise
 
