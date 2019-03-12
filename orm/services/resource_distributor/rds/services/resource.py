@@ -4,7 +4,7 @@ import time
 
 from orm.services.resource_distributor.rds.services import region_resource_id_status as regionResourceIdStatus
 from orm.services.resource_distributor.rds.services import (yaml_customer_builder, yaml_flavor_bulder,
-                                                            yaml_image_builder)
+                                                            yaml_group_builder, yaml_image_builder)
 from orm.services.resource_distributor.rds.services.base import ConflictValue, ErrorMessage
 from orm.services.resource_distributor.rds.services.model.resource_input import ResourceData as InputData
 from orm.services.resource_distributor.rds.sot import sot_factory
@@ -20,7 +20,7 @@ def _get_inputs_from_resource_type(jsondata,
                                    resource_type,
                                    external_transaction_id,
                                    operation="create"):
-    if resource_type == "customer":
+    if resource_type == "customer" or resource_type == "group":
         input_data = InputData(resource_id=jsondata['uuid'],
                                resource_type=resource_type,
                                operation=operation,
@@ -99,6 +99,8 @@ def _create_data_to_sot(input_data):
             yamldata = "delete"
         elif input_data.resource_type == "customer":
             yamldata = yaml_customer_builder.yamlbuilder(jsondata, target)
+        elif input_data.resource_type == "group":
+            yamldata = yaml_group_builder.yamlbuilder(jsondata, target)
         elif input_data.resource_type == "flavor":
             yamldata = yaml_flavor_bulder.yamlbuilder(jsondata, target)
         elif input_data.resource_type == "image":
