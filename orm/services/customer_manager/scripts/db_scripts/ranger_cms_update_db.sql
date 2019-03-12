@@ -3,6 +3,7 @@ SET sql_notes=0;
 USE orm;
 
 insert ignore into cms_region(id,name,type) values(-1, "DEFAULT", "single");
+insert ignore into cms_domain(id,name) values(1, "default");
 
 DROP PROCEDURE IF EXISTS MoveKeyToQuota;
 DELIMITER ;;

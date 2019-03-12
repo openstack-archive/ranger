@@ -41,7 +41,8 @@ audit = {
 
 cms = {
     'base_url': config.cms['base_url'],
-    'delete_region': 'v1/orm/customers/{0}/regions/{1}'
+    'delete_region': 'v1/orm/customers/{0}/regions/{1}',
+    'delete_groups_region': 'v1/orm/groups/{0}/regions/{1}'
 }
 
 fms = {
@@ -115,6 +116,9 @@ yaml_configs = {
     },
     'image_yaml': {
         'yaml_version': '2014-10-16'
+    },
+    'group_yaml': {
+        'yaml_version': '2014-10-16'
     }
 }
 
@@ -148,18 +152,22 @@ region_resource_id_status = {
     {
         'customer',
         'image',
-        'flavor'
+        'flavor',
+        'group'
     },
     'allowed_ranger_agent_resource_version':
     {
         'customer': '1.0',
         'image': '1.0',
-        'flavor': '1.0'
+        'flavor': '1.0',
+        'group': '1.0'
     }
 }
 
 app_module = app['modules'][0]
-logging = config.get_log_config(config.rds['log'], app['service_name'], app_module)
+logging = config.get_log_config(config.rds['log'],
+                                app['service_name'],
+                                app_module)
 
 verify = config.ssl_verify
 

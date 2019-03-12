@@ -1,14 +1,21 @@
 import logging
 
-from orm.services.customer_manager.cms_rest.data.sql_alchemy.customer_record import CustomerRecord
-from orm.services.customer_manager.cms_rest.data.sql_alchemy.customer_region_record import CustomerRegionRecord
-from orm.services.customer_manager.cms_rest.data.sql_alchemy.group_record import GroupRecord
-from orm.services.customer_manager.cms_rest.data.sql_alchemy.models import (CmsRole, CmsUser, Customer,
-                                                                            Groups,
-                                                                            CustomerRegion, Quota,
-                                                                            QuotaFieldDetail, Region,
-                                                                            UserRole)
-from orm.services.customer_manager.cms_rest.data.sql_alchemy.user_role_record import UserRoleRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.customer_record \
+    import CustomerRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
+    customer_region_record import CustomerRegionRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
+    group_record import GroupRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
+    groups_region_record import GroupsRegionRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.models \
+    import (CmsRole, CmsUser, Customer,
+            Groups, GroupRegion,
+            CustomerRegion, Quota,
+            QuotaFieldDetail, Region,
+            UserRole)
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.user_role_record \
+    import UserRoleRecord
 from orm.services.customer_manager.cms_rest.logic.error_base import ErrorStatus
 import oslo_db
 from oslo_db.sqlalchemy import session as db_session
@@ -38,7 +45,8 @@ class DataManager(object):
         if not connection_string:
             connection_string = conf.database.connection_string
 
-        self._engine_facade = db_session.EngineFacade(connection_string, autocommit=False)
+        self._engine_facade = db_session.EngineFacade(connection_string,
+                                                      autocommit=False)
         self._session = None
         listen(self.session, 'before_flush', on_before_flush)
         self.image_record = None
@@ -63,7 +71,9 @@ class DataManager(object):
         try:
             self.session.flush()
         except oslo_db.exception.DBDuplicateEntry as exception:
-            raise ErrorStatus(409.2, 'Duplicate Entry {0} already exist'.format(exception.columns))
+            raise ErrorStatus(
+                409.2, 'Duplicate Entry {0} already exist'.format(
+                    exception.columns))
         except Exception:
             raise
 
@@ -135,6 +145,12 @@ class DataManager(object):
                 self.customer_region_record = CustomerRegionRecord(
                     self.session)
             return self.customer_region_record
+
+        if record_name == "GroupRegion" or record_name == "group_region":
+            if not hasattr(self, "groups_region_record"):
+                self.groups_region_record = GroupsRegionRecord(
+                    self.session)
+            return self.groups_region_record
 
         if record_name == "UserRole" or record_name == "user_role":
             if not hasattr(self, "user_role_record"):
@@ -211,7 +227,8 @@ class DataManager(object):
         sql_group = Groups(
             uuid=uuid,
             name=group.name,
-            domain_id=1,
+            domain_name='default',
+            enabled=group.enabled,
             description=group.description
         )
 
@@ -254,6 +271,27 @@ class DataManager(object):
         )
 
         self.session.add(customer_region)
+        self.flush()
+
+    def add_region(self, region):
+        db_region = self.session.query(Region).filter(
+            Region.name == region.name).first()
+        if not (db_region is None):
+            return db_region
+
+        db_region = Region(name=region.name, type=region.type)
+        self.session.add(db_region)
+        self.flush()
+
+        return db_region
+
+    def add_group_region(self, group_id, region_id):
+        group_region = GroupRegion(
+            group_id=group_id,
+            region_id=region_id
+        )
+
+        self.session.add(group_region)
         self.flush()
 
     def add_region(self, region):
