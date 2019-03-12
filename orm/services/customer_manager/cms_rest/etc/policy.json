@@ -41,6 +41,7 @@
     "groups:get_all": "rule:admin_or_support_or_viewer_or_creator",
     "groups:create": "rule:admin_or_support_or_creator",
     "groups:update": "rule:admin_or_creator",
-    "groups:delete": "rule:admin"
-
+    "groups:delete": "rule:admin",
+    "groups:add_region": "rule:admin_or_support_or_creator",
+    "groups:delete_region": "rule:admin_or_creator"
 }
