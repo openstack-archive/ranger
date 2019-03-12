@@ -26,7 +26,7 @@ CONF = config.CONF
 
 class CmsClient(base_client.RangerClientBase):
 
-    cms_url = '%s:%s' % (CONF.ranger.uri, CONF.ranger.cms_port)
+    cms_url = CONF.ranger.RANGER_CMS_BASE_URL
     version = 'v1'
 
     # POST

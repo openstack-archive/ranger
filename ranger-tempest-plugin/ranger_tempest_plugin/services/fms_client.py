@@ -26,7 +26,7 @@ CONF = config.CONF
 
 class FmsClient(base_client.RangerClientBase):
 
-    fms_url = '%s:%s' % (CONF.ranger.uri, CONF.ranger.fms_port)
+    fms_url = CONF.ranger.RANGER_FMS_BASE_URL
     version = "v1"
 
     def get_extra_headers(self):
