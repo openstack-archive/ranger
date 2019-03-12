@@ -27,7 +27,7 @@ CONF = config.CONF
 
 class RmsClient(base_client.RangerClientBase):
 
-    rms_url = '%s:%s' % (CONF.ranger.uri, CONF.ranger.region_port)
+    rms_url = CONF.ranger.RANGER_RMS_BASE_URL
     version = "v2"
 
     def create_region(self, region_id, **kwargs):
