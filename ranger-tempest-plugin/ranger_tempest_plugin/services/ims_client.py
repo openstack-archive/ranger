@@ -24,7 +24,8 @@ CONF = config.CONF
 
 class ImsClient(base_client.RangerClientBase):
 
-    ims_url = '%s:%s' % (CONF.ranger.uri, CONF.ranger.ims_port)
+#    ims_url = '%s:%s' % (CONF.ranger.uri, CONF.ranger.ims_port)
+    ims_url = CONF.ranger.RANGER_IMS_BASE_URL
     version = "v1"
 
     def get_headers(self):
