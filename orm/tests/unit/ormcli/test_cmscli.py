@@ -33,6 +33,7 @@ class CmsTests(TestCase):
         # Set up the args parameter
         args = mock.MagicMock()
         args.custid = 'test_custid'
+        args.groupid = 'test_groupid'
         args.regionid = 'test_region'
         args.userid = 'test_userid'
         args.region = 'test_region'
@@ -42,35 +43,57 @@ class CmsTests(TestCase):
         args.force_delete is False
 
         subcmd_to_result = {
-            'create_customer': (requests.post, '',),
-            'delete_customer': (requests.delete, '/%s' % args.custid,),
-            'update_customer': (requests.put, '/%s' % args.custid,),
-            'add_region': (requests.post, '/%s/regions' % args.custid,),
-            'replace_region': (requests.put, '/%s/regions' % args.custid,),
+            'create_customer': (requests.post, 'customers/',),
+            'delete_customer': (
+                requests.delete, 'customers/%s' % args.custid,),
+            'update_customer': (requests.put, 'customers/%s' % args.custid,),
+            'add_region': (
+                requests.post, 'customers/%s/regions' % args.custid,),
+            'replace_region': (
+                requests.put, 'customers/%s/regions' % args.custid,),
             'delete_region': (
                 requests.delete,
-                '/%s/regions/%s/%s' % (args.custid, args.regionid,
-                                       args.force_delete),),
+                'customers/%s/regions/%s/%s' % (args.custid, args.regionid,
+                                                args.force_delete),),
             'add_user': (
-                requests.post,
-                '/%s/regions/%s/users' % (args.custid, args.regionid),),
+                requests.post, 'customers/%s/regions/%s/users' % (
+                    args.custid, args.regionid),),
             'replace_user': (
                 requests.put,
-                '/%s/regions/%s/users' % (args.custid, args.regionid),),
-            'delete_user': (requests.delete, '/%s/regions/%s/users/%s' % (
-                args.custid, args.regionid, args.userid),),
-            'add_default_user': (requests.post, '/%s/users' % args.custid,),
-            'replace_default_user': (requests.put, '/%s/users' % args.custid,),
+                'customers/%s/regions/%s/users' % (
+                    args.custid, args.regionid),),
+            'delete_user': (
+                requests.delete, 'customers/%s/regions/%s/users/%s' % (
+                    args.custid, args.regionid, args.userid),),
+            'add_default_user': (
+                requests.post, 'customers/%s/users' % args.custid,),
+            'replace_default_user': (
+                requests.put, 'customers/%s/users' % args.custid,),
             'delete_default_user': (
-                requests.delete, '/%s/users/%s' % (args.custid, args.userid),),
-            'add_metadata': (requests.post, '/%s/metadata' % args.custid,),
-            'replace_metadata': (requests.put, '/%s/metadata' % args.custid,),
-            'get_customer': (requests.get, '/%s' % args.custid,),
+                requests.delete, 'customers/%s/users/%s' % (
+                    args.custid, args.userid),),
+            'add_metadata': (
+                requests.post, 'customers/%s/metadata' % args.custid,),
+            'replace_metadata': (
+                requests.put, 'customers/%s/metadata' % args.custid,),
+            'get_customer': (requests.get, 'customers/%s' % args.custid,),
             'list_customers': (requests.get,
-                               '/?region=%s&user=%s&starts_with=%s'
+                               'customers/?region=%s&user=%s&starts_with=%s'
                                '&contains=%s' % (args.region,
                                                  args.user, args.starts_with,
-                                                 args.contains))
+                                                 args.contains)),
+            'delete_group': (
+                requests.delete, 'groups/%s' % args.groupid,),
+            'delete_groups_region': (
+                requests.delete,
+                'groups/%s/regions/%s/%s' % (args.groupid, args.regionid,
+                                             args.force_delete),),
+            'get_group': (requests.get, 'groups/%s' % args.groupid,),
+            'list_groups': (requests.get,
+                            'groups/?region=%s&starts_with=%s'
+                            '&contains=%s' % (args.region,
+                                              args.starts_with,
+                                              args.contains))
         }
 
         # Assert that each subcommand returns the expected details
@@ -105,7 +128,10 @@ class CmsTests(TestCase):
     @mock.patch.object(cmscli.cli_common, 'get_keystone_ep')
     @mock.patch.object(cmscli.requests, 'post')
     @mock.patch.object(cmscli.requests, 'get')
-    def test_list_customers(self, mock_get, mock_post, mock_get_keystone_ep):
+    @mock.patch.object(cmscli, 'get_token')
+    @mock.patch.object(cmscli, 'globals')
+    def test_list_customers(self, mock_globals, mock_get_token,
+                            mock_get, mock_post, mock_get_keystone_ep):
         mock_post.return_value = self.respond(TJ, 200)
         mock_get.return_value = self.mock_response
         args = ormcli.main('orm cms list_customers t'.split())
@@ -222,7 +248,7 @@ class CmsTests(TestCase):
 
     @mock.patch('requests.get')
     @mock.patch('requests.post')
-    def test_list_customers(self, mock_post, mock_get):
+    def test_list_customers_with_filters(self, mock_post, mock_get):
         cli = ormcli.Cli()
         cli.create_parser()
         cli.parse(
@@ -230,3 +256,70 @@ class CmsTests(TestCase):
         resp = self.respond('{"Hi, mom"}', 200, {'X-Subject-Token': 989})
         mock_post.return_value = self.respond(
             {"access": {"token": {"id": 989}}}, 200)
+
+    @mock.patch.object(cmscli.cli_common, 'get_keystone_ep')
+    @mock.patch.object(cmscli.requests, 'post')
+    @mock.patch.object(cmscli.requests, 'get')
+    @mock.patch.object(cmscli, 'get_token')
+    @mock.patch.object(cmscli, 'globals')
+    def test_list_groups(self, mock_globals, mock_get_token,
+                         mock_get, mock_post, mock_get_keystone_ep):
+        mock_post.return_value = self.respond(TJ, 200)
+        mock_get.return_value = self.mock_response
+        args = ormcli.main('orm cms list_groups t'.split())
+        sys.stdout.seek(0)
+        output = sys.stdout.read()
+        self.assertIn(json.dumps(TJ), output)
+
+    @mock.patch.object(cmscli.cli_common, 'get_keystone_ep')
+    @mock.patch.object(cmscli.requests, 'post')
+    @mock.patch.object(cmscli.requests, 'get')
+    @mock.patch.object(cmscli, 'get_token')
+    @mock.patch.object(cmscli, 'globals')
+    def test_list_groups_a(self, mock_globals, mock_get_token,
+                           mock_get, mock_post, mock_get_keystone_ep):
+        mock_post.return_value = self.respond(TJ, 200)
+        mock_get.return_value = self.mock_response
+        mock_get.__name__ = 'a'
+        args = ormcli.main('orm cms --verbose list_groups t'.split())
+        sys.stdout.seek(0)
+        output = sys.stdout.read()
+        self.assertIn(json.dumps(TJ), output)
+
+    @mock.patch.object(cmscli.cli_common, 'get_keystone_ep')
+    @mock.patch.object(cmscli.requests, 'post')
+    @mock.patch.object(cmscli.requests, 'get')
+    def test_list_groups_e(self, mock_get, mock_post, mock_get_keystone_ep):
+        mock_post.return_value = self.respond(TJ, 200)
+        mock_get.side_effect = Exception('e')
+        with self.assertRaises(SystemExit) as cm:
+            args = ormcli.main('orm cms list_groups t'.split())
+        self.assertEqual(cm.exception.code, 1)
+        sys.stdout.seek(0)
+        output = sys.stdout.read()
+        self.assertIn('e', output)
+
+    @mock.patch.object(cmscli.cli_common, 'get_keystone_ep')
+    @mock.patch.object(cmscli.requests, 'post')
+    @mock.patch.object(cmscli.requests, 'get')
+    @mock.patch.object(cmscli, 'get_token')
+    @mock.patch.object(cmscli, 'globals')
+    def test_list_groups_errors(self, mock_globals, mock_get_token,
+                                mock_get, mock_post,
+                                mock_get_keystone_ep):
+        mock_post.return_value = self.respond(TJ, 200)
+        mock_get.return_value = self.respond(TJ, 204, oy=True)
+        with self.assertRaises(SystemExit) as cm:
+            args = ormcli.main('orm cms list_groups t'.split())
+        self.assertEqual(cm.exception.code, 0)
+        sys.stdout.seek(0)
+        output = sys.stdout.read()
+        self.assertEqual('', output)
+
+        mock_get.return_value = self.respond(TJ, 404, oy=True)
+        with self.assertRaises(SystemExit) as cm:
+            args = ormcli.main('orm cms --faceless list_groups t'.split())
+        self.assertEqual(cm.exception.code, 1)
+        sys.stdout.seek(0)
+        output = sys.stdout.read()
+        self.assertIn('API error:', output)

@@ -270,6 +270,73 @@ def add_to_parser(service_sub):
     parser_list_customer.add_argument('--metadata', action='append', nargs="+",
                                       type=str, help='<key:value>')
 
+    # group
+    parser_create_group = subparsers.add_parser('creste_group',
+                                                help='[<"X-RANGER-Client" '
+                                                     'header>] <data file '
+                                                     'with new group '
+                                                     'JSON>')
+    parser_create_group.add_argument('client',
+                                     **cli_common.ORM_CLIENT_KWARGS)
+    parser_create_group.add_argument('datafile',
+                                     type=argparse.FileType('r'),
+                                     help='<data file with new group '
+                                          'JSON>')
+    parser_delete_group = subparsers.add_parser('delete_group',
+                                                help='[<"X-RANGER-Client" '
+                                                'header>] <group id>')
+    parser_delete_group.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_delete_group.add_argument('groupid', type=str, help='<group id>')
+
+    #  groups region
+    parser_add_groups_region = subparsers.add_parser(
+        'add_groups_region',
+        help='[<"X-RANGER-Client" '
+             'header>] <group id> '
+             '<data file with region(s) JSON>')
+    parser_add_groups_region.add_argument(
+        'client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_add_groups_region.add_argument(
+        'groupid', type=str, help='<groupid id>')
+    parser_add_groups_region.add_argument(
+        'datafile', type=argparse.FileType('r'),
+        help='<data file with region(s) JSON>')
+
+    parser_delete_groups_region = subparsers.add_parser(
+        'delete_groups_region',
+        help='[<"X-RANGER-Client" header>] [--force_delete] '
+        '<group id> <region id>')
+    parser_delete_groups_region.add_argument('client',
+                                             **cli_common.ORM_CLIENT_KWARGS)
+    parser_delete_groups_region.add_argument('groupid',
+                                             type=str,
+                                             help='<group id>')
+    parser_delete_groups_region.add_argument('regionid',
+                                             type=str,
+                                             help='<region id>')
+    parser_delete_groups_region.add_argument('--force_delete',
+                                             help='force delete groups region',
+                                             action="store_true")
+
+    # get group
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<group id or group name>'
+    parser_get_group = subparsers.add_parser('get_group',
+                                             help='%s %s' % (h1, h2))
+    parser_get_group.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_get_group.add_argument('groupid', type=str, help=h2)
+
+    # list groups
+    h1 = '[<"X-RANGER-Client" header>]'
+    h2 = '[--region <name>] [--starts_with <name>] [--contains <name>]'
+    parser_list_groups = subparsers.add_parser('list_groups',
+                                               help='%s %s' % (h1, h2))
+    parser_list_groups.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_list_groups.add_argument('--region', type=str, help='region name')
+    parser_list_groups.add_argument('--starts_with', type=str,
+                                    help='group name')
+    parser_list_groups.add_argument('--contains', type=str,
+                                    help='* contains in group name')
+
     return parser
 
 
@@ -279,42 +346,47 @@ def preparm(p):
 
 def cmd_details(args):
     if args.subcmd == 'create_customer':
-        return requests.post, ''
+        return requests.post, 'customers/'
     elif args.subcmd == 'delete_customer':
-        return requests.delete, '/%s' % args.custid
+        return requests.delete, 'customers/%s' % args.custid
     elif args.subcmd == 'update_customer':
-        return requests.put, '/%s' % args.custid
+        return requests.put, 'customers/%s' % args.custid
     elif args.subcmd == 'add_region':
-        return requests.post, '/%s/regions' % args.custid
+        return requests.post, 'customers/%s/regions' % args.custid
     elif args.subcmd == 'replace_region':
-        return requests.put, '/%s/regions' % args.custid
+        return requests.put, 'customers/%s/regions' % args.custid
     elif args.subcmd == 'delete_region':
-        return requests.delete, '/%s/regions/%s/%s' % (args.custid,
-                                                       args.regionid,
-                                                       args.force_delete)
+        return requests.delete, 'customers/%s/regions/%s/%s' % (
+            args.custid,
+            args.regionid,
+            args.force_delete)
     elif args.subcmd == 'add_user':
-        return requests.post, '/%s/regions/%s/users' % (
+        return requests.post, 'customers/%s/regions/%s/users' % (
             args.custid, args.regionid)
     elif args.subcmd == 'replace_user':
-        return requests.put, '/%s/regions/%s/users' % (
+        return requests.put, 'customers/%s/regions/%s/users' % (
             args.custid, args.regionid)
     elif args.subcmd == 'delete_user':
-        return requests.delete, '/%s/regions/%s/users/%s' % (
-            args.custid, args.regionid, args.userid)
+        return requests.delete, 'customers/%s/regions/%s/users/%s' % (
+            args.custid,
+            args.regionid,
+            args.userid)
     elif args.subcmd == 'add_default_user':
-        return requests.post, '/%s/users' % args.custid
+        return requests.post, 'customers/%s/users' % args.custid
     elif args.subcmd == 'replace_default_user':
-        return requests.put, '/%s/users' % args.custid
+        return requests.put, 'customers/%s/users' % args.custid
     elif args.subcmd == 'delete_default_user':
-        return requests.delete, '/%s/users/%s' % (args.custid, args.userid)
+        return requests.delete, 'customers/%s/users/%s' % (
+            args.custid,
+            args.userid)
     elif args.subcmd == 'add_metadata':
-        return requests.post, '/%s/metadata' % args.custid
+        return requests.post, 'customers/%s/metadata' % args.custid
     elif args.subcmd == 'replace_metadata':
-        return requests.put, '/%s/metadata' % args.custid
+        return requests.put, 'customers/%s/metadata' % args.custid
     elif args.subcmd == 'get_customer':
-        return requests.get, '/%s' % args.custid
+        return requests.get, 'customers/%s' % args.custid
     elif args.subcmd == 'enabled':
-        return requests.put, '/%s/enabled' % args.custid
+        return requests.put, 'customers/%s/enabled' % args.custid
     elif args.subcmd == 'list_customers':
         param = ''
         if args.region:
@@ -328,7 +400,29 @@ def cmd_details(args):
         if args.metadata:
             for meta in args.metadata:
                 param += '%smetadata=%s' % (preparm(param), meta[0])
-        return requests.get, '/%s' % param
+        return requests.get, 'customers/%s' % param
+    elif args.subcmd == 'create_group':
+        return requests.post, 'groups/'
+    elif args.subcmd == 'delete_group':
+        return requests.delete, 'groups/%s' % args.groupid
+    elif args.subcmd == 'add_groups_region':
+        return requests.post, 'groups/%s/regions' % args.groupid
+    elif args.subcmd == 'delete_groups_region':
+        return requests.delete, 'groups/%s/regions/%s/%s' % (
+            args.groupid,
+            args.regionid,
+            args.force_delete)
+    elif args.subcmd == 'get_group':
+        return requests.get, 'groups/%s' % args.groupid
+    elif args.subcmd == 'list_groups':
+        param = ''
+        if args.region:
+            param += '%sregion=%s' % (preparm(param), args.region)
+        if args.starts_with:
+            param += '%sstarts_with=%s' % (preparm(param), args.starts_with)
+        if args.contains:
+            param += '%scontains=%s' % (preparm(param), args.contains)
+        return requests.get, 'groups/%s' % param
 
 
 def get_token(timeout, args, host):
@@ -384,7 +478,11 @@ def get_token(timeout, args, host):
             'Failed in get_token, host: {}, region: {}'.format(host,
                                                                auth_region))
     url = url % (keystone_ep,)
-    data = data % (base_config.user_domain_name, username, password, tenant_name, base_config.project_domain_name,)
+    data = data % (base_config.user_domain_name,
+                   username,
+                   password,
+                   tenant_name,
+                   base_config.project_domain_name,)
 
     if args.verbose:
         print(
@@ -413,14 +511,16 @@ def get_environment_variable(argument):
 
 
 def run(args):
-    rms_url = args.rms_base_url if args.rms_base_url else base_config.rms['base_url']
-    host = args.cms_base_url if args.cms_base_url else base_config.cms['base_url']
+    rms_url = args.rms_base_url if args.rms_base_url else \
+        base_config.rms['base_url']
+    host = args.cms_base_url if args.cms_base_url else \
+        base_config.cms['base_url']
     port = args.port if args.port else base_config.cms['port']
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
 
     rest_cmd, cmd_url = cmd_details(args)
-    url = '%s/v1/orm/customers' % (host) + cmd_url
+    url = '%s/v1/orm/' % (host) + cmd_url
     if args.faceless:
         auth_token = auth_region = requester = client = ''
     else:
