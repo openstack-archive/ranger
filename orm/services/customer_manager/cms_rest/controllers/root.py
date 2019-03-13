@@ -1,3 +1,5 @@
+import orm.base_config as config
+
 from orm.services.customer_manager.cms_rest.controllers.v1 import root as v1
 from pecan import expose
 
@@ -20,7 +22,7 @@ class RootController(object):
                         "id": "v1",
                         "links": [
                             {
-                                "href": "http://localhost:7080/"
+                                "href": config.cms['base_url']
                             }
                         ]
                     }

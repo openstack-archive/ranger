@@ -1,6 +1,7 @@
-from orm.services.flavor_manager.fms_rest.controllers.v1.v1 import V1Controller
+import orm.base_config as config
 
-from pecan import conf, expose
+from orm.services.flavor_manager.fms_rest.controllers.v1.v1 import V1Controller
+from pecan import expose
 from webob.exc import status_map
 
 
@@ -22,7 +23,7 @@ class RootController(object):
                         "id": "v1",
                         "links": [
                             {
-                                "href": conf.application_root
+                                "href": config.fms['base_url']
                             }
                         ]
                     }

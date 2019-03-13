@@ -1,8 +1,10 @@
 from configuration import ConfigurationController
 from lcp_controller import LcpController
 from logs import LogsController
-from orm.services.region_manager.rms.controllers.v2 import root
 
+import orm.base_config as config
+
+from orm.services.region_manager.rms.controllers.v2 import root
 from pecan import expose
 
 
@@ -27,7 +29,7 @@ class RootController(object):
                         "id": "v2",
                         "links": [
                             {
-                                "href": "http://localhost:8080/"
+                                "href": config.rms['base_url']
                             }
                         ]
                     }

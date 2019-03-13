@@ -31,8 +31,6 @@ database = {
     'connection_string': config.db_connect
 }
 
-application_root = 'http://localhost:{0}'.format(server['port'])
-
 api = {
     'uuid_server': {
         'base': config.uuid['base_url'],

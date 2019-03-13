@@ -30,8 +30,6 @@ database = {
 }
 
 
-application_root = config.ims['base_url']
-
 api = {
     'uuid_server': {
         'base': config.uuid['base_url'],
