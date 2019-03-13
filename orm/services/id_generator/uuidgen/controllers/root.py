@@ -1,5 +1,5 @@
 import logging
-
+import orm.base_config as config
 import orm.services.id_generator.uuidgen.controllers.v1.root as root
 from pecan import expose
 from pecan.rest import RestController
@@ -26,7 +26,7 @@ class RootController(RestController):
                         "id": "v1",
                         "links": [
                             {
-                                "href": "http://localhost:8090/"
+                                "href": config.uuid['base_url']
                             }
                         ]
                     }

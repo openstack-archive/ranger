@@ -1,6 +1,7 @@
-from orm.services.flavor_manager.fms_rest.controllers.v1.v1 import V1Controller
+import orm.base_config as config
 
-from pecan import conf, expose
+from orm.services.flavor_manager.fms_rest.controllers.v1.v1 import V1Controller
+from pecan import expose
 from webob.exc import status_map
 
 
@@ -8,12 +9,11 @@ class RootController(object):
     v1 = V1Controller()
 
     @expose(template='json')
-    def get(self):
+    def _default(self):
         """Method to handle GET /
             prameters: None
             return: dict describing flavor command version information
         """
-
         return {
             "versions": {
                 "values": [
@@ -22,7 +22,7 @@ class RootController(object):
                         "id": "v1",
                         "links": [
                             {
-                                "href": conf.application_root
+                                "href": config.fms['base_url']
                             }
                         ]
                     }

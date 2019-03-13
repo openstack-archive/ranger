@@ -1,5 +1,7 @@
+import orm.base_config as config
+
 from orm.services.image_manager.ims.controllers.v1.v1 import V1Controller
-from pecan import conf, expose
+from pecan import expose
 from webob.exc import status_map
 
 
@@ -7,7 +9,7 @@ class RootController(object):
     v1 = V1Controller()
 
     @expose(template='json')
-    def get(self):
+    def _default(self):
         """Method to handle GET /
             prameters: None
             return: dict describing image command version information
@@ -21,7 +23,7 @@ class RootController(object):
                         "id": "v1",
                         "links": [
                             {
-                                "href": conf.application_root
+                                "href": config.ims['base_url']
                             }
                         ]
                     }
