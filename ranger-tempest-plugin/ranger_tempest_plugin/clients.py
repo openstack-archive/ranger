@@ -32,16 +32,16 @@ class OrmClientManager(clients.Manager):
         self.cms_client = CmsClient(base_client.RangerAuthProvider(credentials),
                                     CONF.identity.catalog_type,
                                     CONF.identity.region,
-                                    CONF.ranger.uri)
+                                    CONF.ranger.RANGER_CMS_BASE_URL)
         self.fms_client = FmsClient(base_client.RangerAuthProvider(credentials),
                                     CONF.identity.catalog_type,
                                     CONF.identity.region,
-                                    CONF.ranger.uri)
+                                    CONF.ranger.RANGER_FMS_BASE_URL)
         self.rms_client = RmsClient(base_client.RangerAuthProvider(credentials),
                                     CONF.identity.catalog_type,
                                     CONF.identity.region,
-                                    CONF.ranger.uri)
+                                    CONF.ranger.RANGER_RMS_BASE_URL)
         self.ims_client = ImsClient(base_client.RangerAuthProvider(credentials),
                                     CONF.identity.catalog_type,
                                     CONF.identity.region,
-                                    CONF.ranger.uri)
+                                    CONF.ranger.RANGER_IMS_BASE_URL)
