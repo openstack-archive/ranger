@@ -32,7 +32,7 @@ class RmsTests(TestCase):
         args.type = '1'
         args.status = '2'
         args.metadata = '3'
-        args.aicversion = '4'
+        args.ranger_agent_version = '4'
         args.clli = '5'
         args.regionname = '6'
         args.osversion = '7'
@@ -42,11 +42,11 @@ class RmsTests(TestCase):
         args.city = '11'
         args.street = '12'
         args.zip = '13'
-        args.vlcp_name = '14'
+        args.clcp_name = '14'
 
-        list_region_url = '/?type=%s&status=%s&metadata=%s&aicversion=%s'\
+        list_region_url = '/?type=%s&status=%s&metadata=%s&ranger_agent_version=%s'\
             '&clli=%s&regionname=%s&osversion=%s&location_type=%s&state=%s'\
-            '&country=%s&city=%s&street=%s&zip=%s&vlcp_name=%s'
+            '&country=%s&city=%s&street=%s&zip=%s&clcp_name=%s'
 
         subcmd_to_result = {
             'get_region': (requests.get, '/%s' % args.region_name_or_id),
@@ -57,10 +57,10 @@ class RmsTests(TestCase):
             'list_regions': (requests.get,
                              list_region_url
                              % (args.type, args.status, args.metadata,
-                                args.aicversion, args.clli, args.regionname,
+                                args.ranger_agent_version, args.clli, args.regionname,
                                 args.osversion, args.location_type,
                                 args.state, args.country, args.city,
-                                args.street, args.zip, args.vlcp_name))
+                                args.street, args.zip, args.clcp_name))
         }
 
         for subcmd in subcmd_to_result:
