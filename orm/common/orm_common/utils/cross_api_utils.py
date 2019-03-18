@@ -19,7 +19,8 @@ def set_utils_conf(_conf):
 
 def _check_conf_initialization():
     if not conf:
-        raise AssertionError('Configurations wasnt initiated, please run set_utils_conf and pass pecan configuration')
+        raise AssertionError('Configurations wasnt initiated, please run '
+                             'set_utils_conf and pass pecan configuration')
 
 
 def validate_description(data_value):
@@ -34,7 +35,8 @@ def validate_description(data_value):
     if not isinstance(data_value, str):
         desc = str(data_value)
 
-    invalidChars = (string.punctuation).translate(None, ''.join(allowed_punctuations))
+    invalidChars = (string.punctuation).translate(
+        None, ''.join(allowed_punctuations))
 
     # detect any escape sequences or special characters in data string
     encoded_string = desc.encode('string_escape')
@@ -79,14 +81,16 @@ def get_rms_region_group(group_name):
     _check_conf_initialization()
     try:
         timestamp = time.time()
-        if group_name == prev_group_name and timestamp - prev_timestamp <= conf.api.rms_server.cache_seconds:
+        if group_name == prev_group_name and timestamp - \
+                prev_timestamp <= conf.api.rms_server.cache_seconds:
             return prev_resp
 
         headers = {
             'content-type': 'application/json',
         }
-        # GET https://{serverRoot}/v1/orm/groups/{groupId}/
-        rms_server_url = '%s%s/%s' % (conf.api.rms_server.base, conf.api.rms_server.groups, group_name)
+        # GET https://{serverRoot}/v2/orm/groups/{groupId}/
+        rms_server_url = '%s/%s/%s' % (conf.api.rms_server.base,
+                                       conf.api.rms_server.groups, group_name)
         logger.info("RMS Server URL:" + rms_server_url)
         resp = requests.get(rms_server_url, headers=headers, verify=conf.verify)
         resp = resp.json()
@@ -100,7 +104,8 @@ def get_rms_region_group(group_name):
         logger.error(
             'CRITICAL|{}| Failed in getting data from rms: connection error'.format(
                 nagois) + str(exp))
-        exp.message = 'connection error: Failed to get get data from rms: unable to connect to server'
+        exp.message = 'connection error: Failed to get get data from rms: ' \
+                      'unable to connect to server'
         raise
     except Exception as e:
         logger.exception(" Exception: " + str(e))

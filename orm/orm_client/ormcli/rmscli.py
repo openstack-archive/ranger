@@ -124,11 +124,12 @@ def add_to_parser(service_sub):
     parser_list_region = subparsers.add_parser('list_regions',
                                                help='\
 [--use_version <api version>] [--type <type>][--status <status>]\
-[--metadata <metadata>] [--aicversion <aicversion>][--clli <clli>]\
+[--metadata <metadata>] [--ranger_agent_version <ranger_agent_version>]\
+[--clli <clli>]\
 [--regionname <regionname>] [--osversion <osversion>]\
 [--location_type <location_type>]\
 [--state <state>] [--country <country>] [--city <city>] [--street <street>]\
-[--zip <zip>] [--vlcp_name <vlcp_name>]')
+[--zip <zip>] [--clcp_name <clcp_name>]')
     parser_list_region.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_list_region.add_argument('--use_version', type=int,
                                     help='<api version to use>')
@@ -136,8 +137,8 @@ def add_to_parser(service_sub):
     parser_list_region.add_argument('--status', type=str, help='<status>')
     parser_list_region.add_argument('--metadata', action='append', nargs="+",
                                     type=str, help='<metadata>')
-    parser_list_region.add_argument('--aicversion', type=str,
-                                    help='<aicversion>')
+    parser_list_region.add_argument('--ranger_agent_version', type=str,
+                                    help='<ranger_agent_version>')
     parser_list_region.add_argument('--clli', type=str, help='<clli>')
     parser_list_region.add_argument('--regionname', type=str,
                                     help='<regionname>')
@@ -150,8 +151,8 @@ def add_to_parser(service_sub):
     parser_list_region.add_argument('--city', type=str, help='<city>')
     parser_list_region.add_argument('--street', type=str, help='<street>')
     parser_list_region.add_argument('--zip', type=str, help='<zip>')
-    parser_list_region.add_argument('--vlcp_name', type=str,
-                                    help='<vlcp_name>')
+    parser_list_region.add_argument('--clcp_name', type=str,
+                                    help='<clcp_name>')
 
     # add metadata to region
     h1, h2 = '<region_id>', '<metadata json file>'
@@ -256,7 +257,8 @@ def get_token(timeout, args, host):
             'Failed in get_token, host: {}, region: {}'.format(host,
                                                                auth_region))
     url = url % (keystone_ep,)
-    data = data % (base_config.user_domain_name, username, password, tenant_name, base_config.project_domain_name,)
+    data = data % (base_config.user_domain_name, username, password,
+                   tenant_name, base_config.project_domain_name,)
 
     if args.verbose:
         print(
@@ -297,8 +299,9 @@ def cmd_details(args):
         if args.metadata:
             for meta in args.metadata:
                 param += '%smetadata=%s' % (preparm(param), meta[0])
-        if args.aicversion:
-            param += '%saicversion=%s' % (preparm(param), args.aicversion)
+        if args.ranger_agent_version:
+            param += '%sranger_agent_version=%s' % (preparm(param),
+                                                    args.ranger_agent_version)
         if args.clli:
             param += '%sclli=%s' % (preparm(param), args.clli)
         if args.regionname:
@@ -318,8 +321,8 @@ def cmd_details(args):
             param += '%sstreet=%s' % (preparm(param), args.street)
         if args.zip:
             param += '%szip=%s' % (preparm(param), args.zip)
-        if args.vlcp_name:
-            param += '%svlcp_name=%s' % (preparm(param), args.vlcp_name)
+        if args.clcp_name:
+            param += '%svlcp_name=%s' % (preparm(param), args.clcp_name)
         return requests.get, '/%s' % param
     elif args.subcmd == 'add_metadata':
         return requests.post, '/%s/metadata' % args.region_id
@@ -361,7 +364,8 @@ def get_environment_variable(argument):
 
 def run(args):
     url_path = get_path(args)
-    rms_base_url = args.rms_base_url if args.rms_base_url else base_config.rms['base_url']
+    rms_base_url = args.rms_base_url if args.rms_base_url \
+        else base_config.rms['base_url']
     data = args.datafile.read() if 'datafile' in args else '{}'
     timeout = args.timeout if args.timeout else 10
     rest_cmd, cmd_url = cmd_details(args)
