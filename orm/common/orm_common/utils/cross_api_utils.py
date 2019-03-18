@@ -85,8 +85,8 @@ def get_rms_region_group(group_name):
         headers = {
             'content-type': 'application/json',
         }
-        # GET https://{serverRoot}/v1/orm/groups/{groupId}/
-        rms_server_url = '%s%s/%s' % (conf.api.rms_server.base, conf.api.rms_server.groups, group_name)
+        # GET https://{serverRoot}/v2/orm/groups/{groupId}/
+        rms_server_url = '%s/%s/%s' % (conf.api.rms_server.base, conf.api.rms_server.groups, group_name)
         logger.info("RMS Server URL:" + rms_server_url)
         resp = requests.get(rms_server_url, headers=headers, verify=conf.verify)
         resp = resp.json()

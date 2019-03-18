@@ -216,7 +216,7 @@ class RegionsController(rest.RestController):
 
     @wsexpose(Regions, str, str, [str], str, str, str, str, str, str, str,
               str, str, str, str, status_code=200, rest_content_types='json')
-    def get_all(self, type=None, status=None, metadata=None, rangerAgentVersion=None,
+    def get_all(self, type=None, status=None, metadata=None, ranger_agent_version=None,
                 clli=None, regionname=None, osversion=None, location_type=None,
                 state=None, country=None, city=None, street=None, zip=None,
                 vlcp_name=None):
@@ -225,7 +225,7 @@ class RegionsController(rest.RestController):
         :param type: query field
         :param status: query field
         :param metadata: query field
-        :param rangerAgentVersion: query field
+        :param ranger_agent_version: query field
         :param clli: query field
         :param regionname: query field
         :param osversion: query field
@@ -243,7 +243,7 @@ class RegionsController(rest.RestController):
         authentication.authorize(request, 'region:get_all', skip_auth=True)
 
         url_args = {'type': type, 'status': status, 'metadata': metadata,
-                    'rangerAgentVersion': rangerAgentVersion, 'clli': clli, 'regionname': regionname,
+                    'ranger_agent_version': ranger_agent_version, 'clli': clli, 'regionname': regionname,
                     'osversion': osversion, 'location_type': location_type, 'state': state,
                     'country': country, 'city': city, 'street': street, 'zip': zip,
                     'vlcp_name': vlcp_name}

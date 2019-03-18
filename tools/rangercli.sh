@@ -70,4 +70,4 @@ EndOfCommand
 )
 
 # Execute Ranger CLI
-${base_docker_command} -v "${RANGERCLI_JSONPATH}":"${RANGERCLI_HOSTPATH}" "${RANGERCLI_IMAGE}" $@
+${base_docker_command} -v "${RANGERCLI_JSONPATH}":"${RANGERCLI_HOSTPATH}" "${RANGERCLI_IMAGE}" ./orm "$@"
