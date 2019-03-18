@@ -85,7 +85,7 @@ class TestTempestRegion(rms_base.RmsBaseOrmTest):
 
     @decorators.idempotent_id('871be582-ecaa-4a46-a403-4d6b5e59d7de')
     def test_list_region_with_ranger_version(self):
-        filter = {'rangerAgentVersion': self.region_1['rangerAgentVersion']}
+        filter = {'ranger_agent_version': self.region_1['rangerAgentVersion']}
         self._list_regions_with_filter(filter, 'rangerAgentVersion')
 
     @decorators.idempotent_id('ac18be48-c787-4a65-913f-a0b0a80fbd1d')

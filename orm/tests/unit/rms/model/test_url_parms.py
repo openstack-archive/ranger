@@ -7,7 +7,7 @@ parms = {'status': 'functional', 'city': 'Los Angeles', 'clli': 'clli_0',
          'zip': '012345', 'country': 'US', 'metadata': ['key_1:value_1',
                                                         'key_2:value_2'],
          'location_type': 'location_type_0', 'state': 'Cal', 'street': 'Blv st',
-         'rangerAgentVersion': 'aic 3.0', 'osversion': 'kilo',
+         'ranger_agent_version': 'aic 3.0', 'osversion': 'kilo',
          'type': 'design_type_0', 'regionname': 'lcp 0',
          'vlcp_name': 'abcd-1234'}
 
@@ -16,7 +16,7 @@ parms_meta_none = {'status': 'functional', 'city': 'Los Angeles',
                    'zip': '012345', 'country': 'US',
                    'metadata': None,
                    'location_type': 'location_type_0', 'state': 'Cal', 'street': 'Blv st',
-                   'rangerAgentVersion': 'aic 3.0', 'osversion': 'kilo',
+                   'ranger_agent_version': 'aic 3.0', 'osversion': 'kilo',
                    'type': 'design_type_0', 'regionname': 'lcp 0',
                    'vlcp_name': 'abcd-1234'}
 

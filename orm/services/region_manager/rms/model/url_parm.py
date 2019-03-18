@@ -4,7 +4,7 @@
 class UrlParms(object):
     """class method."""
 
-    def __init__(self, type=None, status=None, metadata=None, rangerAgentVersion=None,
+    def __init__(self, type=None, status=None, metadata=None, ranger_agent_version=None,
                  clli=None, regionname=None, osversion=None, location_type=None,
                  state=None, country=None, city=None, street=None, zip=None,
                  vlcp_name=None):
@@ -13,7 +13,7 @@ class UrlParms(object):
         :param type:
         :param status:
         :param metadata:
-        :param rangerAgentVersion:
+        :param ranger_agent_version:
         :param clli:
         :param regionname:
         :param osversion:
@@ -31,8 +31,8 @@ class UrlParms(object):
             self.region_status = status
         if metadata:
             self.metadata = metadata
-        if rangerAgentVersion:
-            self.ranger_agent_version = rangerAgentVersion
+        if ranger_agent_version:
+            self.ranger_agent_version = ranger_agent_version
         if clli:
             self.clli = clli
         if regionname:
