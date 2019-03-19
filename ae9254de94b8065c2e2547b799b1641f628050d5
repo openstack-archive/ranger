@@ -1,0 +1,8 @@
+Code-Review+2: Chi Lo <cl566n@att.com>
+Workflow+1: Chi Lo <cl566n@att.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 19 Mar 2019 22:37:37 +0000
+Reviewed-on: https://review.openstack.org/644443
+Project: openstack/ranger
+Branch: refs/heads/master
