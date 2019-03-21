@@ -928,6 +928,7 @@ def calculate_name(flavor):
           and 'n0' - flavor options are OPTIONAL
     """
 
+    option_order = ['n0', 'i2', 't0']
     name = "{0}.c{1}r{2}d{3}".format(flavor.flavor.series, flavor.flavor.vcpus,
                                      int(flavor.flavor.ram) / 1024,
                                      flavor.flavor.disk)
@@ -959,8 +960,9 @@ def calculate_name(flavor):
 
     if options:
         name += '.'
-        for key in sorted(options):
-            name += key
+        for item in option_order:
+            if item in options:
+                name += item
 
     return name
 
