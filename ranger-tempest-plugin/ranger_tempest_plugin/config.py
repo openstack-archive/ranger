@@ -60,6 +60,12 @@ OrmGroup = [
                help="Ranger Image Service URL"),
     cfg.StrOpt("RANGER_RMS_BASE_URL",
                help="Ranger Region Service URL"),
+    cfg.BoolOpt('verify',
+                default=False,
+                help='Flag for SSL verfiy Enabled/Disabled.'),
+    cfg.BoolOpt('auth_enabled',
+                default=False,
+                help='Token Authentication enabled/disabled'),
     cfg.ListOpt("flavor_series",
                 default=['xx'],
                 help="Supported flavor series")

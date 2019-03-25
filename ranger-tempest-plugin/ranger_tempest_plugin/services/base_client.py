@@ -14,7 +14,7 @@
 #    under the License.
 
 import json
-
+import requests
 from tempest import config
 from tempest.lib import auth
 from tempest.lib.common import rest_client
@@ -22,10 +22,120 @@ from tempest.lib.common import rest_client
 CONF = config.CONF
 
 
+class ResponseError(Exception):
+    pass
+
+
+class ConnectionError(Exception):
+    pass
+
+
 class RangerClientBase(rest_client.RestClient):
+
+    rms_url = CONF.ranger.RANGER_RMS_BASE_URL
+    auth_region = CONF.identity.region
+    timeout = 10
+
+    # def get_keystone_ep(rms_url, region_name):
+    def get_keystone_ep(self, rms_url, region_name):
+        """Get the Keystone EP from RMS.
+
+        :param rms_url: RMS server URL
+        :param region_name: The region name
+        :return: Keystone EP (string), None if it was not found
+        """
+        try:
+            response = requests.get('%s/v2/orm/regions?regionname=%s' % (
+                rms_url, region_name, ), verify=CONF.ranger.verify)
+        except requests.exceptions.ConnectionError as e:
+            print('Could not connect to RMS, URL: {}'.format(rms_url))
+            return None
+
+        if response.status_code != 200:
+            print('RMS returned status: {}, content: {}'.format(
+                response.status_code, response.content))
+            return None
+
+        # get the identity URL info from the rms region record
+        lcp = response.json()
+        try:
+            for endpoint in lcp['regions'][0]['endpoints']:
+                if endpoint['type'] == 'identity':
+                    return endpoint['publicURL']
+        except KeyError:
+            print('Key error while attempting to get keystone endpoint. '
+                  'Please investigate.')
+            return None
+
+        # Keystone EP not found in the response
+        print('No identity endpoint was found in the response from RMS')
+        return None
+
+    def get_token(self, timeout, host):
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        url = '%s/v3/auth/tokens'
+        data = '''
+{
+   "auth":{
+      "identity":{
+         "methods":[
+            "password"
+         ],
+         "password":{
+            "user":{
+               "domain":{
+                  "name":"%s"
+               },
+               "name":"%s",
+               "password":"%s"
+            }
+         }
+      },
+      "scope":{
+         "project":{
+            "name":"%s",
+            "domain":{
+               "name":"%s"
+            }
+         }
+      }
+   }
+}'''
+        if not CONF.ranger.auth_enabled:
+            return None
+
+        region = self.auth_region
+
+        keystone_ep = self.get_keystone_ep('{}'.format(host), region)
+        if keystone_ep is None:
+            raise ConnectionError(
+                'Failed in get_token, host: {}, region: {}'.format(host,
+                                                                   region))
+
+        url = url % (keystone_ep,)
+        data = data % (CONF.auth.admin_domain_name,
+                       CONF.auth.admin_username,
+                       CONF.auth.admin_password,
+                       CONF.auth.admin_project_name,
+                       CONF.auth.admin_domain_name,)
+
+        try:
+            resp = requests.post(url, timeout=timeout, data=data, headers=headers)
+            if resp.status_code != 201:
+                raise ResponseError(
+                    'Failed to get token (Reason: {})'.format(
+                        resp.status_code))
+            return resp.headers['x-subject-token']
+
+        except Exception as e:
+            print e.message
+            raise ConnectionError(e.message)
 
     def get_headers(self):
         headers = {'X-Auth-Region': CONF.identity.region,
+                   'X-Auth-Token': self.get_token(self.timeout, self.rms_url),
                    'X-RANGER-Tracking-Id': 'test',
                    'X-RANGER-Requester': CONF.auth.admin_username,
                    'X-RANGER-Client': 'cli',

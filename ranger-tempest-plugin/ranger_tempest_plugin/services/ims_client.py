@@ -27,16 +27,6 @@ class ImsClient(base_client.RangerClientBase):
     ims_url = CONF.ranger.RANGER_IMS_BASE_URL
     version = "v1"
 
-    def get_headers(self):
-        headers = {'Content-Type': 'application/json',
-                   'Accept': 'application/json',
-                   'X-Auth-Region': CONF.identity.region,
-                   'X-RANGER-Tracking-Id': 'test',
-                   'X-RANGER-Requester': CONF.auth.admin_username,
-                   'X-RANGER-Client': 'cli'
-                   }
-        return headers
-
     def create_image(self, **kwargs):
         uri = '%s/%s/orm/images' % (self.ims_url, self.version)
         post_body = {"image": kwargs}

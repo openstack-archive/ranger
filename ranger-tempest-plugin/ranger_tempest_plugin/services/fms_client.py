@@ -29,24 +29,10 @@ class FmsClient(base_client.RangerClientBase):
     fms_url = CONF.ranger.RANGER_FMS_BASE_URL
     version = "v1"
 
-    def get_extra_headers(self):
-        headers = {'X-Auth-Region': CONF.identity.region,
-                   'X-RANGER-Tracking-Id': 'test',
-                   'X-RANGER-Requester': CONF.auth.admin_username,
-                   'X-RANGER-Client': 'cli'
-                   }
-        return headers
-
     def create_flavor(self, **kwargs):
         uri = '%s/%s/orm/flavors' % (self.fms_url, self.version)
         post_body = {"flavor": kwargs}
         post_body = json.dumps(post_body)
-        # ex_headers = self.get_headers()
-        # resp, body = self.post(uri, body=post_body,
-        #                       extra_headers=ex_headers)
-        # body = json.loads(body)
-        # self.validate_response(schema.create_flavor, resp, body)
-        # return rest_client.ResponseBody(resp, body["flavor"])
         return self.post_request(uri, post_body, schema.create_flavor)
 
     def get_flavor(self, identifier, para=None):
@@ -63,12 +49,6 @@ class FmsClient(base_client.RangerClientBase):
             uri = '%s/%s/orm/flavors' % (self.fms_url, self.version)
         else:
             uri = '%s/%s/orm/flavors/%s' % (self.fms_url, self.version, para)
-        # ex_headers = self.get_headers()
-        # resp, body = self.get(url, extra_headers=ex_headers)
-        # self.expected_success(200, resp.status)
-        # body = json.loads(body)
-        # self.validate_response(schema.list_flavors, resp, body)
-        # return rest_client.ResponseBody(resp, body)
         return self.get_request(uri, schema.list_flavors)
 
     def delete_region_from_flavor(self, flavor_id, region_id):
