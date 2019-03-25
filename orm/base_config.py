@@ -89,7 +89,7 @@ OrmAuthGroup = [
                default='default',
                help='User domain name.'),
     cfg.StrOpt('user_role',
-               default='admin',
+               default='admin2',
                help='token user role.')
 ]
 
