@@ -54,12 +54,7 @@ class ImsBaseOrmTest(base.BaseOrmTest):
         post_body["name"] = data_utils.rand_name(
             "orm-plugin-TestTempestIms-image")
 
-        # use ubuntu website for the image location URL
-        ubuntu_url = "http://archive.ubuntu.com/"
-        ubuntu_dir = "ubuntu/dists/xenial/main/installer-i386/current/images/"
-        ubuntu_iso = "netboot/mini.iso"
-        post_body["url"] = ubuntu_url + ubuntu_dir + ubuntu_iso
-
+        post_body["url"] = CONF.ranger.image_url
         post_body["disk-format"] = "qcow2"
         post_body["container-format"] = "bare"
 
