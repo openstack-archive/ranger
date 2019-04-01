@@ -16,6 +16,7 @@
 from ranger_tempest_plugin.services import base_client
 from ranger_tempest_plugin.services.cms_client import CmsClient
 from ranger_tempest_plugin.services.fms_client import FmsClient
+from ranger_tempest_plugin.services.grp_client import GrpClient
 from ranger_tempest_plugin.services.ims_client import ImsClient
 from ranger_tempest_plugin.services.rms_client import RmsClient
 
@@ -45,3 +46,7 @@ class OrmClientManager(clients.Manager):
                                     CONF.identity.catalog_type,
                                     CONF.identity.region,
                                     CONF.ranger.RANGER_IMS_BASE_URL)
+        self.grp_client = GrpClient(base_client.RangerAuthProvider(credentials),
+                                    CONF.identity.catalog_type,
+                                    CONF.identity.region,
+                                    CONF.ranger.RANGER_CMS_BASE_URL)
