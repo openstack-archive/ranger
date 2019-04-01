@@ -26,6 +26,7 @@ class RangerClientBase(rest_client.RestClient):
 
     def get_headers(self):
         headers = {'X-Auth-Region': CONF.identity.region,
+                   'X-Auth-Token': None,
                    'X-RANGER-Tracking-Id': 'test',
                    'X-RANGER-Requester': CONF.auth.admin_username,
                    'X-RANGER-Client': 'cli',
