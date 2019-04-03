@@ -42,3 +42,6 @@ def main(argv=None):
     path, filename = os.path.split(path_and_file)
     runner = CommandRunner()
     runner.run(['serve', path + '/config.py'])
+
+if __name__ == "__main__":
+	main()

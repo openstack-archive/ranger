@@ -1,33 +1,10 @@
 """yaml build build yaml from json input."""
 import logging
-import re
-import yaml
-
 from pecan import conf
+from pprint import pformat
+from orm.services.resource_distributor.rds.services.helpers import create_final_yaml
 
 logger = logging.getLogger(__name__)
-
-
-def create_final_yaml(title, description, resources, outputs):
-    """put all yaml strings together.
-
-    :param title: ther version of yaml
-    :param description: file description
-    :param resources: body of the yaml file
-    :param outputs: the output of the yaml
-    :return: the full string of yaml file
-    """
-    title_yaml = re.sub("'", "", yaml.dump(title, default_flow_style=False))
-    description_yaml = yaml.dump(description, default_flow_style=False)
-    resourcesyaml = re.sub("''", '', yaml.dump(resources,
-                                               default_flow_style=False))
-    resources_yaml = re.sub("'", '', resourcesyaml)
-    yamldata = title_yaml
-    yamldata = yamldata + "\n" + description_yaml
-    yamldata = yamldata + "\n" + resources_yaml
-    yamldata = yamldata + "\n" + yaml.dump(outputs)
-    return yamldata
-
 
 def yamlbuilder(alldata, region):
     logger.info("building group yaml")
@@ -39,31 +16,69 @@ def yamlbuilder(alldata, region):
     :param region: data per region
     :return: the full string of yaml file
     """
+    logger.info("group alldata {} for region {}".format(pformat(alldata), region))
+
     outputs = {}
     resources = {}
     yaml_version = conf.yaml_configs.group_yaml.yaml_version
     title = {'heat_template_version': yaml_version}
     description = {'description': 'yaml file for region - %s' % region['name']}
     jsondata = alldata
-    group_name = jsondata['name']
-    group_description = '"%s"' % (jsondata['description'])
     status = {"0": False, "1": True}[str(jsondata['enabled'])]
-    outputs['outputs'] = {}
-    resources['resources'] = {}
 
-    resources['resources'][group_name] =\
-        {'type': 'OS::Keystone::Group\n',
-         'properties': {'name': "%s" % group_name,
-                        'description': group_description,
-                        'domain': alldata['domain_name'],
-                        'roles': []}}
-
-    # create the output
-    outputs['outputs'][group_name] =\
-        {"value": {"get_resource": "%s" % group_name}}
+    if "roles" in alldata:
+        outputs['outputs'], resources['resources'] = build_group_roles_yaml(jsondata)
+    else:
+        outputs['outputs'], resources['resources'] = build_group_yaml(jsondata)
 
     # putting all parts together for full yaml
     yamldata = create_final_yaml(title, description, resources, outputs)
     logger.debug(
         "done building group yaml for region %s " % region['name'])
+
     return yamldata
+
+def build_group_yaml(jsondata):
+    resources = {}
+    outputs = {}
+    group_name = jsondata['name']
+
+    resources[group_name] = {
+        'type': 'OS::Keystone::Group\n',
+        'properties': {
+            'name': "%s" % group_name,
+            'description': jsondata['description'],
+            'domain': jsondata['domain_name'],
+            'roles': []
+        }
+    }
+
+    outputs[group_name] = {
+        "value": {
+            "get_resource": "%s" % group_name
+        }
+    }
+
+    return outputs, resources
+
+def build_group_roles_yaml(jsondata):
+    resources = {}
+    outputs = {}
+    group_name = jsondata['name']
+    template_name = "{}-Role-Assignment".format(group_name)
+
+    resources[template_name] = {
+        'type': 'OS::Keystone::GroupRoleAssignment\n',
+        'properties': {
+            'group': "%s" % group_name,
+            'roles': jsondata['roles']
+        }
+    }
+
+    outputs[template_name] = {
+        "value": {
+            "get_resource": "%s" % template_name
+        }
+    }
+
+    return outputs, resources
