@@ -1,8 +1,7 @@
 """yaml build build yaml from json input."""
 import logging
-import re
-import yaml
 
+from orm.services.resource_distributor.rds.services.helpers import create_final_yaml
 from pecan import conf
 
 logger = logging.getLogger(__name__)
@@ -18,27 +17,6 @@ def get_users_quotas(data, region):
     users = region['users'] if region['users'] else data['default_region']['users']
     quotas = region['quotas'] if region['quotas'] else data['default_region']['quotas']
     return users, quotas
-
-
-def create_final_yaml(title, description, resources, outputs):
-    """put all yaml strings together.
-
-    :param title: ther version of yaml
-    :param description: file description
-    :param resources: body of the yaml file
-    :param outputs: the output of the yaml
-    :return: the full string of yaml file
-    """
-    title_yaml = re.sub("'", "", yaml.dump(title, default_flow_style=False))
-    description_yaml = yaml.dump(description, default_flow_style=False)
-    resourcesyaml = re.sub("''", '', yaml.dump(resources,
-                                               default_flow_style=False))
-    resources_yaml = re.sub("'", '', resourcesyaml)
-    yamldata = title_yaml
-    yamldata = yamldata + "\n" + description_yaml
-    yamldata = yamldata + "\n" + resources_yaml
-    yamldata = yamldata + "\n" + yaml.dump(outputs)
-    return yamldata
 
 
 def _metadata_to_tags(metadata):
