@@ -375,6 +375,7 @@ rms = {'port': CONF.rms.port,
        'log': '{}/{}'.format(CONF.log_location, CONF.rms.log)}
 
 rds = {'port': CONF.rds.port,
+       'token_version': CONF.keystone_authtoken.auth_version,
        'repo_local_location': CONF.rds.repo_local_location,
        'repo_remote_location': CONF.rds.repo_remote_location,
        'repo_user': CONF.rds.repo_user,

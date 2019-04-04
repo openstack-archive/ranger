@@ -55,6 +55,8 @@ ims = {
     'delete_region': 'v1/orm/images/{0}/regions/{1}'
 }
 
+token_version = config.rds['token_version']
+
 rms = {
     'base_url': config.rms['base_url'],
     'all_regions_path': 'v2/orm/regions'

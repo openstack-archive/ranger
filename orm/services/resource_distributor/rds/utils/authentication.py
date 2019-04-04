@@ -53,6 +53,7 @@ def get_keystone_ep_region_name(region):
 
 
 def get_token(region):
+    V3_TOKEN_GET_SUCCESS = 201
 
     logger.debug("create token")
     if not _is_authorization_enabled():
@@ -66,26 +67,43 @@ def get_token(region):
         logger.error(log_message)
         return
 
-    url = keystone_ep + '/v2.0/tokens'
-    logger.debug("url :- {}".format(url))
+    url = keystone_ep + '/{}/auth/tokens'.format(conf.token_version)
+
     data = {
         "auth": {
-            "tenantName": conf.authentication.tenant_name,
-            "passwordCredentials": {
-                "username": conf.authentication.mech_id,
-                "password": conf.authentication.mech_pass
+            "identity": {
+                "methods": [
+                    "password"
+                ],
+                "password": {
+                    "user": {
+                        "name": conf.authentication.mech_id,
+                        "domain": {
+                            "name": user_domain_name
+                        },
+                        "password": conf.authentication.mech_pass
+                    }
+                }
+            },
+            "scope": {
+                "project": {
+                    "domain": {
+                        "name": project_domain_name
+                    },
+                    "name": conf.authentication.tenant_name
+                }
             }
         }
     }
-    try:
-        logger.debug("get token url- {} data= {}".format(url, data))
-        respone = requests.post(url, data=json.dumps(data), headers=headers,
-                                verify=conf.verify)
 
-        if respone.status_code != 200:
+    try:
+        logger.debug("get token url- {}".format(url))
+        resp = requests.post(url, data=json.dumps(data), headers=headers)
+
+        if resp.status_code != V3_TOKEN_GET_SUCCESS:
             logger.error("fail to get token from url")
         logger.debug("got token for region {}".format(region))
-        return respone.json()['access']['token']['id']
+        return resp.headers['x-subject-token']
 
     except Exception as exp:
         logger.error(exp)
