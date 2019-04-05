@@ -218,11 +218,11 @@ full_yaml_ldap = 'heat_template_version: 2015-1-2\n\ndescription: yaml file' \
                  '- project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n        ' \
                  'role: admin\n      - project: ' \
                  '{get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n        ' \
-                 'role: other\n      user: userId1\n    ' \
+                 'role: other\n      user_domain: default\n      user: userId1\n    ' \
                  'type: OS::Keystone::UserRoleAssignment\n\n      \n  ' \
                  'userId2:\n    properties:\n      roles:\n      ' \
                  '- project: {get_resource: 1e24981a-fa51-11e5-86aa-5e5517507c66}\n        ' \
-                 'role: storage\n      user: userId2\n    ' \
+                 'role: storage\n      user_domain: default\n      user: userId2\n    ' \
                  'type: OS::Keystone::UserRoleAssignment\n\n      \n  ' \
                  '1e24981a-fa51-11e5-86aa-5e5517507c66:\n    properties:\n      ' \
                  'description: this is a description\n      ' \
