@@ -158,3 +158,14 @@ create table if not exists groups_customer
          foreign key (`region_id`) references `cms_region` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
          index customer_id_idx (customer_id),
          index regio_id_idx (region_id));
+
+create table if not exists groups_domain
+   (
+         group_id varchar(64) not null,
+         domain_name varchar(64) not null,
+         region_id integer not null,
+         primary key (group_id, domain_name, region_id),
+         foreign key (`group_id`) references `groups` (`uuid`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`domain_name`) references `cms_domain` (`name`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`region_id`) references `cms_region` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         index regio_id_idx (region_id));

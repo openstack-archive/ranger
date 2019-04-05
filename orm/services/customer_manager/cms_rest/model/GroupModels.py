@@ -35,6 +35,19 @@ class Region(Model):
             self.error_message = error_message
 
 
+class Role(Model):
+    role = wsme.wsattr(wsme.types.text, mandatory=True)
+    project = wsme.wsattr(wsme.types.text, mandatory=False)
+    domain_name = wsme.wsattr(wsme.types.text, mandatory=False)
+    status = wsme.wsattr(wsme.types.text, mandatory=False)
+
+    def __init__(self, name="", status="", domain="", project="", role=""):
+        self.status = status
+        self.domain_name = domain
+        self.project = project
+        self.role = role
+
+
 class Group(Model):
     """group entity with all it's related data
     """
@@ -168,9 +181,6 @@ class GroupSummaryResponse(Model):
         self.groups = []
 
 
-""" Region Result Handler """
-
-
 class RegionResult(Model):
     id = wsme.wsattr(wsme.types.text, mandatory=True)
     added = wsme.wsattr(wsme.types.text, mandatory=False)
@@ -195,4 +205,23 @@ class RegionResultWrapper(Model):
         self.regions = regions_result
 
 
-""" ****************************************************************** """
+class RoleResult(Model):
+    role = wsme.wsattr(wsme.types.text, mandatory=True)
+    project = wsme.wsattr(wsme.types.text, mandatory=False)
+    domain_name = wsme.wsattr(wsme.types.text, mandatory=False)
+
+    def __init__(self, role, project="", domain=""):
+        Model.__init__(self)
+        self.role = role
+        self.project = project
+        self.domain_name = domain
+
+
+class RoleResultWrapper(Model):
+    transaction_id = wsme.wsattr(wsme.types.text, mandatory=True)
+    roles = wsme.wsattr([RoleResult], mandatory=True)
+
+    def __init__(self, transaction_id):
+        Model.__init__(self)
+        self.roles = []
+        self.transaction_id = transaction_id
