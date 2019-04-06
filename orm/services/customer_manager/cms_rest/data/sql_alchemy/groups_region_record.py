@@ -44,16 +44,16 @@ class GroupsRegionRecord:
 
         try:
             group_record = GroupRecord(self.session)
-            group_id = group_record.get_group_id_from_uuid(group_uuid)
             query = self.session.query(GroupRegion).filter(
-                GroupRegion.group_id == group_id)
+                GroupRegion.group_id == group_uuid,
+                GroupRegion.region_id != -1)
 
             for group_region in query.all():
                 group_regions.append(group_region)
             return group_regions
 
         except Exception as exception:
-            message = "Failed to get_region_names_for_group: %d" % (group_id)
+            message = "Failed to get_region_id_for_group: %d" % (group_uuid)
             LOG.log_exception(message, exception)
             raise
 
