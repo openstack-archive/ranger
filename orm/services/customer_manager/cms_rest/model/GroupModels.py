@@ -35,6 +35,27 @@ class Region(Model):
             self.error_message = error_message
 
 
+class RoleAssignment(Model):
+    roles = wsme.wsattr([str], mandatory=True)
+    project = wsme.wsattr(wsme.types.text, mandatory=False)
+    domain_name = wsme.wsattr(wsme.types.text, mandatory=False)
+
+    def __init__(self, name="", status="", domain="", project="", roles=[]):
+        self.domain_name = domain
+        self.project = project
+        self.roles = roles
+
+    def validate_model(self):
+        if self.project and self.domain_name:
+            raise ErrorStatus(400,
+                              "Found both project and domain_name tag used. "
+                              "Only one can be specified for role assignment.")
+
+        if len(set(self.roles)) != len(self.roles):
+            raise ErrorStatus(400,
+                              "Duplicate role in roles tag found ")
+
+
 class Group(Model):
     """group entity with all it's related data
     """
@@ -168,9 +189,6 @@ class GroupSummaryResponse(Model):
         self.groups = []
 
 
-""" Region Result Handler """
-
-
 class RegionResult(Model):
     id = wsme.wsattr(wsme.types.text, mandatory=True)
     added = wsme.wsattr(wsme.types.text, mandatory=False)
@@ -195,4 +213,31 @@ class RegionResultWrapper(Model):
         self.regions = regions_result
 
 
-""" ****************************************************************** """
+class RoleResult(Model):
+    roles = wsme.wsattr([str], mandatory=True)
+    project = wsme.wsattr(wsme.types.text, mandatory=False)
+    domain_name = wsme.wsattr(wsme.types.text, mandatory=False)
+
+    def __init__(self, roles, project="", domain=""):
+        Model.__init__(self)
+        self.roles = roles
+        if project:
+            self.project = project
+        if domain:
+            self.domain_name = domain
+
+
+class RoleResultWrapper(Model):
+    transaction_id = wsme.wsattr(wsme.types.text, mandatory=True)
+    roles = wsme.wsattr([RoleResult], mandatory=True)
+    links = wsme.wsattr({str: str}, mandatory=True)
+    created = wsme.wsattr(wsme.types.text, mandatory=True)
+
+    def __init__(self, transaction_id, roles, links, created):
+        roles_result = [RoleResult(role['roles'],
+                        project=role['project'],
+                        domain=role['domain']) for role in roles]
+        self.roles = roles_result
+        self.transaction_id = transaction_id
+        self.links = links
+        self.created = created

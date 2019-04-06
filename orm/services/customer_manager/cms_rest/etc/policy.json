@@ -43,5 +43,7 @@
     "groups:update": "rule:admin_or_creator",
     "groups:delete": "rule:admin",
     "groups:add_region": "rule:admin_or_support_or_creator",
-    "groups:delete_region": "rule:admin_or_creator"
+    "groups:delete_region": "rule:admin_or_creator",
+    "groups:assign_role": "rule:admin_or_support_or_creator",
+    "groups:unassign_role": "rule:admin_or_creator"
 }
