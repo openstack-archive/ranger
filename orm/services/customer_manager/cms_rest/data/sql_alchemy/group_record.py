@@ -41,7 +41,7 @@ class GroupRecord:
 
     def delete_by_primary_key(self, group_id):
         cmd = 'DELETE FROM groups WHERE id = %s'
-        result = self.session.connection().execute(cmd, (group_id))
+        result = self.session.connection().execute(cmd, (group_id,))
         return result
 
     def read_by_primary_key(self):
@@ -70,7 +70,7 @@ class GroupRecord:
 
     def get_group_id_from_uuid(self, group_uuid):
         cmd = "SELECT id from groups WHERE uuid = %s"
-        result = self.session.connection().scalar(cmd, (group_uuid))
+        result = self.session.connection().scalar(cmd, (group_uuid,))
 
         if result:
             return int(result)
@@ -80,7 +80,7 @@ class GroupRecord:
     def get_groups_status_by_uuids(self, uuid_str):
         cmd = "SELECT id, resource_id, region, status FROM " \
             "rds_resource_status_view WHERE resource_id IN (%s)"
-        results = self.session.connection().execute(cmd, (uuid_str))
+        results = self.session.connection().execute(cmd % uuid_str)
 
         group_region = {}
         if results:
