@@ -130,11 +130,9 @@ create table if not exists groups_role
    (
          role_id integer not null,
          group_id varchar(64) not null,
-         region_id integer not null,
-         primary key (role_id, region_id, group_id),
-	     foreign key (role_id) references cms_role(id),
+         primary key (role_id, group_id),
+	 foreign key (role_id) references cms_role(id),
          foreign key (`group_id`) references `groups` (`uuid`) ON DELETE CASCADE ON UPDATE NO ACTION,
-         index region_id (region_id),
          index group_id_idx (group_id));
 
 create table if not exists groups_user
@@ -147,14 +145,29 @@ create table if not exists groups_user
          index user_id (user_id),
          index group_id (group_id));
 
-create table if not exists groups_customer
+create table if not exists groups_customer_role
    (
          group_id varchar(64) not null,
          customer_id integer not null,
-         region_id integer not null,
-         primary key (group_id, customer_id, region_id),
+         region_id integer,
+         role_id integer not null,
+         primary key (group_id, customer_id, role_id),
          foreign key (`group_id`) references `groups` (`uuid`) ON DELETE CASCADE ON UPDATE NO ACTION,
          foreign key (`customer_id`) references `customer` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`role_id`) references `groups_role` (`role_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
          foreign key (`region_id`) references `cms_region` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
          index customer_id_idx (customer_id),
-         index regio_id_idx (region_id));
+         index role_id_idx (role_id));
+
+create table if not exists groups_domain_role
+   (
+         group_id varchar(64) not null,
+         domain_name varchar(64) not null,
+         region_id integer,
+         role_id integer not null,
+         primary key (group_id, domain_name, role_id),
+         foreign key (`group_id`) references `groups` (`uuid`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`domain_name`) references `cms_domain` (`name`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`role_id`) references `groups_role` (`role_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         foreign key (`region_id`) references `cms_region` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+         index role_id_idx (role_id));

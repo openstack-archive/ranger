@@ -12,7 +12,10 @@ from orm.services.customer_manager.cms_rest.logger import get_logger
 from orm.services.customer_manager.cms_rest.logic.error_base import (
     DuplicateEntryError, ErrorStatus)
 from orm.services.customer_manager.cms_rest.model.GroupModels import (
-    GroupResultWrapper, GroupSummary, GroupSummaryResponse)
+    GroupResultWrapper,
+    RoleResultWrapper,
+    GroupSummary,
+    GroupSummaryResponse)
 
 from orm.services.customer_manager.cms_rest.rds_proxy import RdsProxy
 LOG = get_logger(__name__)
@@ -51,14 +54,169 @@ class GroupLogic(object):
                         ' already associated with group')
                 raise ex
 
+    def assign_roles(self,
+                     group_id,
+                     role_assignments,
+                     transaction_id):
+
+        group_dict = {
+            "name": group_id,
+            "roles": [],
+            "regions": {}
+        }
+
+        datamanager = DataManager()
+        try:
+            [assignment.validate_model() for assignment in role_assignments]
+
+            region_record = datamanager.get_record('groups_region')
+            groups_regions = region_record.get_regions_for_group(group_id)
+            cms_role_record = datamanager.get_record('cms_role')
+
+            for role_assignment in role_assignments:
+                for role in role_assignment.roles:
+                    role_id = cms_role_record.get_cms_role_id_from_name(role)
+                    for group_region in groups_regions:
+                        region_id = group_region.region_id
+
+                        if region_id:
+                            group_dict.regions[region_id] = {"action": "create"}
+
+                        # Need to check either domain or project but not both
+                        if role_assignment.domain_name:
+                            datamanager.add_groups_role_on_domain(
+                                group_id,
+                                role_id,
+                                region_id,
+                                role_assignment.domain_name)
+
+                            group_dict.roles.append({
+                                "role": role_id,
+                                "domain": role_assignment.domain_name
+                            })
+
+                        elif role_assignment.project:
+                            project_id = datamanager.get_customer_id_by_uuid(
+                                role_assignment.project)
+                            datamanager.add_groups_role_on_project(
+                                group_id,
+                                role_id,
+                                region_id,
+                                project_id)
+
+                            group_dict.roles.append({
+                                "role": role_id,
+                                "project": project_id
+                            })
+
+            if len(group_dict.regions.keys()) > 0:
+                datamanager.flush()
+                RdsProxy.send_group_dict(group_dict, transaction_id, "POST")
+
+            roles = [{'roles': role_assignment.roles,
+                      'domain': role_assignment.domain_name,
+                      'project': role_assignment.project}
+                     for role_assignment in role_assignments]
+            role_result_wrapper = build_response(group_id,
+                                                 transaction_id,
+                                                 'role_assignment',
+                                                 roles=roles)
+            datamanager.commit()
+            return role_result_wrapper
+        except Exception as exp:
+            LOG.log_exception("GroupLogic - Failed to Assign Role(s)", exp)
+            datamanager.rollback()
+            raise
+
+    def unassign_roles(self,
+                       group_id,
+                       role_assignments,
+                       transaction_id,
+                       on_success_by_rds):
+
+        datamanager = DataManager()
+        try:
+            [assignment.validate_model() for assignment in role_assignments]
+
+            region_record = datamanager.get_record('groups_region')
+            groups_regions = region_record.get_regions_for_group(group_id)
+            groups_role = datamanager.get_record('groups_role')
+            sql_group = datamanager.get_group_by_uuid_or_name(group_id)
+
+            if on_success_by_rds and sql_group is None:
+                return
+            if sql_group is None:
+                raise ErrorStatus(
+                    404,
+                    "group with id {} does not exist".format(group_id))
+
+            cms_role_record = datamanager.get_record('cms_role')
+
+            for role_assignment in role_assignments:
+                for role in role_assignment.roles:
+                    role_id = cms_role_record.get_cms_role_id_from_name(role)
+                    for group_region in groups_regions:
+                        region_id = group_region.region_id
+
+                        if role_assignment.domain_name:
+                            role_record = datamanager.get_record(
+                                'groups_domain_role')
+                            role_record.remove_domain_role_from_group(
+                                group_id,
+                                region_id,
+                                role_assignment.domain_name,
+                                role_id)
+                            groups_role.remove_role_from_group(
+                                group_id,
+                                role_id)
+                        elif role_assignment.project:
+                            project_id = datamanager.get_customer_id_by_uuid(
+                                role_assignment.project)
+                            role_record = datamanager.get_record(
+                                'groups_customer_role')
+                            role_record.remove_customer_role_from_group(
+                                group_id,
+                                region_id,
+                                project_id,
+                                role_id)
+                            groups_role.remove_role_from_group(
+                                group_id,
+                                role_id)
+
+            datamanager.flush()
+
+            roles = [{'roles': role_assignment.roles,
+                      'domain': role_assignment.domain_name,
+                      'project': role_assignment.project}
+                     for role_assignment in role_assignments]
+
+            role_result_wrapper = build_response(group_id,
+                                                 transaction_id,
+                                                 'role_assignment',
+                                                 roles=roles)
+
+            # Rds not working yet, over-ride here so as to commit
+            on_success_by_rds = True
+            if on_success_by_rds:
+                datamanager.commit()
+                # LOG.debug("Roles {0} in group {1} deleted".format(region_id,
+                #                                                   group_id))
+        except Exception as exp:
+            datamanager.rollback()
+            raise
+
+        finally:
+            datamanager.close()
+        return role_result_wrapper
+
     def create_group(self, group, uuid, transaction_id):
         datamanager = DataManager()
         try:
             group.handle_region_group()
             sql_group = self.build_full_group(group, uuid, datamanager)
-            group_result_wrapper = build_response(uuid, transaction_id,
-                                                  'create')
-
+            group_result_wrapper = build_response(uuid,
+                                                  transaction_id,
+                                                  'create_group')
             if sql_group.group_regions and len(sql_group.group_regions) > 1:
                 group_dict = sql_group.get_proxy_dict()
                 for region in group_dict["regions"]:
@@ -100,8 +258,9 @@ class GroupLogic(object):
                                               datamanager)
             # new_group_dict = sql_group.get_proxy_dict()
 
-            group_result_wrapper = build_response(group_uuid, transaction_id,
-                                                  'update')
+            group_result_wrapper = build_response(group_uuid,
+                                                  transaction_id,
+                                                  'update_group')
             datamanager.flush()
             datamanager.commit()
 
@@ -116,7 +275,7 @@ class GroupLogic(object):
                       on_success_by_rds, force_delete):
         datamanager = DataManager()
         try:
-            group_region = datamanager.get_record('group_region')
+            group_region = datamanager.get_record('groups_region')
             sql_group = datamanager.get_group_by_uuid_or_name(group_id)
             if on_success_by_rds and sql_group is None:
                 return
@@ -197,10 +356,11 @@ class GroupLogic(object):
             limit=limit)
         response = GroupSummaryResponse()
         if sql_groups:
-            uuids = ','.join(str(sql_group.uuid)
-                             for sql_group in sql_groups
-                             if sql_group and sql_group.uuid)
-            resource_status = group_record.get_groups_status_by_uuids(uuids)
+            uuids = [sql_group.uuid for sql_group in sql_groups
+                     if sql_group and sql_group.uuid]
+
+            sql_in = ', '.join(list(map(lambda arg: "'%s'" % arg, uuids)))
+            resource_status = group_record.get_groups_status_by_uuids(sql_in)
 
             for sql_group in sql_groups:
                 groups = GroupSummary.from_db_model(sql_group)
@@ -302,24 +462,38 @@ class GroupLogic(object):
             raise
 
 
-def build_response(group_uuid, transaction_id, context):
+def build_response(group_uuid, transaction_id, context, roles=[]):
     """this function generate th group action response JSON
     :param group_uuid:
     :param transaction_id:
-    :param context: create or update
+    :param context:
+    :param roles:
     :return:
     """
+    timestamp = utils.get_time_human()
     # The link should point to the group itself (/v1/orm/groups/{id})
     link_elements = request.url.split('/')
     base_link = '/'.join(link_elements)
-    if context == 'create':
-        base_link = base_link + '/' + group_uuid
+    if context == 'create_group' or context == 'update_group':
+        if context == 'create_group':
+            base_link = base_link + group_uuid
 
-    timestamp = utils.get_time_human()
-    group_result_wrapper = GroupResultWrapper(
-        transaction_id=transaction_id,
-        id=group_uuid,
-        updated=None,
-        created=timestamp,
-        links={'self': base_link})
-    return group_result_wrapper
+        group_result_wrapper = GroupResultWrapper(
+            transaction_id=transaction_id,
+            id=group_uuid,
+            updated=None,
+            created=timestamp,
+            links={'self': base_link})
+
+        return group_result_wrapper
+
+    elif context == 'role_assignment':
+        role_result_wrapper = RoleResultWrapper(
+            transaction_id=transaction_id,
+            roles=roles,
+            links={'self': base_link},
+            created=timestamp)
+
+        return role_result_wrapper
+    else:
+        return None
