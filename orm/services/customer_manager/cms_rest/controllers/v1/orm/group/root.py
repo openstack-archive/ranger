@@ -8,6 +8,8 @@ from orm.services.customer_manager.cms_rest.controllers.v1.orm.customer.users \
     import DefaultUserController
 from orm.services.customer_manager.cms_rest.controllers.v1.orm.group.regions \
     import RegionController
+from orm.services.customer_manager.cms_rest.controllers.v1.orm.group.roles \
+    import RoleController
 from orm.services.customer_manager.cms_rest.logger import get_logger
 from orm.services.customer_manager.cms_rest.logic.error_base import ErrorStatus
 from orm.services.customer_manager.cms_rest.logic.group_logic import GroupLogic
@@ -19,6 +21,7 @@ LOG = get_logger(__name__)
 
 
 class GroupController(rest.RestController):
+    roles = RoleController()
     regions = RegionController()
     users = DefaultUserController()
 

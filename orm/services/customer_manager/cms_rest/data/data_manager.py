@@ -1,5 +1,7 @@
 import logging
 
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
+    cms_role_record import CmsRoleRecord
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.customer_record \
     import CustomerRecord
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
@@ -7,11 +9,17 @@ from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
     group_record import GroupRecord
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
+    groups_customer_role_record import GroupsCustomerRoleRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
+    groups_domain_role_record import GroupsDomainRoleRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
     groups_region_record import GroupsRegionRecord
+from orm.services.customer_manager.cms_rest.data.sql_alchemy.\
+    groups_role_record import GroupsRoleRecord
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.models \
-    import (CmsRole, CmsUser, Customer,
-            Groups, GroupRegion,
-            CustomerRegion, Quota,
+    import (CmsRole, CmsUser, Customer, CustomerRegion,
+            Groups, GroupsCustomerRole, GroupsDomainRole, GroupRegion,
+            GroupsRole, Quota,
             QuotaFieldDetail, Region,
             UserRole)
 from orm.services.customer_manager.cms_rest.data.sql_alchemy.user_role_record \
@@ -135,27 +143,53 @@ class DataManager(object):
                 self.customer_record = CustomerRecord(self.session)
             return self.customer_record
 
-        if record_name == "Group" or record_name == "group":
+        elif record_name == "Group" or record_name == "group":
             if not hasattr(self, "group_record"):
                 self.group_record = GroupRecord(self.session)
             return self.group_record
 
-        if record_name == "CustomerRegion" or record_name == "customer_region":
+        elif (record_name == "CustomerRegion" or
+              record_name == "customer_region"):
             if not hasattr(self, "customer_region_record"):
                 self.customer_region_record = CustomerRegionRecord(
                     self.session)
             return self.customer_region_record
 
-        if record_name == "GroupRegion" or record_name == "group_region":
+        elif record_name == "GroupsRegion" or record_name == "groups_region":
             if not hasattr(self, "groups_region_record"):
                 self.groups_region_record = GroupsRegionRecord(
                     self.session)
             return self.groups_region_record
 
-        if record_name == "UserRole" or record_name == "user_role":
+        elif record_name == "UserRole" or record_name == "user_role":
             if not hasattr(self, "user_role_record"):
                 self.user_role_record = UserRoleRecord(self.session)
             return self.user_role_record
+
+        elif record_name == "GroupsRole" or record_name == "groups_role":
+            if not hasattr(self, "groups_role_record"):
+                self.groups_role_record = GroupsRoleRecord(self.session)
+            return self.groups_role_record
+
+        elif (record_name == "GroupsCustomerRole" or
+              record_name == "groups_customer_role"):
+            if not hasattr(self, "groups_customer_role_record"):
+                self.groups_customer_role_record = GroupsCustomerRoleRecord(
+                    self.session)
+            return self.groups_customer_role_record
+
+        elif (record_name == "GroupsDomainRole" or
+              record_name == "groups_domain_role"):
+            if not hasattr(self, "groups_domain_role_record"):
+                self.groups_domain_role_record = GroupsDomainRoleRecord(
+                    self.session)
+            return self.groups_domain_role_record
+
+        elif record_name == "CmsRole" or record_name == "cms_role":
+            if not hasattr(self, "cms_role_record"):
+                self.cms_role_record = CmsRoleRecord(self.session)
+            return self.cms_role_record
+
         return None
 
     def add_user(self, user):
@@ -227,7 +261,7 @@ class DataManager(object):
         sql_group = Groups(
             uuid=uuid,
             name=group.name,
-            domain_name='default',
+            domain_name=group.domain_name,
             enabled=group.enabled,
             description=group.description
         )
@@ -317,6 +351,36 @@ class DataManager(object):
             Customer.uuid == uuid).scalar()
 
         return customer_id
+
+    def add_groups_role(self, role_id, group_id):
+        groups_role = GroupsRole(role_id=role_id,
+                                 group_id=group_id)
+        self.session.add(groups_role)
+        self.flush()
+
+    def add_groups_role_on_domain(self,
+                                  group_id, role_id, region_id, domain):
+        self.add_groups_role(role_id, group_id)
+
+        groups_domain_role = GroupsDomainRole(role_id=role_id,
+                                              group_id=group_id,
+                                              domain_name=domain,
+                                              region_id=region_id)
+        self.session.add(groups_domain_role)
+
+        self.flush()
+
+    def add_groups_role_on_project(self,
+                                   group_id, role_id, region_id, customer_id):
+        self.add_groups_role(role_id, group_id)
+
+        groups_customer_role = GroupsCustomerRole(role_id=role_id,
+                                                  group_id=group_id,
+                                                  customer_id=customer_id,
+                                                  region_id=region_id)
+        self.session.add(groups_customer_role)
+
+        self.flush()
 
     @classmethod
     def get_dict_from_quota(cls, quota, quota_type):
