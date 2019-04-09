@@ -1,0 +1,9 @@
+Code-Review+2: Chi Lo <cl566n@att.com>
+Code-Review+2: STEW TY <st3wty@att.com>
+Workflow+1: Chi Lo <cl566n@att.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 09 Apr 2019 15:12:35 +0000
+Reviewed-on: https://review.openstack.org/649769
+Project: openstack/ranger
+Branch: refs/heads/keystone_group
