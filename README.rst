@@ -21,7 +21,7 @@ is required for connecting with Openstack.
 Devstack Installation
 ---------------------
 1. Add the following line in `local.conf` to include ranger repository in your devstack.
-	`enable_plugin ranger git://git.openstack.org/openstack/ranger`
+	`enable_plugin ranger https://git.openstack.org/openstack/ranger`
 
 2. Make sure `MYSQL_PASSWORD` is included for creating and accessing the database.
 
