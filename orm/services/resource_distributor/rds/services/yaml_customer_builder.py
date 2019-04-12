@@ -129,6 +129,7 @@ def yamlbuilder(alldata, region):
             resources['resources'][user['id']] = \
                 {'type': 'OS::Keystone::UserRoleAssignment\n',
                  'properties': {'user': user['id'],
+                                'user_domain': domain,
                                 'roles': user_roles}}
 
         # create the output for users
