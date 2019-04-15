@@ -124,7 +124,7 @@ yaml_configs = {
 block_by_status = "Submitted"
 
 # this tells which values to allow resource submit the region
-allow_region_statuses = ['functional']
+allow_region_statuses = ['building', 'functional', 'maintenance']
 
 region_resource_id_status = {
     # interval_time_validation in minutes

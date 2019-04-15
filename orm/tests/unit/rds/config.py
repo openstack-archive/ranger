@@ -100,7 +100,7 @@ yaml_flavor_version = '2014-10-16'
 block_by_status = "Submitted"
 
 # this tells which values to allow resource submit the region
-allow_region_statuses = ['functional']
+allow_region_statuses = ['building', 'functional', 'maintenance']
 
 keystone_role_list = {
     'member': '68cddd1a64eb4eae9c5d82581bc55426',
