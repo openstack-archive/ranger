@@ -17,7 +17,7 @@ def create_final_yaml(title, description, resources, outputs):
                             yaml.dump(resources, default_flow_style=False)).strip()
     outputs_yaml = yaml.dump(outputs).strip()
 
-    return '\n\n'.join([
+    return '\n'.join([
         title_yaml,
         description_yaml,
         resources_yaml,

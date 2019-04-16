@@ -48,6 +48,9 @@ class Groups(Base, CMSBaseModel):
     description = Column(String(255), nullable=True)
     enabled = Column(SmallInteger, nullable=False)
     group_regions = relationship("GroupRegion", cascade="all, delete, delete-orphan")
+    groups_roles = relationship("GroupsRole", cascade="all, delete, delete-orphan")
+    groups_customer_roles = relationship("GroupsCustomerRole", cascade="all, delete, delete-orphan")
+    groups_domain_roles = relationship("GroupsDomainRole", cascade="all, delete, delete-orphan")
 
     def __json__(self):
         return dict(
@@ -73,6 +76,14 @@ class Groups(Base, CMSBaseModel):
         }
         group_regions = self.get_group_regions()
         proxy_dict["regions"] = [group_region.get_proxy_dict() for group_region in group_regions]
+
+        proxy_dict["groups_roles"] = [group_role.get_proxy_dict() for group_role in self.groups_roles]
+
+        proxy_dict["groups_customer_roles"] = [group_customer_role.get_proxy_dict()
+            for group_customer_role in self.groups_customer_roles]
+
+        proxy_dict["groups_domain_roles"] = [group_domain_role.get_proxy_dict()
+            for group_domain_role in self.groups_domain_roles]
 
         return proxy_dict
 
@@ -120,12 +131,12 @@ class GroupRegion(Base, CMSBaseModel):
         )
 
     def get_proxy_dict(self):
-        proxy_dict = {
+        return {
             "name": self.region.name,
+            "group_id": self.group_id,
+            "region_id": self.region_id,
             "action": "modify"
         }
-
-        return proxy_dict
 
     def to_wsme(self):
         name = self.region.name
@@ -134,9 +145,135 @@ class GroupRegion(Base, CMSBaseModel):
                                         type=type)
         return region
 
+
 '''
-' CmsUser is a DataObject and contains all the fields defined in CmsUser table record.
-' defined as SqlAlchemy model map to a table
+' GroupRole is a DataObject and contains all the fields defined in GroupRole
+' table record, defined as SqlAlchemy model map to a table
+'''
+
+
+class GroupsRole(Base, CMSBaseModel):
+    __tablename__ = 'groups_role'
+
+    role_id = Column(Integer, ForeignKey('cms_role.id'),
+                     primary_key=True, nullable=False)
+
+    group_id = Column(String(64), ForeignKey('groups.uuid'),
+                      primary_key=True, nullable=False, index=True)
+
+    role = relationship("CmsRole", viewonly=True)
+
+    def __json__(self):
+        return dict(
+            role_id=self.role_id,
+            group_id=self.group_id
+        )
+
+    def get_proxy_dict(self):
+        return {
+            "role_name": self.role.name,
+            "role_id": self.role_id,
+            "group_id": self.group_id
+        }
+
+    def to_wsme(self):
+        role = GroupWsmeModels.Role(name=self.role.name)
+        return role
+
+
+'''
+' GroupsCustomerRole is a DataObject and contains all the fields defined in
+' GroupsCustomerRole table record, defined as SqlAlchemy model map to a table
+'''
+
+
+class GroupsCustomerRole(Base, CMSBaseModel):
+    __tablename__ = 'groups_customer_role'
+
+    group_id = Column(String(64), ForeignKey('groups.uuid'),
+                      primary_key=True, nullable=False)
+
+    region_id = Column(Integer, ForeignKey('cms_region.id'))
+
+    customer_id = Column(Integer, ForeignKey('customer.id'),
+                         primary_key=True, nullable=False, index=True)
+
+    role_id = Column(Integer, ForeignKey('groups_role.role_id'),
+                     primary_key=True, nullable=False, index=True)
+
+    groups = relationship("Groups", viewonly=True)
+    customer = relationship("Customer", viewonly=True)
+    groups_role = relationship("GroupsRole", viewonly=True)
+
+    def __json__(self):
+        return dict(
+            group_id=self.group_id,
+            region_id=self.region_id,
+            customer_id=self.customer_id,
+            role_id=self.role_id
+        )
+
+    def get_proxy_dict(self):
+        return {
+            "group_id": self.group_id,
+            "region_id": self.region_id,
+            "customer_id": self.customer_id,
+            "customer_uuid": self.customer.uuid,
+            "role_id": self.role_id,
+            "role_name": self.groups_role.role.name
+        }
+
+    def to_wsme(self):
+        customer = GroupWsmeModels.Customer(customer_uuid=self.customer_id,
+                                            group=self.group.name,
+                                            role_id=self.role_id)
+        return customer
+
+
+'''
+' GroupsDomainRole is a DataObject and contains all the fields defined in
+' GroupsDomainRole table record, defined as SqlAlchemy model map to a table
+'''
+
+
+class GroupsDomainRole(Base, CMSBaseModel):
+    __tablename__ = 'groups_domain_role'
+
+    group_id = Column(String(64), ForeignKey('groups.uuid'),
+                      primary_key=True, nullable=False)
+
+    region_id = Column(Integer, ForeignKey('cms_region.id'))
+
+    domain_name = Column(String(64), ForeignKey('cms_domain.name'),
+                         primary_key=True, nullable=False)
+
+    role_id = Column(Integer, ForeignKey('groups_role.role_id'),
+                     primary_key=True, nullable=False, index=True)
+
+    groups = relationship("Groups", viewonly=True)
+    groups_role = relationship("GroupsRole", viewonly=True)
+
+    def __json__(self):
+        return dict(
+            group_id=self.group_id,
+            region_id=self.region_id,
+            domain_name=self.domain_name,
+            role_id=self.role_id
+        )
+
+    def get_proxy_dict(self):
+        return {
+            "group_id": self.group_id,
+            "region_id": self.region_id,
+            "domain_name": self.domain_name,
+            "role_id": self.role_id,
+            "role_name": self.groups_role.role.name
+        }
+
+
+'''
+' CmsRole is a DataObject and contains all the fields defined in CmsRole
+' table record, defined as SqlAlchemy model map to a table
 '''
 
 
