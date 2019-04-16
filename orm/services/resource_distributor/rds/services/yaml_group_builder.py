@@ -25,7 +25,6 @@ def yamlbuilder(alldata, region):
     title = {'heat_template_version': yaml_version}
     description = {'description': 'yaml file for region - %s' % region['name']}
     jsondata = alldata
-    status = {"0": False, "1": True}[str(jsondata['enabled'])]
 
     if "roles" in alldata:
         outputs['outputs'], resources['resources'] = build_group_roles_yaml(jsondata)

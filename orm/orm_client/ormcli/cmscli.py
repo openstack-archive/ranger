@@ -271,7 +271,7 @@ def add_to_parser(service_sub):
                                       type=str, help='<key:value>')
 
     # group
-    parser_create_group = subparsers.add_parser('creste_group',
+    parser_create_group = subparsers.add_parser('create_group',
                                                 help='[<"X-RANGER-Client" '
                                                      'header>] <data file '
                                                      'with new group '
@@ -287,6 +287,25 @@ def add_to_parser(service_sub):
                                                 'header>] <group id>')
     parser_delete_group.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
     parser_delete_group.add_argument('groupid', type=str, help='<group id>')
+
+    # get group
+    h1, h2 = '[<"X-RANGER-Client" header>]', '<group id or group name>'
+    parser_get_group = subparsers.add_parser('get_group',
+                                             help='%s %s' % (h1, h2))
+    parser_get_group.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_get_group.add_argument('groupid', type=str, help=h2)
+
+    # list groups
+    h1 = '[<"X-RANGER-Client" header>]'
+    h2 = '[--region <name>] [--starts_with <name>] [--contains <name>]'
+    parser_list_groups = subparsers.add_parser('list_groups',
+                                               help='%s %s' % (h1, h2))
+    parser_list_groups.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_list_groups.add_argument('--region', type=str, help='region name')
+    parser_list_groups.add_argument('--starts_with', type=str,
+                                    help='group name')
+    parser_list_groups.add_argument('--contains', type=str,
+                                    help='* contains in group name')
 
     #  groups region
     parser_add_groups_region = subparsers.add_parser(
@@ -318,24 +337,32 @@ def add_to_parser(service_sub):
                                              help='force delete groups region',
                                              action="store_true")
 
-    # get group
-    h1, h2 = '[<"X-RANGER-Client" header>]', '<group id or group name>'
-    parser_get_group = subparsers.add_parser('get_group',
-                                             help='%s %s' % (h1, h2))
-    parser_get_group.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
-    parser_get_group.add_argument('groupid', type=str, help=h2)
+    #  groups roles
+    parser_assign_group_roles = subparsers.add_parser(
+        'assign_group_roles',
+        help='[<"X-RANGER-Client" '
+             'header>] <group id> '
+             '<data file with group role(s) assignment JSON>')
+    parser_assign_group_roles.add_argument(
+        'client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_assign_group_roles.add_argument(
+        'groupid', type=str, help='<groupid id>')
+    parser_assign_group_roles.add_argument(
+        'datafile', type=argparse.FileType('r'),
+        help='<data file with group role(s) assignment JSON>')
 
-    # list groups
-    h1 = '[<"X-RANGER-Client" header>]'
-    h2 = '[--region <name>] [--starts_with <name>] [--contains <name>]'
-    parser_list_groups = subparsers.add_parser('list_groups',
-                                               help='%s %s' % (h1, h2))
-    parser_list_groups.add_argument('client', **cli_common.ORM_CLIENT_KWARGS)
-    parser_list_groups.add_argument('--region', type=str, help='region name')
-    parser_list_groups.add_argument('--starts_with', type=str,
-                                    help='group name')
-    parser_list_groups.add_argument('--contains', type=str,
-                                    help='* contains in group name')
+    parser_unassign_group_roles = subparsers.add_parser(
+        'unassign_group_roles',
+        help='[<"X-RANGER-Client" '
+             'header>] <group id> '
+             '<data file with group role(s) assignment JSON>')
+    parser_unassign_group_roles.add_argument(
+        'client', **cli_common.ORM_CLIENT_KWARGS)
+    parser_unassign_group_roles.add_argument(
+        'groupid', type=str, help='<groupid id>')
+    parser_unassign_group_roles.add_argument(
+        'datafile', type=argparse.FileType('r'),
+        help='<data file with group role(s) assignment JSON>')
 
     return parser
 
@@ -423,6 +450,10 @@ def cmd_details(args):
         if args.contains:
             param += '%scontains=%s' % (preparm(param), args.contains)
         return requests.get, 'groups/%s' % param
+    elif args.subcmd == 'assign_group_roles':
+        return requests.post, 'groups/%s/roles' % args.groupid
+    elif args.subcmd == 'unassign_group_roles':
+        return requests.delete, 'groups/%s/roles' % args.groupid
 
 
 def get_token(timeout, args, host):
