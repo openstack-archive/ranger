@@ -17,9 +17,11 @@ def create_full_yaml(title, resources, description, outputs):
     return full_yaml
 
 
-def _properties(alldata, region):
+def _properties(alldata, region, create_req):
     public = True if alldata['visibility'] == "public" else False
     protected = {0: False, 1: True}[alldata['protected']]
+    reactivate = {0: False, 1: True}[alldata['enabled']]
+    deactivate = {1: False, 0: True}[alldata['enabled']]
     tenants = [tenant['customer_id'] for tenant in alldata['customers']]
     properties = dict(
         name=alldata['name'],
@@ -29,32 +31,40 @@ def _properties(alldata, region):
         min_disk=alldata['min_disk'],
         id=str(uuid.UUID(alldata['id'])),
         protected=protected,
+        reactivate=reactivate,
+        deactivate=deactivate,
         copy_from=alldata["url"],
         owner=alldata["owner"],
         is_public=public,
         tenants=str(tenants)
     )
+    # no need to pass reactivate/deactivate fields when creating image
+    if create_req:
+        for item in ['reactivate', 'deactivate']:
+            del properties[item]
+
     if alldata['properties']:
         properties['extra_properties'] = alldata['properties']
 
     return properties
 
 
-def _glanceimage(alldata, region):
+def _glanceimage(alldata, region, create_req):
     return dict(
         type="OS::Glance::Image2",
-        properties=_properties(alldata, region)
+        properties=_properties(alldata, region, create_req)
     )
 
 
-def yamlbuilder(alldata, region):
+def yamlbuilder(alldata, region, create_req=False):
     resources = {}
     outputs = {}
     image_type = "glance_image"
     yaml_version = conf.yaml_configs.image_yaml.yaml_version
     title = {'heat_template_version': yaml_version}
     description = {'description': 'yaml file for region - %s' % region['name']}
-    resources['resources'] = {"glance_image": _glanceimage(alldata, region)}
+    resources['resources'] = {"glance_image": _glanceimage(alldata, region,
+                                                           create_req)}
     outputs['outputs'] = {
         '%s_id' % image_type: {"value": {"get_resource": "%s" % image_type}}}
     full_yaml = create_full_yaml(title, resources, description, outputs)

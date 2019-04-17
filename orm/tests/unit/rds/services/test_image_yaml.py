@@ -75,6 +75,7 @@ class CreateImage(unittest.TestCase):
     @patch.object(ImageBuild, 'conf')
     def test_create_image(self, mock_conf):
         self.maxDiff = None
+        create_image = True
         mock_conf.yaml_configs.image_yaml.yaml_version = '2015-1-1'
-        response = ImageBuild.yamlbuilder(json_input, region)
+        response = ImageBuild.yamlbuilder(json_input, region, create_image)
         self.assertEqual(yaml.safe_load(response), yaml_output)

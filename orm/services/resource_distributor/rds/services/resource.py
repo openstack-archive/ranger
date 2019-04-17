@@ -89,6 +89,7 @@ def _create_data_to_sot(input_data):
     """
     jsondata = input_data.model
     targetslist = []
+    create_req = False
     targets = input_data.targets
     for target in targets:
         # save start status to submitted for each region
@@ -102,7 +103,10 @@ def _create_data_to_sot(input_data):
         elif input_data.resource_type == "flavor":
             yamldata = yaml_flavor_bulder.yamlbuilder(jsondata, target)
         elif input_data.resource_type == "image":
-            yamldata = yaml_image_builder.yamlbuilder(jsondata, target)
+            if target['action'] == "create":
+                create_req = True
+            yamldata = yaml_image_builder.yamlbuilder(jsondata, target,
+                                                      create_req)
         targetslist.append({"region_id": target['name'],
                             "resource_type": input_data.resource_type,
                             "resource_name": input_data.resource_id,
