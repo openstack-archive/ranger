@@ -34,6 +34,10 @@ def _properties(alldata, region):
         is_public=public,
         tenants=str(tenants)
     )
+
+    if region['action'] <> 'create':
+        properties['deactivate'] = {1: False, 0: True}[alldata['enabled']]
+
     if alldata['properties']:
         properties['extra_properties'] = alldata['properties']
 
