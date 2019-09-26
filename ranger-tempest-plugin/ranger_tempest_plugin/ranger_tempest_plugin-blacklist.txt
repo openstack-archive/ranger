@@ -1,6 +1,0 @@
-###############################################################################################
-# Blacklist ORM Tests since the tests are having issues.
-# IST is looking into the same
-# This will be removed once IST resolves the same [no ETA has been provided]
-###############################################################################################
-(?:aic_orm_tempest_plugin.*)

@@ -1,8 +1,0 @@
-[run]
-branch = True
-source = orm
-omit = orm/tests/*
-cover_pylib = True
-
-[report]
-ignore_errors = True
